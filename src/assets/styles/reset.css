@@ -1,0 +1,101 @@
+@import "./motion.css";
+html {
+  --text-color: rgba(0,0,0,.85);
+  --text-color-1: rgba(0,0,0,.45);
+  --text-color-2: rgba(0,0,0,.2);
+  --bg-color: #fff;
+  --hover-color:rgba(0,0,0,.025);
+  --bg-color-container: #f0f2f5;
+  --c-shadow: 2px 0 8px 0 rgba(29,35,41,.05);
+}
+
+html.dark{
+  --text-color: rgba(229, 224, 216, 0.85);
+  --text-color-1: rgba(229, 224, 216, 0.45);
+  --text-color-2: rgba(229, 224, 216, 0.45);
+  --bg-color: rgb(36, 37, 37);
+  --hover-color:rgb(42, 44, 55);
+  --bg-color-container: rgb(42, 44, 44);
+  --c-shadow: rgba(13, 13, 13, 0.65) 0 2px 8px 0;
+}
+
+body{
+  color: var(--text-color);
+  background-color: var(--bg-color);
+  text-rendering: optimizeLegibility;
+  overflow: hidden;
+  font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Ubuntu, Helvetica Neue, Helvetica, Arial, PingFang SC, Hiragino Sans GB, Microsoft YaHei UI, Microsoft YaHei, Source Han Sans CN, noto sans, sans-serif, Apple Color Emoji, Segoe UI Emoji, Segoe UI Symbol, Noto Color Emoji;
+
+  color: #333;
+  font-family: Helvetica Neue For Number, -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, PingFang SC, Hiragino Sans GB, Microsoft YaHei, Helvetica Neue, Helvetica, Arial, sans-serif;
+  font-size: 12px;
+  line-height: 1.5;
+
+}
+
+#app, body, html{
+  height: 100%;
+}
+
+#app{
+  overflow-x: hidden;
+}
+*, :after, :before{
+  box-sizing: border-box;
+}
+:where(.css-dev-only-do-not-override-iiz7vl).ant-table-wrapper .ant-table-thead >tr>th, :where(.css-dev-only-do-not-override-iiz7vl).ant-table-wrapper .ant-table-thead >tr>td {
+
+  border-bottom: 0px solid #f0f0f0 !important;
+
+}
+:where(.css-dev-only-do-not-override-iiz7vl).ant-table-wrapper .ant-table-thead >tr>th:not(:last-child):not(.ant-table-selection-column):not(.ant-table-row-expand-icon-cell):not([colspan])::before, :where(.css-dev-only-do-not-override-iiz7vl).ant-table-wrapper .ant-table-thead >tr>td:not(:last-child):not(.ant-table-selection-column):not(.ant-table-row-expand-icon-cell):not([colspan])::before {
+
+  width: 0px !important;
+}
+
+.no-padding .ant-modal .ant-modal-content{
+  padding: 0px !important;
+}
+.no-padding .ant-modal .ant-modal-header{
+  padding: 20px 24px 0 24px;
+}
+.no-padding .ant-modal .ant-modal-footer{
+  padding: 0 24px 20px 20px;
+}
+
+.card-container > .ant-tabs-card .ant-tabs-content > .ant-tabs-tabpane {
+  background: #fff;
+  border-radius:4px;
+  padding: 15px 0;
+}
+.card-container > .ant-tabs-card  .ant-tabs-nav{
+  margin: 0 !important;
+
+}
+
+.card-container > .ant-tabs-card  .ant-tabs-nav .ant-tabs-tab{
+  padding: 10px 16px;
+  background: transparent;
+  border: none;
+}
+.card-container > .ant-tabs-card  .ant-tabs-nav::before{
+  border: none;
+}
+.card-container > .ant-tabs-card  .ant-tabs-nav .ant-tabs-tab .ant-tabs-tab-btn{
+  color: #64666b;
+  display: block;
+  font-size: 14px;
+  line-height: 22px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.card-container > .ant-tabs-card  .ant-tabs-nav .ant-tabs-tab.ant-tabs-tab-active .ant-tabs-tab-btn{
+  color: #333;
+}
+.card-container > .ant-tabs-card  .ant-tabs-nav .ant-tabs-tab.ant-tabs-tab-active{
+  color: #333;
+  background: white;
+  border: none;
+}
+
