@@ -10,23 +10,7 @@ export default [
       title: '登录',
     },
   },
-  {
-    path:'/page/designer',
-    component:()=>import('~/pages/designer/index.vue'),
-    meta: {
-      title: '设计器',
-    },
-  },
-  {
-    path: '/media/union/mediationCodeCreate',
-    name: 'MediationCodeCreate',
-    component: () => import('~/pages/mediation/unitCode/mediation-code-create.vue'),
-    meta: {
-      hideInMenu: true,
-      hideInBreadcrumb:true
-    },
-    children: [],
-  },
+
   {
     path: '/401',
     name: 'Error401',

@@ -17,9 +17,6 @@ export const basicRouteMap = {
   Iframe: () => import('~/pages/common/iframe.vue'),
   // 一般用于存在子集的页面
   RouteView: () => import('~/pages/common/route-view.vue'),
-  ApplicationLayout:()=>import('~/pages/application/app_layout.vue'),
-  MemberLayout:()=>import('~/pages/member/member_layout.vue'),
-  MediationCodeLayout:()=>import("~/pages/mediation/unitCode/code-edit.vue"),
   // 空页面
   ComponentError: () => import('~/pages/exception/component-error.vue'),
 }

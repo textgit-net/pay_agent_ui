@@ -63,22 +63,13 @@ onMounted(()=>{
   >
     <template #headerActions>
 
-<!--      <a-space>-->
-<!--        <a-typography-text style="color: white">更换企业</a-typography-text>-->
-
-<!--        <a-select style="width: 180px" size="middle" v-model:value="userStore.businessId">-->
-<!--          <a-select-option  v-for="(item) in businessSelectOption" :value="item.value">-->
-<!--            {{item.title}}-->
-<!--          </a-select-option>-->
-<!--        </a-select>-->
-<!--      </a-space>-->
-<!--      <UserAvatar />-->
-<!--      <SelectLang />-->
+      <UserAvatar />
+      <SelectLang />
 <!--      <GithubLink />-->
-      <template v-if="!isMobile">
+<!--      <template v-if="!isMobile">-->
 <!--        <GiteeLink />-->
 <!--        <DocLink />-->
-      </template>
+<!--      </template>-->
     </template>
     <template #contentPrefix>
       <MultiTab v-if="layoutSetting.multiTab" />
