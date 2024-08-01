@@ -9,31 +9,31 @@ const columns:ColumnsType =[
     dataIndex: 'id',
   },
   {
-    title: '渠道名称',
+    title: '商户名称',
     dataIndex: 'name',
   },
   {
-    title: '渠道类型',
+    title: '联系人',
     dataIndex: 'company',
   },
   {
-    title: '应用ID',
+    title: '取系方式',
     dataIndex: 'appId',
   },
   {
-    title: '加密方式',
+    title: '渠道数量',
     dataIndex: 'isEnable',
   },
   {
-    title: '支付方式',
+    title: '备注',
     dataIndex: 'isEnable',
   },
   {
-    title: '启用分账',
+    title: '合作状态',
     dataIndex: 'isEnable',
   },
   {
-    title: '启用状态',
+    title: '合作日期',
     dataIndex: 'isEnable',
   },
   {
@@ -84,7 +84,7 @@ const dataSource=shallowRef<NetworkInfo[]>([])
       <a-table ref="tableRef" :data-source="dataSource" :pagination="pagination" :loading="state.dataSourceLoading"  :columns="columns" size="middle" :bordered="false">
         <template #emptyText>
           <a-empty></a-empty>
-          <a-button  type="primary">添加渠道</a-button>
+          <a-button  type="primary">添加商户</a-button>
         </template>
         <template #bodyCell="{ column , record}">
 

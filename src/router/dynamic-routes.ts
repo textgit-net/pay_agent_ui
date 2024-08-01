@@ -15,47 +15,16 @@ export const rootRoute: RouteRecordRaw = {
 
 export default [
   {
-    path: '/dashboard',
-    redirect: '/dashboard/analysis',
+    path: '/home',
     name: 'DashboardFilled',
     meta: {
-      title: '仪表盘',
+      title: '首页',
       icon: 'DashboardOutlined'
     },
-    component: basicRouteMap.RouteView,
-    children: [
-      {
-        path: '/dashboard/analysis',
-        name: 'DashboardAnalysis',
-        component: () => import('~/pages/dashboard/analysis/index.vue'),
-        meta: {
-          title: '分析页'
-        }
-      }
-    ]
+    component: () => import('~/pages/dashboard/analysis/index.vue')
   },
   {
-    name: '渠道管理',
-    path: '/channel',
-    meta: {
-      title: '渠道管理',
-      icon: 'RobotFilled'
-    },
-    component: basicRouteMap.RouteView,
-    children: [
-      {
-        path: '/channel/list',
-        name: 'ChannelList',
-        component: () => import('~/pages/channel/index.vue'),
-        meta: {
-          title: '渠道列表',
-          hideChildrenInMenu: true
-        }
-      }
-    ]
-  },
-  {
-    name: '商户管理',
+    name: 'MchManage',
     path: '/mch',
     meta: {
       title: '商户管理',
@@ -68,6 +37,26 @@ export default [
         name: 'MchList',
         component: () => import('~/pages/mch/index.vue'),
         meta: {
+          title: '商户列表',
+          hideChildrenInMenu: true
+        }
+      }
+    ]
+  },
+  {
+    name: 'ChannelManage',
+    path: '/channel',
+    meta: {
+      title: '渠道管理',
+      icon: 'RobotFilled'
+    },
+    component: basicRouteMap.RouteView,
+    children: [
+      {
+        path: '/channel/list',
+        name: 'ChannelList',
+        component: basicRouteMap.RouteView,
+        meta: {
           title: '渠道列表',
           hideChildrenInMenu: true
         }
@@ -75,21 +64,166 @@ export default [
     ]
   },
   {
-    name: 'system',
+    path:"/order",
+    name: 'OrderManage',
+    meta: {
+      title: '订单管理',
+      icon: 'RobotFilled'
+    },
+    children: [
+
+      {
+        path: '/order/list',
+        name: 'OrderList',
+        component: () => import('~/pages/system/domain/list.vue'),
+        meta: {
+          title: '订单列表',
+          hideChildrenInMenu: true
+        }
+      },
+      {
+        path: '/order/royalty',
+        name: 'OrderRoyalty',
+        component: () => import('~/pages/system/domain/list.vue'),
+        meta: {
+          title: '分账单',
+          hideChildrenInMenu: true
+        }
+      }
+    ]
+  },
+  {
+    name: 'AccountManage',
+    path: '/account',
+    meta: {
+      title: '账户信息',
+      icon: 'RobotFilled'
+    },
+    children: [
+      {
+        path: '/account/role',
+        name: 'AccountRoleManage',
+        meta: {
+          title: '账户权限'
+        },
+        children: [
+          {
+            path: '/system/role/staff',
+            name: 'AccountStaffManage',
+            component: () => import('~/pages/mch/index.vue'),
+            meta: {
+              title: '人员管理',
+            }
+          },
+          {
+            path: '/system/role/list',
+            name: 'RolePermission',
+            component: () => import('~/pages/mch/index.vue'),
+            meta: {
+              title: '角色权限',
+            }
+          }
+        ]
+      },
+      {
+        path: '/account/accountInfo',
+        name: 'AccountInfo',
+        component: () => import('~/pages/mch/index.vue'),
+        meta: {
+          title: '账号管理',
+        }
+      },
+
+    ]
+  },
+  {
+    name: 'Report',
+    path: '/report',
+    meta: {
+      title: '报表中心',
+      icon: 'RobotFilled'
+    },
+    children: [
+      {
+        path: '/report/order',
+        name: 'OrderReport',
+        component: () => import('~/pages/report/order/index.vue'),
+        meta: {
+          title: '订单报表',
+          hideChildrenInMenu: true
+        }
+      },
+      {
+        path: '/report/mch',
+        name: 'MchReport',
+        component: () => import('~/pages/report/mch/index.vue'),
+        meta: {
+          title: '商户报表',
+          hideChildrenInMenu: true
+        }
+      },
+      {
+        path: '/report/channel',
+        name: 'ChannelReport',
+        component: () => import('~/pages/report/channel/index.vue'),
+        meta: {
+          title: '渠道报表',
+          hideChildrenInMenu: true
+        }
+      },
+      {
+        path: '/report/agent',
+        name: 'AgentReport',
+        component: () => import('~/pages/report/agent/index.vue'),
+        meta: {
+          title: '代理商报表',
+          hideChildrenInMenu: true
+        }
+      },
+      {
+        path: '/report/hour',
+        name: 'HourReport',
+        component: () => import('~/pages/report/hour/index.vue'),
+        meta: {
+          title: '分小时报表',
+          hideChildrenInMenu: true
+        }
+      }
+    ]
+  },
+  {
+    name: 'System',
     path: '/system',
     meta: {
       title: '系统设置',
       icon: 'RobotFilled'
     },
-    component: basicRouteMap.RouteView,
     children: [
       {
-        path: '/system/appBlacklist',
-        name: 'AppBlackList',
-        component: () => import('~/pages/system/app-blacklist/index.vue'),
+        path: '/system/domain/list',
+        name: 'DomainList',
+        component: () => import('~/pages/system/domain/list.vue'),
         meta: {
-          title: '应用黑名单',
+          title: '域名管理',
 
+          hideChildrenInMenu: true
+        }
+      },
+      {
+        path: '/system/config',
+        name: 'SystemConfig',
+        component: () => import('~/pages/system/config/index.vue'),
+        meta: {
+          title: '参数配制',
+          hideChildrenInMenu: true
+        }
+      },
+      {
+        path: '/system/log',
+        name: 'SystemLog',
+        component: () => import('~/pages/system/log/index.vue'),
+        meta: {
+          title: '操作日志',
           hideChildrenInMenu: true
         }
       }

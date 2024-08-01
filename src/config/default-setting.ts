@@ -1,7 +1,7 @@
 import type { LayoutSetting } from '~@/stores/app'
 
 export default {
-  title: '应用管理后台',
+  title: '管理后台',
   theme: 'light',
   logo: '/logo.svg',
   collapsed: false,
