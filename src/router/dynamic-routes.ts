@@ -15,33 +15,13 @@ export const rootRoute: RouteRecordRaw = {
 
 export default [
   {
-    path: '/home',
+    path: '/dashboard',
     name: 'DashboardFilled',
     meta: {
       title: '首页',
       icon: 'DashboardOutlined'
     },
     component: () => import('~/pages/dashboard/analysis/index.vue')
-  },
-  {
-    name: 'MchManage',
-    path: '/mch',
-    meta: {
-      title: '商户管理',
-      icon: 'RobotFilled'
-    },
-    component: basicRouteMap.RouteView,
-    children: [
-      {
-        path: '/mch/list',
-        name: 'MchList',
-        component: () => import('~/pages/mch/index.vue'),
-        meta: {
-          title: '商户列表',
-          hideChildrenInMenu: true
-        }
-      }
-    ]
   },
   {
     name: 'ChannelManage',
@@ -199,25 +179,6 @@ export default [
       icon: 'RobotFilled'
     },
     children: [
-      {
-        path: '/system/domain/list',
-        name: 'DomainList',
-        component: () => import('~/pages/system/domain/list.vue'),
-        meta: {
-          title: '域名管理',
-
-          hideChildrenInMenu: true
-        }
-      },
-      {
-        path: '/system/config',
-        name: 'SystemConfig',
-        component: () => import('~/pages/system/config/index.vue'),
-        meta: {
-          title: '参数配制',
-          hideChildrenInMenu: true
-        }
-      },
       {
         path: '/system/log',
         name: 'SystemLog',
