@@ -12,215 +12,73 @@ export  enum  SerialStatus{
   COMPLETE=1
 }
 
-
-export enum MediationNetworkType{
-    CSJ=1,
-    GDT=2,
-    KS=3,
-    AD_MOB=4,
-    APPLOVIN=5,
-    AD_SCOPE=6,
-    BAIDU_MOB=7,
-    K_LEVIN=8,
-    SIG_MOB=9,
-    UNITY=10
-}
-
-/**
- * android应用商店类型
- */
-export enum AndroidApplicationStoreType{
-  LENOVO=1
-}
 export enum CommonEnable{
   UNKNOWN=0,
   OPEN=1,
   DISABLE=2
 }
+
 /**
- * 获取android应用商店类型描述文本
+ * 签名类型
+ */
+export enum SignType{
+  MD5,
+  RSA2
+}
+/**
+ * 获取签名类型描述文本
  * @param type
  */
-export const getAndroidApplicationStoreTypeText=(type:AndroidApplicationStoreType)=>{
+export const getSignTypeText=(type:SignType)=>{
   switch (type) {
-    case AndroidApplicationStoreType.LENOVO:
-      return "联想(乐商店)"
+    case SignType.MD5:
+      return "MD5"
+    case SignType.RSA2:
+      return "RSA2"
   }
 }
 /**
- * android应用商店类型下拉选项
+ * 签名类型下拉选项
  */
-export const  AndroidApplicationStoreTypeSelectOption:SelectOption<AndroidApplicationStoreType>[]=[
+export const  SignTypeSelectOption:SelectOption<SignType>[]=[
   {
-    value:AndroidApplicationStoreType.LENOVO,
-    title:getAndroidApplicationStoreTypeText(AndroidApplicationStoreType.LENOVO)
+    value:SignType.MD5,
+    title:getSignTypeText(SignType.MD5)
+  },
+  {
+    value:SignType.RSA2,
+    title:getSignTypeText(SignType.RSA2)
   }
 ]
-
+export enum PayChannelType{
+  ALI="alipay"
+}
 /**
- * 应用商店状态
+ * 获取支付渠道描述文本
+ * @param type
  */
-export enum ApplicationStoreStatus{
-  WAIT_SUBMIT=1,
-  AUDIT=2,
-  REJECTED=3,
-  COMPLETE=4
+export const getPayChannelTypeText=(type:PayChannelType)=>{
+  switch (type) {
+    case PayChannelType.ALI:
+      return "支付宝"
+  }
 }
-
 /**
- * 应用商店状态描述文本
- * @param status
+ * 支付渠道下拉选项
  */
-export const getApplicationStoreStatusText=(status:ApplicationStoreStatus)=>{
-  switch (status) {
-    case ApplicationStoreStatus.WAIT_SUBMIT:
-      return "待提审"
-    case ApplicationStoreStatus.AUDIT:
-      return "审核中";
-    case ApplicationStoreStatus.REJECTED:
-      return "驳回"
-    case ApplicationStoreStatus.COMPLETE:
-      return  "完成"
-  }
-}
-
-/**
- * 应用商店状态下拉选项
- */
-export const  ApplicationStoreStatusSelectOption:SelectOption<ApplicationStoreStatus>[]=[
+export const  PayChannelTypeSelectOption:SelectOption<PayChannelType>[]=[
   {
-    value:ApplicationStoreStatus.WAIT_SUBMIT,
-    title:getApplicationStoreStatusText(ApplicationStoreStatus.WAIT_SUBMIT)
-  },
-  {
-    value:ApplicationStoreStatus.AUDIT,
-    title:getApplicationStoreStatusText(ApplicationStoreStatus.AUDIT)
-  },
-  {
-    value:ApplicationStoreStatus.REJECTED,
-    title:getApplicationStoreStatusText(ApplicationStoreStatus.REJECTED)
-  },
-  {
-    value:ApplicationStoreStatus.COMPLETE,
-    title:getApplicationStoreStatusText(ApplicationStoreStatus.COMPLETE)
+    value:PayChannelType.ALI,
+    title:getPayChannelTypeText(PayChannelType.ALI)
   }
 ]
 
-export enum MediationSiteCodeType{
-  REWARD=1,
-  SPLASH=2,
-  INTERSTITIAL_FULL=3,
-  BANNER=4
-}
-export const getMediationSiteCodeTypeText=(type:MediationSiteCodeType)=>{
-  switch (type) {
-    case MediationSiteCodeType.REWARD:
-      return "激励视频"
-    case MediationSiteCodeType.SPLASH:
-      return "开屏广告"
-    case MediationSiteCodeType.INTERSTITIAL_FULL:
-      return "插全屏广告"
-    case MediationSiteCodeType.BANNER:
-      return "Banner"
-  }
-}
-export const  MediationSiteCodeTypeSelectOption:SelectOption<MediationSiteCodeType>[]=[
-  {
-    value:MediationSiteCodeType.REWARD,
-    title:getMediationSiteCodeTypeText(MediationSiteCodeType.REWARD)
-  },
-  {
-    value:MediationSiteCodeType.SPLASH,
-    title:getMediationSiteCodeTypeText(MediationSiteCodeType.SPLASH)
-  },
-  {
-    value:MediationSiteCodeType.INTERSTITIAL_FULL,
-    title:getMediationSiteCodeTypeText(MediationSiteCodeType.INTERSTITIAL_FULL)
-  },
-  {
-    value:MediationSiteCodeType.BANNER,
-    title:getMediationSiteCodeTypeText(MediationSiteCodeType.BANNER)
-  }
-]
 
-export enum MediationSiteStatus{
-  DISABLE=0,
-  ENABLE=1
-}
-export const getMediationSiteStatusText=(status:MediationSiteStatus)=>{
-  switch (status) {
-    case MediationSiteStatus.DISABLE:
-      return "禁用"
-    case MediationSiteStatus.ENABLE:
-      return "启用"
-  }
-}
-export const  MediationSiteStatusSelectOption:SelectOption<MediationSiteStatus>[]=[
-  {
-    value:MediationSiteStatus.DISABLE,
-    title:getMediationSiteStatusText(MediationSiteStatus.DISABLE)
-  },
-  {
-    value:MediationSiteStatus.ENABLE,
-    title:getMediationSiteStatusText(MediationSiteStatus.ENABLE)
-  }
-]
 
-export enum CompanyAccountType{
-  CSJ=1,
-  ALI_YUN=2,
-  SINA_CLOUD=3,
-  LENOVO=4
-}
 
-export const getCompanyAccountTypeText=(type:CompanyAccountType)=>{
-  switch (type) {
-    case CompanyAccountType.ALI_YUN:
-      return "啊里云"
-    case CompanyAccountType.CSJ:
-      return "穿山甲";
-    case CompanyAccountType.SINA_CLOUD:
-      return "新浪云"
-    case CompanyAccountType.LENOVO:
-      return  "联想开发者"
-  }
-}
 
-export const  companyAccountSelectOption:SelectOption<CompanyAccountType>[]=[
-  {
-    value:CompanyAccountType.CSJ,
-    title:getCompanyAccountTypeText(CompanyAccountType.CSJ)
-  },
-  {
-    value:CompanyAccountType.ALI_YUN,
-    title:getCompanyAccountTypeText(CompanyAccountType.ALI_YUN)
-  },
-  {
-    value:CompanyAccountType.SINA_CLOUD,
-    title:getCompanyAccountTypeText(CompanyAccountType.SINA_CLOUD)
-  },
-  {
-    value:CompanyAccountType.SINA_CLOUD,
-    title:getCompanyAccountTypeText(CompanyAccountType.LENOVO)
-  }
-]
 
-export enum GamePlatformType{
-  TAO_JIN_91=1
-}
 
-export const getGamePlatformTypeTypeText=(type:GamePlatformType)=>{
-  switch (type) {
-    case GamePlatformType.TAO_JIN_91:
-      return "91淘金"
-  }
-}
-export const  gamePlatformTypeSelectOption:SelectOption<GamePlatformType>[]=[
-  {
-    value:GamePlatformType.TAO_JIN_91,
-    title:getGamePlatformTypeTypeText(GamePlatformType.TAO_JIN_91)
-  }
-]
 
 export interface UploadResourceResponse{
   id?:number
@@ -264,25 +122,8 @@ export enum AccessEnum {
   USER = 'USER',
 }
 
-/**
- * 终端平台
- */
-export enum ClientPlatform{
-  ANDROID="ANDROID",
-  IOS="IOS"
-}
 
-/**
- * 应用状态
- */
-export enum ApplicationStatus{
-  //关闭
-  CLOSE=1,
-  //测式
-  TEST=2,
-  //上线
-  ONLINE=3
-}
+
 /**
  * 基础树形结构
  */

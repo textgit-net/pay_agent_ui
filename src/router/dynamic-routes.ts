@@ -30,12 +30,11 @@ export default [
       title: '渠道管理',
       icon: 'RobotFilled'
     },
-    component: basicRouteMap.RouteView,
     children: [
       {
         path: '/channel/list',
         name: 'ChannelList',
-        component: basicRouteMap.RouteView,
+        component: () => import('~/pages/channel/index.vue'),
         meta: {
           title: '渠道列表',
           hideChildrenInMenu: true
@@ -90,7 +89,7 @@ export default [
           {
             path: '/system/role/staff',
             name: 'AccountStaffManage',
-            component: () => import('~/pages/mch/index.vue'),
+            component: () => import('~/pages/account/staff/list.vue'),
             meta: {
               title: '人员管理',
             }
@@ -98,7 +97,7 @@ export default [
           {
             path: '/system/role/list',
             name: 'RolePermission',
-            component: () => import('~/pages/mch/index.vue'),
+            component: () => import('~/pages/account/role/list.vue'),
             meta: {
               title: '角色权限',
             }
@@ -108,7 +107,7 @@ export default [
       {
         path: '/account/accountInfo',
         name: 'AccountInfo',
-        component: () => import('~/pages/mch/index.vue'),
+        component: () => import('~/pages/account/account-info.vue'),
         meta: {
           title: '账号管理',
         }
