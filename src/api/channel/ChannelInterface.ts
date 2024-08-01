@@ -1,9 +1,7 @@
 import {BasePageRequest, PageWarp, PayChannelType, SignType} from "~/utils/constant.ts";
 
-/**
- * 渠道列表结构体
- */
-export interface ChannelListResponse {
+
+export interface ChannelSimpleResponse{
     /**
      * 渠道ID
      */
@@ -16,6 +14,13 @@ export interface ChannelListResponse {
      * 渠道类型
      */
     channelType: PayChannelType
+}
+
+/**
+ * 渠道列表结构体
+ */
+export interface ChannelListResponse extends ChannelSimpleResponse{
+
     /**
      * 签名类型
      */
@@ -38,6 +43,7 @@ export interface ChannelListResponse {
     totalAmount:number
     createTime:string
 }
+
 
 /**
  * 支付宝渠道配制

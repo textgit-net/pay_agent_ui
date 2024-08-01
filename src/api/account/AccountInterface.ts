@@ -35,6 +35,26 @@ export interface AccountListResponse {
 }
 
 /**
+ * 账号安全检测
+ */
+export interface AccountSafeCheckResponse{
+    /**
+     * 是否需更新密码
+     */
+    isNeedUpdatePassword:boolean
+    /**
+     * 是否需要绑定google验证码
+     */
+    isNeedBindGoogleVerify:boolean
+
+    /**
+     * 是否需要验证
+     */
+    isNeedVerify:boolean
+
+}
+
+/**
  * 账户信息
  */
 export interface AccountInfo  extends AccountListResponse{
@@ -112,7 +132,9 @@ export interface RolInfo{
     createTime:string
 }
 
-
+/**
+ * 员工账号查询参数
+ */
 export interface StaffSearch extends BasePageRequest{
     /**
      * 晚称/登录账号
@@ -124,6 +146,56 @@ export interface StaffSearch extends BasePageRequest{
     roleId:number|unknown|undefined
 }
 
+
+/**
+ * Token
+ */
+export interface TokenResponse{
+    /**
+     * token
+     */
+    token:string
+}
+
+/**
+ * 登录
+ * @param loginName
+ * @param password
+ */
+export function login(loginName:string,password:string){
+    return usePost("/account/login",{"loginName":loginName,"password":password})
+}
+
+/**
+ * 绑定google安全验证码
+ * @param googleSecretKey 密钥
+ * @param verifyCode 动态验证码
+ */
+export function bindGoogleVerify(googleSecretKey:String,verifyCode:string){
+    return usePost("/account/bindGoogleVerify",{"googleSecretKey":googleSecretKey,"verifyCode":verifyCode})
+}
+
+
+
+/**
+ * 修改当前登录人密码
+ * @param oldPassword 旧密码
+ * @param newPassword 新密码
+ * @param verifyCode  安全验证码 如果启用了google安全验证码需要
+ */
+export function updatePassword(oldPassword?:string, newPassword?:string,verifyCode?:string) {
+    return usePost<String>("/account/update/password",{"oldPassword":oldPassword,"newPassword":newPassword})
+}
+
+/**
+ * 重置账号密码
+ * @param longName 登录账号
+ * @param password 密码
+ * @param verifyCode  安全验证码
+ */
+export function  resetPassword(longName:string,password:string,verifyCode:string){
+    return usePost<String>("/account/reset/password",{"password":password,"verifyCode":verifyCode,"longName":longName})
+}
 
 
 
@@ -150,27 +222,6 @@ export function saveStaff(data:AccountFromData) {
  */
 export function resetStaffPassword(id:number|string|unknown,newPassword?:string) {
     return usePut<String>("/staff/reset/password", {"id":id,"password":newPassword})
-}
-
-
-/**
- * 修改当前登录人密码
- * @param oldPassword 旧密码
- * @param newPassword 新密码
- * @param verifyCode  安全验证码 如果启用了google安全验证码需要
- */
-export function updatePassword(oldPassword?:string, newPassword?:string,verifyCode?:string) {
-    return usePost<String>("/account/update/password",{"oldPassword":oldPassword,"newPassword":newPassword})
-}
-
-/**
- * 重置账号密码
- * @param longName 登录账号
- * @param password 密码
- * @param verifyCode  安全验证码
- */
-export function  resetPassword(longName:string,password:string,verifyCode:string){
-    return usePost<String>("/account/reset/password",{"password":password,"verifyCode":verifyCode,"longName":longName})
 }
 
 /**
