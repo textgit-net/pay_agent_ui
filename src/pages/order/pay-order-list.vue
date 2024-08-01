@@ -1,52 +1,52 @@
 <script setup lang="ts">
 import {ColumnsType} from "ant-design-vue/es/table";
-import {NetworkInfo, NetworkSearch} from "~/api/network.ts";
+
 import {PaginationProps} from "ant-design-vue";
 
 const columns:ColumnsType =[
   {
-    title: 'ID',
+    title: '订单编号',
     dataIndex: 'id',
   },
   {
-    title: '商户名称',
+    title: '商品标题',
     dataIndex: 'name',
   },
   {
-    title: '联系人',
+    title: '支付方式',
     dataIndex: 'company',
   },
   {
-    title: '取系方式',
+    title: '订单金额',
     dataIndex: 'appId',
   },
   {
-    title: '渠道数量',
+    title: '手续费',
     dataIndex: 'isEnable',
   },
   {
-    title: '备注',
+    title: '货币种类',
     dataIndex: 'isEnable',
   },
   {
-    title: '合作状态',
+    title: '商家订单号',
     dataIndex: 'isEnable',
   },
   {
-    title: '合作日期',
+    title: '渠道订单号',
     dataIndex: 'isEnable',
   },
   {
-    title:'操作',
-    dataIndex: 'action',
-  },
+    title: '订单状态',
+    dataIndex: 'isEnable',
+  }
 ]
 const state=reactive({
   isShowEditModal:false,
   dataSourceLoading:false,
 
 })
-const searchParams=reactive<NetworkSearch>({
+const searchParams=reactive<any>({
   page:1,
   limit:10
 })
@@ -64,7 +64,7 @@ const pagination = reactive<PaginationProps>({
 
   },
 })
-const dataSource=shallowRef<NetworkInfo[]>([])
+const dataSource=shallowRef<any[]>([])
 
 </script>
 
@@ -73,7 +73,7 @@ const dataSource=shallowRef<NetworkInfo[]>([])
     <!--头部-->
     <a-card :body-style="{padding:'15px'}">
       <a-flex justify="space-between">
-        <a-typography-text>支付渠道</a-typography-text>
+        <a-typography-text>订单列表</a-typography-text>
       </a-flex>
     </a-card>
     <a-card :body-style="{'padding':'0px'}">
@@ -84,7 +84,6 @@ const dataSource=shallowRef<NetworkInfo[]>([])
       <a-table ref="tableRef" :data-source="dataSource" :pagination="pagination" :loading="state.dataSourceLoading"  :columns="columns" size="middle" :bordered="false">
         <template #emptyText>
           <a-empty></a-empty>
-          <a-button  type="primary">添加商户</a-button>
         </template>
         <template #bodyCell="{ column , record}">
 

@@ -17,10 +17,6 @@ const columns:ColumnsType =[
     dataIndex: 'company',
   },
   {
-    title: '应用ID',
-    dataIndex: 'appId',
-  },
-  {
     title: '加密方式',
     dataIndex: 'isEnable',
   },
@@ -30,6 +26,10 @@ const columns:ColumnsType =[
   },
   {
     title: '启用分账',
+    dataIndex: 'isEnable',
+  },
+  {
+    title: '交易金额',
     dataIndex: 'isEnable',
   },
   {
