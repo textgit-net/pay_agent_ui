@@ -8,8 +8,6 @@ const loginPath = '/login'
 
 router.beforeEach(async (to, h, next) => {
   setRouteEmitter(to)
-
-
   // 获取
   const userStore = useUserStore()
   const token = useAuthorization()

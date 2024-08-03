@@ -14,6 +14,7 @@ export const rootRoute: RouteRecordRaw = {
 }
 
 export default [
+
   {
     path: '/dashboard',
     name: 'DashboardFilled',

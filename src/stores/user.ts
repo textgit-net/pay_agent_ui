@@ -37,12 +37,12 @@ export const useUserStore = defineStore('user', () => {
   const getUserInfo = async () => {
     // 获取用户信息
     // const { data } = await getUserInfoApi()
-    userInfo.value = {
-      nickname: 'admin',
-      id: 1,
-      username: 'admin',
-      avatar: '',
-    }
+    // userInfo.value = {
+    //   nickname: 'admin',
+    //   id: 1,
+    //   username: 'admin',
+    //   avatar: '',
+    // }
 
   }
 

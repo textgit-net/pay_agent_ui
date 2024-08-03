@@ -16,7 +16,6 @@ import 'uno.css'
 const token = useAuthorization()
 const pinia = createPinia()
 async function start() {
-  token.value="123"
   const app: App = createApp(Root)
   app.use(PickColors)
   app.use(pinia)

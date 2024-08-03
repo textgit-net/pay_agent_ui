@@ -7,8 +7,12 @@ html {
   --hover-color:rgba(0,0,0,.025);
   --bg-color-container: #f0f2f5;
   --c-shadow: 2px 0 8px 0 rgba(29,35,41,.05);
+
 }
 
+div, span, p {
+  caret-color: transparent;
+}
 html.dark{
   --text-color: rgba(229, 224, 216, 0.85);
   --text-color-1: rgba(229, 224, 216, 0.45);
