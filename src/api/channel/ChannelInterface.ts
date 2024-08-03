@@ -159,8 +159,8 @@ export function saveChannel(data:ChannelFromData) {
  * 关闭渠道
  * @param id
  */
-export function closeChannel(id:number) {
-    return usePut<String>(`/channel/close/${id}`)
+export function changeChannel(id:number) {
+    return usePut<String>(`/channel/change/${id}`)
 }
 
 
