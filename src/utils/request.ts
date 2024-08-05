@@ -42,7 +42,7 @@ async function requestHandler(config: InternalAxiosRequestConfig & RequestConfig
 }
 
 function responseHandler(response: any): ResponseBody<any> | AxiosResponse<any> | Promise<any> | any {
-  if(response.data.code!=200){
+  if(response.data.code!=0){
     return errorHandler({
       toJSON(): object {
         return {}

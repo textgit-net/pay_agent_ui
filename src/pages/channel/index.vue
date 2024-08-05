@@ -1,8 +1,7 @@
 <script setup lang="ts">
 import {ColumnsType} from "ant-design-vue/es/table";
-import {NetworkInfo, NetworkSearch} from "~/api/network.ts";
 import {PaginationProps} from "ant-design-vue";
-
+const router=useRouter()
 const columns:ColumnsType =[
   {
     title: 'ID',
@@ -64,7 +63,7 @@ const pagination = reactive<PaginationProps>({
 
   },
 })
-const dataSource=shallowRef<NetworkInfo[]>([])
+const dataSource=shallowRef<any[]>([])
 
 </script>
 
@@ -84,7 +83,7 @@ const dataSource=shallowRef<NetworkInfo[]>([])
       <a-table ref="tableRef" :data-source="dataSource" :pagination="pagination" :loading="state.dataSourceLoading"  :columns="columns" size="middle" :bordered="false">
         <template #emptyText>
           <a-empty></a-empty>
-          <a-button  type="primary">添加渠道</a-button>
+          <a-button @click="router.push({path:'/channel/edit'})" type="primary">添加渠道</a-button>
         </template>
         <template #bodyCell="{ column , record}">
 

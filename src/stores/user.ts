@@ -5,15 +5,16 @@ import type { MenuData } from '~@/layouts/basic-layout/typing'
 import {rootRoute} from '~@/router/dynamic-routes'
 import { generateFlatRoutes, generateRoutes, generateTreeRoutes } from '~@/router/generate-route'
 import {BaseSelectOption, DYNAMIC_LOAD_WAY, DynamicLoadEnum, SelectOption} from '~@/utils/constant'
+import {AccountInfo, getAccountInfo} from "~/api/account/AccountInterface.ts";
 
 export const useUserStore = defineStore('user', () => {
   const routerData = shallowRef()
   const menuData = shallowRef<MenuData>([])
-  const userInfo = shallowRef<UserInfo>()
+  const userInfo = shallowRef<AccountInfo>()
   const token = useAuthorization()
   const avatar = computed(() => userInfo.value?.avatar)
-  const nickname = computed(() => userInfo.value?.nickname ?? userInfo.value?.username)
-  const roles = computed(() => userInfo.value?.roles)
+  const nickname = computed(() => userInfo.value?.nickName ?? userInfo.value?.loginName)
+  const permissions = computed(() => userInfo.value?.permissions)
   const getMenuRoutes = async () => {
     const { data } = await getRouteMenusApi()
     return generateTreeRoutes(data ?? [])
@@ -36,14 +37,8 @@ export const useUserStore = defineStore('user', () => {
   // 获取用户信息
   const getUserInfo = async () => {
     // 获取用户信息
-    // const { data } = await getUserInfoApi()
-    // userInfo.value = {
-    //   nickname: 'admin',
-    //   id: 1,
-    //   username: 'admin',
-    //   avatar: '',
-    // }
-
+    const { data } = await getAccountInfo()
+    userInfo.value=data
   }
 
 
@@ -63,7 +58,7 @@ export const useUserStore = defineStore('user', () => {
 
   return {
     userInfo,
-    roles,
+    permissions,
     getUserInfo,
     logout,
     routerData,

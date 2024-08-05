@@ -1,6 +1,10 @@
 import {BasePageRequest, PageWarp} from "~/utils/constant.ts";
 import AccountInfo from "~/pages/account/account-info.vue";
-
+export interface AuthToken {
+    accessToken:string
+    expiresIn:string
+    refreshToken:string
+}
 export interface AccountListResponse {
     /**
      * 昵称
@@ -157,14 +161,7 @@ export interface TokenResponse{
     token:string
 }
 
-/**
- * 登录
- * @param loginName
- * @param password
- */
-export function login(loginName:string,password:string){
-    return usePost("/account/login",{"loginName":loginName,"password":password})
-}
+
 
 /**
  * 绑定google安全验证码
@@ -223,13 +220,20 @@ export function saveStaff(data:AccountFromData) {
 export function resetStaffPassword(id:number|string|unknown,newPassword?:string) {
     return usePut<String>("/staff/reset/password", {"id":id,"password":newPassword})
 }
+/**
+ * 登录
+ * @param params
+ */
+export function login(loginName:string,password:string){
+    return usePost<AuthToken>('/auth/token', {"loginName":loginName,"password":password})
+}
 
 /**
  * 获取账户详情
  * @param accountId
  */
-export function getAccountInfo(accountId:number|string|unknown){
-    return useGet<AccountInfo>("/account/{accountId}")
+export function getAccountInfo(){
+    return useGet<AccountInfo>("/account/info")
 }
 
 /**

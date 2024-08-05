@@ -40,6 +40,16 @@ export default [
           title: '渠道列表',
           hideChildrenInMenu: true
         }
+      },
+      {
+        path: '/channel/edit',
+        name: 'ChannelEdit',
+        component: () => import('~/pages/channel/edit.vue'),
+        meta: {
+          title: '渠道编辑',
+          hideInMenu: true,
+          hideChildrenInMenu: true
+        }
       }
     ]
   },

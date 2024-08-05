@@ -1,4 +1,5 @@
 import {BasePageRequest, PageWarp, PayChannelType, SignType} from "~/utils/constant.ts";
+import {an} from "vitest/dist/reporters-5f784f42";
 
 
 export interface ChannelSimpleResponse{
@@ -87,7 +88,7 @@ export interface AlipayChannelConfig  {
 /**
  * 渠道表单
  */
-export interface ChannelFromData{
+export interface ChannelFormData{
     /**
      * 渠道ID
      */
@@ -103,7 +104,8 @@ export interface ChannelFromData{
     /**
      * 渠道配制
      */
-    channelConfig?:AlipayChannelConfig
+    channelConfig?: any
+
     /**
      * 分账配制
      */
