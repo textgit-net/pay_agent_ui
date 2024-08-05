@@ -62,21 +62,21 @@ function responseHandler(response: any): ResponseBody<any> | AxiosResponse<any> 
 }
 
 function errorHandler(error: AxiosError): Promise<any> {
+  debugger
   const token = useAuthorization()
   const notification = useNotification()
-  if (error.response) {
-    const { data, status, statusText } = error.response as AxiosResponse<ResponseBody>
-    if (status === 401) {
-      notification?.error({
-        message: '401',
-        description: data?.msg || statusText,
-        duration: 3,
-      })
-      /**
-       * 这里处理清空用户信息和token的逻辑，后续扩展
-       */
-      token.value = null
-      router
+  const { data, status, statusText } = error.response as AxiosResponse<ResponseBody>
+  if (status === 401) {
+    // notification?.error({
+    //   message: '401',
+    //   description: data?.msg || statusText,
+    //   duration: 3,
+    // })
+    /**
+     * 这里处理清空用户信息和token的逻辑，后续扩展
+     */
+    token.value = null
+    router
         .push({
           path: '/login',
           query: {
@@ -84,30 +84,29 @@ function errorHandler(error: AxiosError): Promise<any> {
           },
         })
         .then(() => {})
-    }
-    else if (status === 403) {
-      notification?.error({
-        message: '403',
-        description: data?.msg || statusText,
-        duration: 3,
-      })
-    }
-    else if (status === 500) {
-      notification?.error({
-        message: '500',
-        description: data?.msg || statusText,
-        duration: 3,
-      })
-    }
-    else {
-      notification?.error({
-        message: '服务错误',
-        description: data?.msg || statusText,
-        duration: 3,
-      })
-    }
   }
-  return Promise.reject(error)
+  else if (status === 403) {
+    // notification?.error({
+    //   message: '403',
+    //   description: data?.msg || statusText,
+    //   duration: 3,
+    // })
+  }
+  else if (status === 500) {
+    // notification?.error({
+    //   message: '500',
+    //   description: data?.msg || statusText,
+    //   duration: 3,
+    // })
+  }
+  else {
+    // notification?.error({
+    //   message: '服务错误',
+    //   description: data?.msg || statusText,
+    //   duration: 3,
+    // })
+  }
+  return Promise.reject(data)
 }
 interface AxiosOptions<T> {
   url: string

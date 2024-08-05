@@ -150,11 +150,11 @@ export function searchChannel(params:ChannelSearch) {
  * 保存渠道
  * @param data
  */
-export function saveChannel(data:ChannelFromData) {
+export function saveChannel(data:ChannelFormData) {
     if(data.id){
-        return usePost<String>('/channel', data)
+        return usePost<String>('/channel', data,)
     }
-    return usePut<String>("/channel", data)
+    return usePut<String>("/channel", data,)
 }
 
 /**
