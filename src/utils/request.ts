@@ -62,10 +62,18 @@ function responseHandler(response: any): ResponseBody<any> | AxiosResponse<any> 
 }
 
 function errorHandler(error: AxiosError): Promise<any> {
-  debugger
   const token = useAuthorization()
   const notification = useNotification()
   const { data, status, statusText } = error.response as AxiosResponse<ResponseBody>
+
+  if(status === 200 &&data?.code === 500){
+    notification?.error({
+      message: '500',
+      description: data?.msg || statusText,
+      duration: 3,
+    })
+  }
+
   if (status === 401) {
     // notification?.error({
     //   message: '401',
@@ -93,11 +101,11 @@ function errorHandler(error: AxiosError): Promise<any> {
     // })
   }
   else if (status === 500) {
-    // notification?.error({
-    //   message: '500',
-    //   description: data?.msg || statusText,
-    //   duration: 3,
-    // })
+    notification?.error({
+      message: '500',
+      description: data?.msg || statusText,
+      duration: 3,
+    })
   }
   else {
     // notification?.error({
