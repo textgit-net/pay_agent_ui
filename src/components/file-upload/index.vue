@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import {ResponseBody, uploadAction, UploadResourceResponse} from "~/utils/constant.ts";
 import {UploadFile, UploadListType} from "ant-design-vue/es/upload/interface";
-import {UploadChangeParam} from "ant-design-vue";
+import {UploadChangeParam, UploadProps} from "ant-design-vue";
 
 
 const message = useMessage()
@@ -11,6 +11,10 @@ const props = defineProps({
   value:{
     type:Array,
     default:[]
+  },
+  isUpload:{
+    type:Boolean,
+    default:true
   },
   listType:{
     type:String,
@@ -48,8 +52,12 @@ const onChange=(info: UploadChangeParam<UploadFile<ResponseBody<String>>>)=>{
   }
   emits("update:value",info.fileList)
 
-
 }
+
+const beforeUpload: UploadProps['beforeUpload'] = file => {
+  fileList.value = [...(fileList.value || []), file];
+  return props.isUpload;
+};
 </script>
 
 <template>
@@ -57,6 +65,7 @@ const onChange=(info: UploadChangeParam<UploadFile<ResponseBody<String>>>)=>{
             v-model:file-list="fileList"
             :max-count="maxCount"
             :show-upload-list="showUploadList"
+            :before-upload="beforeUpload"
             style="border: none;"
             :action="`${uploadAction}?path=${uploadPath}`"
             @change="onChange">

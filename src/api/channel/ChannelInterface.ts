@@ -152,9 +152,9 @@ export function searchChannel(params:ChannelSearch) {
  */
 export function saveChannel(data:ChannelFormData) {
     if(data.id){
-        return usePost<String>('/channel', data,)
+        return usePut<String>('/channel', data,)
     }
-    return usePut<String>("/channel", data,)
+    return usePost<String>("/channel", data,)
 }
 
 /**

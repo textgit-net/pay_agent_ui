@@ -1,6 +1,9 @@
 <script setup lang="ts">
 import {ColumnsType} from "ant-design-vue/es/table";
+import {AlipaySquareFilled } from "@ant-design/icons-vue"
 import {PaginationProps} from "ant-design-vue";
+import {ChannelListResponse, ChannelSearch, searchChannel} from "~/api/channel/ChannelInterface.ts";
+import {PayChannelType} from "~/utils/constant.ts";
 const router=useRouter()
 const columns:ColumnsType =[
   {
@@ -13,27 +16,24 @@ const columns:ColumnsType =[
   },
   {
     title: '渠道类型',
-    dataIndex: 'company',
+    dataIndex: 'channelType',
   },
-  {
-    title: '加密方式',
-    dataIndex: 'isEnable',
-  },
-  {
-    title: '支付方式',
-    dataIndex: 'isEnable',
-  },
+
   {
     title: '启用分账',
-    dataIndex: 'isEnable',
+    dataIndex: 'isEnableAllocation',
   },
   {
     title: '交易金额',
-    dataIndex: 'isEnable',
+    dataIndex: 'amount',
   },
   {
     title: '启用状态',
     dataIndex: 'isEnable',
+  },
+  {
+    title:'创建日间',
+    dataIndex:'createTime'
   },
   {
     title:'操作',
@@ -45,9 +45,10 @@ const state=reactive({
   dataSourceLoading:false,
 
 })
-const searchParams=reactive<NetworkSearch>({
+const searchParams=reactive<ChannelSearch>({
   page:1,
-  limit:10
+  limit:10,
+  isIgnoreDisable:true
 })
 const pagination = reactive<PaginationProps>({
   pageSize: 10,
@@ -63,8 +64,29 @@ const pagination = reactive<PaginationProps>({
 
   },
 })
-const dataSource=shallowRef<any[]>([])
+const dataSource=shallowRef<ChannelListResponse[]>([])
 
+const loadData=async ()=>{
+  if (state.dataSourceLoading)
+    return
+  state.dataSourceLoading = true
+  try {
+    const { data } = await searchChannel({
+      ...searchParams,
+      page: pagination.current,
+      limit: pagination.pageSize,
+    })
+    dataSource.value = data?.rows ?? []
+    pagination.total = data?.total ?? 0
+  }
+  finally {
+    state.dataSourceLoading = false
+  }
+}
+
+onMounted(()=>{
+  loadData()
+})
 </script>
 
 <template>
@@ -86,7 +108,28 @@ const dataSource=shallowRef<any[]>([])
           <a-button @click="router.push({path:'/channel/edit'})" type="primary">添加渠道</a-button>
         </template>
         <template #bodyCell="{ column , record}">
-
+          <template v-if="column.dataIndex==='isEnableAllocation'">
+            <a-tag v-if="record['isEnableAllocation']" color="success">已配制</a-tag>
+            <a-tag v-else color="#f50">未配制</a-tag>
+          </template>
+          <template v-if="column.dataIndex==='amount'">
+            {{record['totalAmount']||'--'}}
+          </template>
+          <template v-if="column.dataIndex==='isEnable'">
+            <a-tag v-if="record['isEnable']" color="#389e0d" > 启用</a-tag>
+            <a-tag v-else color="#f50">禁用</a-tag>
+          </template>
+          <template v-if="column.dataIndex==='channelType'">
+              <a-flex :gap="5" v-if="PayChannelType.ALI==record['channelType']">
+                <AlipaySquareFilled style="color: dodgerblue;font-size: 18px"/><a-typography-text strong  style="font-size: 12px">支付宝</a-typography-text >
+              </a-flex>
+          </template>
+          <template v-if="column.dataIndex==='action'">
+            <a-flex :gap="10">
+              <a-button v-if="record['isEnable']" type="primary" danger>禁用</a-button>
+              <a-button type="primary" >编辑</a-button>
+            </a-flex>
+          </template>
         </template>
       </a-table>
     </a-card>

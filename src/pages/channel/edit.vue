@@ -64,21 +64,21 @@ const validateAlipayPublicKey = async (_rule: Rule, value: string) => {
     return Promise.resolve();
   }
 };
-const validateAlipayAppCert = async (_rule: Rule, value: string) => {
+const validateAlipayAppCert = async (_rule: Rule, value: any) => {
   if (current.value==1 && !formData.channelConfig['appCert'] ) {
     return Promise.reject("请输入应用公钥证书");
   }else {
     return Promise.resolve();
   }
 };
-const validateAlipayPublicCert = async (_rule: Rule, value: string) => {
+const validateAlipayPublicCert = async (_rule: Rule, value: any) => {
   if (current.value==1 && !formData.channelConfig['alipayPublicCert'] ) {
     return Promise.reject("请输入支付宝公钥证书");
   }else {
     return Promise.resolve();
   }
 };
-const validateAlipayRootCert = async (_rule: Rule, value: string) => {
+const validateAlipayRootCert = async (_rule: Rule, value: any) => {
   if (current.value==1 && !formData.channelConfig['alipayRootCert'] ) {
     return Promise.reject("请输入支付宝根证书");
   }else {
@@ -107,10 +107,9 @@ const rules: Record<string, Rule[]> = {
   alipayPrivateKey: [{required:true, validator: validateAlipayPrivateKey, trigger: 'change' }],
   IsCert: [{required:true, validator: validateIsCert, trigger: 'change' }],
   alipayPublicKey:[{required:true, validator: validateAlipayPublicKey, trigger: 'change' }],
-  alipayAppCert:[{ required:true,validator: validateAlipayAppCert, trigger: 'change' }],
-  alipayPublicCert:[{ required:true,validator: validateAlipayPublicCert, trigger: 'change' }],
-  alipayRootCert:[{ required:true,validator: validateAlipayRootCert, trigger: 'change' }],
-
+  alipayAppCert:[{ required:true,validator: validateAlipayAppCert, trigger: 'blur' }],
+  alipayPublicCert:[{ required:true,validator: validateAlipayPublicCert, trigger: 'blur' }],
+  alipayRootCert:[{ required:true,validator: validateAlipayRootCert, trigger: 'blur' }],
 };
 
 const next=(value:number)=>{
@@ -214,19 +213,34 @@ const onSubmit =async ()=>{
             </a-form-item>
             <a-form-item v-if="formData.channelConfig['isCert']" label="应用公钥证书" name="alipayAppCert"  class="mt-5" >
               <a-flex style="flex: 1" vertical>
-                <a-textarea v-model:value="formData.channelConfig['appCert']" placeholder="请输入应用公钥证书" :rows="6"></a-textarea>
+                <SingFileUpload :is-upload="false" :show-upload-list="true" v-model:value="formData.channelConfig['appCert']" >
+                  <a-button>
+                    <UploadOutlined/>
+                    upload
+                  </a-button>
+                </SingFileUpload>
                 <a-typography-text type="secondary">支付宝平台下发的应用公钥证书.</a-typography-text>
               </a-flex>
             </a-form-item>
             <a-form-item v-if="formData.channelConfig['isCert']" label="支付宝公钥证书" name="alipayPublicCert"  class="mt-5" >
               <a-flex style="flex: 1" vertical>
-                <a-textarea v-model:value="formData.channelConfig['alipayPublicCert']" placeholder="请输入支付宝公钥证书" :rows="6"></a-textarea>
+                <SingFileUpload :is-upload="false" :show-upload-list="true" v-model:value="formData.channelConfig['alipayPublicCert']" >
+                  <a-button>
+                    <UploadOutlined/>
+                    upload
+                  </a-button>
+                </SingFileUpload>
                 <a-typography-text type="secondary">支付宝平台下发的公钥证书.</a-typography-text>
               </a-flex>
             </a-form-item>
-            <a-form-item v-if="formData.channelConfig['isCert']" label="支付宝根证书" name="alipayRootCert"  class="mt-5" :rules="[{required:true,message:'请输入支付宝根证书'}]">
+            <a-form-item v-if="formData.channelConfig['isCert']" label="支付宝根证书" name="alipayRootCert"  class="mt-5" >
               <a-flex style="flex: 1" vertical>
-                <a-textarea  v-model:value="formData.channelConfig['alipayRootCert']" placeholder="请输入支付宝根证书" :rows="6"></a-textarea>
+                <SingFileUpload :is-upload="false" :show-upload-list="true" v-model:value="formData.channelConfig['alipayRootCert']" >
+                  <a-button>
+                    <UploadOutlined/>
+                    upload
+                  </a-button>
+                </SingFileUpload>
                 <a-typography-text type="secondary">支付宝平台下发的公钥证书.</a-typography-text>
               </a-flex>
             </a-form-item>
