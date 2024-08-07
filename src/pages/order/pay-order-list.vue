@@ -3,6 +3,9 @@ import {ColumnsType} from "ant-design-vue/es/table";
 
 import {PaginationProps} from "ant-design-vue";
 
+
+import {searchOrder} from "~/api/order/OrderInterface.ts";
+
 const columns:ColumnsType =[
   {
     title: '订单号',
