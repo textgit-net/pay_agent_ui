@@ -5,6 +5,7 @@ import {PaginationProps} from "ant-design-vue";
 
 
 import {searchOrder} from "~/api/order/OrderInterface.ts";
+import {searchChannel} from "~/api/channel/ChannelInterface.ts";
 
 const columns:ColumnsType =[
   {
@@ -77,7 +78,27 @@ const pagination = reactive<PaginationProps>({
   },
 })
 const dataSource=shallowRef<any[]>([])
+const loadData=async ()=>{
+  if (state.dataSourceLoading)
+    return
+  state.dataSourceLoading = true
+  try {
+    const { data } = await searchOrder({
+      ...searchParams,
+      page: pagination.current,
+      limit: pagination.pageSize,
+    })
+    dataSource.value = data?.rows ?? []
+    pagination.total = data?.total ?? 0
+  }
+  finally {
+    state.dataSourceLoading = false
+  }
+}
 
+onMounted(()=>{
+  loadData()
+})
 </script>
 
 <template>
