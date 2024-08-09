@@ -24,8 +24,12 @@ const columns:ColumnsType =[
     dataIndex: 'isEnableAllocation',
   },
   {
-    title: '交易金额',
-    dataIndex: 'amount',
+    title: '成功金额',
+    dataIndex: 'successAmount',
+  },
+  {
+    title: '成功率',
+    dataIndex: 'successRate',
   },
   {
     title: '启用状态',

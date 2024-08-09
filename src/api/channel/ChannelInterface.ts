@@ -1,5 +1,4 @@
 import {BasePageRequest, PageWarp, PayChannelType, SignType} from "~/utils/constant.ts";
-import {an} from "vitest/dist/reporters-5f784f42";
 
 
 export interface ChannelSimpleResponse{

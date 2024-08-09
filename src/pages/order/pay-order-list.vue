@@ -3,43 +3,56 @@ import {ColumnsType} from "ant-design-vue/es/table";
 
 import {PaginationProps} from "ant-design-vue";
 
+
+import {searchOrder} from "~/api/order/OrderInterface.ts";
+import {searchChannel} from "~/api/channel/ChannelInterface.ts";
+
 const columns:ColumnsType =[
   {
-    title: '订单编号',
+    title: '订单号',
     dataIndex: 'id',
-  },
-  {
-    title: '商品标题',
-    dataIndex: 'name',
-  },
-  {
-    title: '支付方式',
-    dataIndex: 'company',
-  },
-  {
-    title: '订单金额',
-    dataIndex: 'appId',
-  },
-  {
-    title: '手续费',
-    dataIndex: 'isEnable',
-  },
-  {
-    title: '货币种类',
-    dataIndex: 'isEnable',
-  },
-  {
+  },{
     title: '商家订单号',
-    dataIndex: 'isEnable',
+    dataIndex: 'mchOrderNo',
   },
   {
     title: '渠道订单号',
-    dataIndex: 'isEnable',
+    dataIndex: 'channelOrderNo',
+  },
+  {
+    title: '商品标题',
+    dataIndex: 'subject',
+  },
+  {
+    title: '支付方式',
+    dataIndex: 'payMode',
+  },
+  {
+    title: '支付渠道',
+    dataIndex: 'payChannelName',
+  },
+  {
+    title: '订单金额',
+    dataIndex: 'amount',
+  },
+  {
+    title: '手续费',
+    dataIndex: 'mchFeeAmount',
   },
   {
     title: '订单状态',
-    dataIndex: 'isEnable',
-  }
+    dataIndex: 'orderStatus',
+  },
+  {
+    title: '通知状态',
+    dataIndex: 'notifyStatus',
+  },{
+    title: '创建时间',
+    dataIndex: 'createdTime',
+  },{
+    title: '支付时间',
+    dataIndex: 'successTime',
+  },
 ]
 const state=reactive({
   isShowEditModal:false,
@@ -65,7 +78,27 @@ const pagination = reactive<PaginationProps>({
   },
 })
 const dataSource=shallowRef<any[]>([])
+const loadData=async ()=>{
+  if (state.dataSourceLoading)
+    return
+  state.dataSourceLoading = true
+  try {
+    const { data } = await searchOrder({
+      ...searchParams,
+      page: pagination.current,
+      limit: pagination.pageSize,
+    })
+    dataSource.value = data?.rows ?? []
+    pagination.total = data?.total ?? 0
+  }
+  finally {
+    state.dataSourceLoading = false
+  }
+}
 
+onMounted(()=>{
+  loadData()
+})
 </script>
 
 <template>
@@ -86,6 +119,50 @@ const dataSource=shallowRef<any[]>([])
           <a-empty></a-empty>
         </template>
         <template #bodyCell="{ column , record}">
+
+          <template v-if="column.dataIndex==='id'">
+            {{record['id']}}
+          </template>
+          <template v-if="column.dataIndex==='mchOrderNo'">
+            {{record['mchOrderNo']}}
+          </template>
+          <template v-if="column.dataIndex==='channelOrderNo'">
+            {{record['channelOrderNo']}}
+          </template>
+          <template v-if="column.dataIndex==='subject'">
+            {{record['subject']}}
+          </template>
+          <template v-if="column.dataIndex==='payMode'">
+            {{record['payMode']}}
+          </template>
+          <template v-if="column.dataIndex==='payChannelName'">
+            {{record['payChannelName']}}
+          </template>
+          <template v-if="column.dataIndex==='amount'">
+            {{record['amount'] / 100 }}
+          </template>
+          <template v-if="column.dataIndex==='mchFeeAmount'">
+            {{record['mchFeeAmount'] /100 }}
+          </template>
+          <template v-if="column.dataIndex==='orderStatus'">
+            <a-tag v-if="record['orderStatus']=='WAIT_PAY'" color="success">待支付</a-tag>
+            <a-tag v-if="record['orderStatus']=='PAY_ING'" color="success">待支付</a-tag>
+            <a-tag v-if="record['orderStatus']=='SUCCESS'" color="success">成功</a-tag>
+            <a-tag v-if="record['orderStatus']=='FAIL'" color="success">失败</a-tag>
+            <a-tag v-if="record['orderStatus']=='CLOSE'" color="success">订单关闭</a-tag>
+          </template>
+          <template v-if="column.dataIndex==='notifyStatus'">
+            <a-tag v-if="record['orderStatus']=='NOT'" color="success">未回调</a-tag>
+            <a-tag v-if="record['orderStatus']=='SUCCESS'" color="success">已通知</a-tag>
+          </template>
+          <template v-if="column.dataIndex==='successTime'">
+            {{record['successTime']}}
+          </template>
+          <template v-if="column.dataIndex==='createdTime'">
+            {{record['createdTime']}}
+          </template>
+
+
 
         </template>
       </a-table>
