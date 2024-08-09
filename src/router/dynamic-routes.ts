@@ -50,6 +50,14 @@ export default [
           hideInMenu: true,
           hideChildrenInMenu: true
         }
+      },
+      {
+        path: '/channel/test',
+        name: 'ChannelTest',
+        component: () => import('~/pages/channel/test.vue'),
+        meta: {
+          title: '渠道测式',
+        }
       }
     ]
   },

@@ -37,6 +37,7 @@ const columns:ColumnsType =[
   },
   {
     title:'操作',
+    width:180,
     dataIndex: 'action',
   },
 ]
@@ -102,7 +103,7 @@ onMounted(()=>{
       <a-card style="border: none" :body-style="{padding:'15px'}">
 
       </a-card>
-      <a-table ref="tableRef" :data-source="dataSource" :pagination="pagination" :loading="state.dataSourceLoading"  :columns="columns" size="middle" :bordered="false">
+        <a-table ref="tableRef" :scroll="{x: 'max-content'}" :data-source="dataSource" :pagination="pagination" :loading="state.dataSourceLoading"  :columns="columns" size="middle" :bordered="false">
         <template #emptyText>
           <a-empty></a-empty>
           <a-button @click="router.push({path:'/channel/edit'})" type="primary">添加渠道</a-button>
@@ -126,8 +127,9 @@ onMounted(()=>{
           </template>
           <template v-if="column.dataIndex==='action'">
             <a-flex :gap="10">
-              <a-button v-if="record['isEnable']" type="primary" danger>禁用</a-button>
-              <a-button type="primary" >编辑</a-button>
+              <a-button type="link" style="padding: 5px" >编辑</a-button>
+              <a-button  @click="router.push({path:'/channel/test',query:{id:record['id']}})" type="link" style="padding: 5px" >测式</a-button>
+              <a-button  v-if="record['isEnable']" style="padding: 5px" type="link" danger>禁用</a-button>
             </a-flex>
           </template>
         </template>

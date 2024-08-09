@@ -3,6 +3,7 @@ import { createApp } from 'vue'
 import type { App } from 'vue'
 import Root from './App.vue'
 import { setupI18n } from './locales'
+import VueQrcode from 'vue-qrcode'
 import {
   setupAccessDirective,
   setupLoadingDirective,
@@ -18,6 +19,7 @@ async function start() {
   app.use(pinia)
   await setupI18n(app)
   setupDirective(app)
+  app.component('vue-qrcode', VueQrcode)
   app.use(router)
   app.mount('#app')
   app.config.performance = true
