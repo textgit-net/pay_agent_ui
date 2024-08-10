@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import {DoubleRightOutlined} from '@ant-design/icons-vue'
 import {PayChannelTypeSelectOption} from "~/utils/constant.ts";
+import {channelTest, ChannelTestRequest, saveChannel} from "~/api/channel/ChannelInterface.ts";
 const items = ref([
   {
     title: '创建订单'
@@ -12,7 +13,7 @@ const items = ref([
     title: '支付结果'
   }
 ]);
-const current=ref(0)
+
 interface ChannelGroup{
   name:string,
   channels:any[],
@@ -21,15 +22,15 @@ interface ChannelGroup{
 }
 const isExtend=ref(false)
 const router=useRouter()
+const formRef=ref()
 var channels = [];
 const payModes=shallowRef<any[]>([])
 const channelGroups=shallowRef<ChannelGroup[]>([])
-const fromData=reactive<{
-  channelId?:any,
-  isWebCashier:boolean,
-  amount:number
-}>({
-   channelId:null,
+const state=reactive({
+  isCreateLoading:false,
+  current:0,
+})
+const fromData=reactive<ChannelTestRequest>({
    isWebCashier:false,
    amount:0.1
 })
@@ -43,7 +44,17 @@ const onChannelChange=()=>{
 }
 
 const createOrder=()=>{
-
+  formRef.value
+      .validate()
+      .then(() => {
+        state.isCreateLoading=true
+        channelTest(unref(fromData)).then(res=>{
+          state.isCreateLoading=false
+          state.current=1
+        }).catch(err=>{
+          state.isCreateLoading=false
+        })
+      })
 }
 onMounted(()=>{
   useGet("/channel/groupList").then(res=>{
@@ -62,8 +73,8 @@ onMounted(()=>{
 
   <a-flex justify="center"   class="mt-10" >
     <a-flex vertical justify="center" align="center" style="width: 800px;background: white;padding: 15px;border-radius: 4px" >
-      <a-steps :current="current" :items="items"></a-steps>
-      <a-form ref="formRef"  v-show="current==0" class="mt-4" style="width: 80%" :model="fromData"  layout="vertical"   >
+      <a-steps :current="state.current" :items="items"></a-steps>
+      <a-form ref="formRef"  v-show="state.current==0" class="mt-4" style="width: 80%" :model="fromData"  layout="vertical"   >
         <a-form-item  class="mt-2" label="支会渠道" name="channelId" :rules="{required:true,message:'请选择支付渠道'}">
           <a-select placeholder="选择支付渠道" v-model:value="fromData.channelId" @change="onChannelChange">
             <a-select-opt-group v-for="(group,index) in channelGroups">
@@ -80,8 +91,8 @@ onMounted(()=>{
             <a-radio :value="true">Web收银台</a-radio>
           </a-radio-group>
         </a-form-item>
-        <a-form-item label="支付方式" :rules="{required:true,message:'请选择支付渠道'}">
-          <a-select placeholder="请选择支付方式">
+        <a-form-item label="支付方式" name="payMode" :rules="{required:true,message:'请选择支付渠道'}">
+          <a-select placeholder="请选择支付方式" v-model:value="fromData.payMode">
             <a-select-option v-if="fromData.isWebCashier" value="ALL">聚合支付</a-select-option>
             <a-select-option v-for="(item) in payModes"  :value="item.value">{{item.name}}</a-select-option>
           </a-select>
@@ -94,21 +105,21 @@ onMounted(()=>{
         </a-flex>
         <a-flex vertical v-if="isExtend">
           <a-form-item label="商品标题">
-            <a-input  placeholder="商品标题" style="width: 100%;"></a-input>
+            <a-input  placeholder="请输入商品标题" v-model:value="fromData.subject" style="width: 100%;"></a-input>
           </a-form-item>
-          <a-form-item label="商品标题">
-            <a-input  placeholder="商户内容" style="width: 100%;"></a-input>
+          <a-form-item label="商品描述">
+            <a-input  placeholder="请输入商品描述"  v-model:value="fromData.body" style="width: 100%;"></a-input>
           </a-form-item>
         </a-flex>
       </a-form>
-      <a-flex  v-if="current==1" vertical justify="center" align="center" style="padding: 60px" :gap="10">
+      <a-flex  v-if="state.current==1" vertical justify="center" align="center" style="padding: 60px" :gap="10">
         <vue-qrcode :color="{}" :quality="1" value="fsdfsdfdsfsdfsdfs" :width="200" :margin="0"></vue-qrcode>
         <a-typography-text type="secondary">打开手机浏览器扫一扫</a-typography-text>
       </a-flex>
       <a-flex class="mt-4"  justify="center" align="center" :gap="10" >
-        <a-button @click="current=1" v-if="current==0" type="primary" class="mt-0" size="large" style="width: 250px">下一步</a-button>
-        <a-button @click="current=0" v-if="current==1" class="mt-0" size="large" style="width: 250px">上一步</a-button>
-        <a-button @click="current=2" type="primary" v-if="current==1" class="mt-0" size="large" style="width: 250px">确认支付</a-button>
+        <a-button @click="createOrder" :loading="state.isCreateLoading" v-if="state.current==0" type="primary" class="mt-0" size="large" style="width: 250px">下一步</a-button>
+        <a-button @click="state.current=0" v-if="state.current==1" class="mt-0" size="large" style="width: 250px">上一步</a-button>
+        <a-button @click="state.current=2" type="primary" v-if="state.current==1" class="mt-0" size="large" style="width: 250px">确认支付</a-button>
       </a-flex>
     </a-flex>
   </a-flex>

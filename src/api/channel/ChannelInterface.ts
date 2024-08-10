@@ -1,4 +1,5 @@
 import {BasePageRequest, PageWarp, PayChannelType, SignType} from "~/utils/constant.ts";
+import {exists} from "fs-extra";
 
 
 export interface ChannelSimpleResponse{
@@ -136,6 +137,25 @@ export interface ChannelSearch extends BasePageRequest{
     isIgnoreDisable:boolean
 }
 
+export interface ChannelTestRequest{
+    channelId?:number
+    amount?:number
+    body?:string
+    subject?:string
+    isWebCashier?:boolean
+    payMode?:string
+}
+export enum PayDataType{
+    app="app",
+    codeUrl="codeUrl",
+    codeImgUrl="codeImgUrl",
+    redirect="redirect"
+}
+export interface ChannelTestResponse {
+    orderNo:string
+    data:string
+    dataType:PayDataType
+}
 /**
  * 分页查询渠道列表
  * @param params
@@ -164,6 +184,10 @@ export function changeChannel(id:number) {
     return usePut<String>(`/channel/change/${id}`)
 }
 
+
+export function channelTest(params:ChannelTestRequest){
+    return usePost<ChannelTestResponse>("/channel/payTest",params)
+}
 
 
 
