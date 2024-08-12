@@ -68,7 +68,7 @@ const searchParams = reactive<OrderSearch>({
 })
 const pagination = reactive<PaginationProps>({
   pageSize: 10,
-  pageSizeOptions: ['10', '20', '30', '40'],
+  pageSizeOptions: ['10', '20', '30', '50'],
   current: 1,
   total: 0,
   showSizeChanger: true,
