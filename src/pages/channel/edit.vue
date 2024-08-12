@@ -200,8 +200,8 @@ const onSubmit =async ()=>{
             </a-form-item>
             <a-form-item label="开发者私钥" name="alipayPrivateKey"  class="mt-5" >
               <a-flex style="flex: 1" vertical>
-                <a-input v-model:value="formData.channelConfig['privateKey']" placeholder="请输入支付宝合作伙伴Id"></a-input>
-                <a-typography-text type="secondary">支付宝平台申请的合作伙伴Id.</a-typography-text>
+                <a-input v-model:value="formData.channelConfig['privateKey']" placeholder="请输入支付宝开发者私钥"></a-input>
+                <a-typography-text type="secondary">请输入支付宝开发者私钥</a-typography-text>
               </a-flex>
             </a-form-item>
             <a-form-item label="签名方式" name="isCert"  class="mt-5" >
