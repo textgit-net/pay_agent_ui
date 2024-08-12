@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import {DoubleRightOutlined} from '@ant-design/icons-vue'
+import {CloseCircleOutlined, DoubleRightOutlined} from '@ant-design/icons-vue'
 import {PayChannelTypeSelectOption} from "~/utils/constant.ts";
 import {channelTest, ChannelTestRequest, saveChannel} from "~/api/channel/ChannelInterface.ts";
 const items = ref([
@@ -28,13 +28,16 @@ const payModes=shallowRef<any[]>([])
 const channelGroups=shallowRef<ChannelGroup[]>([])
 const state=reactive({
   isCreateLoading:false,
+  isCheckOrderStatus:false,
+  orderIsPaySuccess:false,
+  orderStatusCheckInterval:null,
   current:0,
 })
 const fromData=reactive<ChannelTestRequest>({
    isWebCashier:false,
    amount:0.1
 })
-
+const orderInfo=reactive<any>({})
 const onChannelChange=()=>{
   if(fromData.channelId){
     payModes.value= channels.find(v=>v.id==fromData.channelId).payModes
@@ -50,11 +53,34 @@ const createOrder=()=>{
         state.isCreateLoading=true
         channelTest(unref(fromData)).then(res=>{
           state.isCreateLoading=false
+          Object.assign(orderInfo,res.data??{})
           state.current=1
         }).catch(err=>{
           state.isCreateLoading=false
         })
       })
+}
+
+
+
+const doCheckPayOrderStatus=()=>{
+  state.isCheckOrderStatus=true
+  state.orderIsPaySuccess=false
+  state.current=2
+  state.orderStatusCheckInterval=setInterval(()=>{
+    useGet<Boolean>(`/channel/payTest/orderStatus?orderNo=${orderInfo["orderNo"]}`).then(res=>{
+      if(res.data){
+        state.isCheckOrderStatus=false
+        state.orderIsPaySuccess=true
+        clearInterval(state.orderStatusCheckInterval)
+      }
+    })
+  },1000)
+  setTimeout(()=>{
+    state.isCheckOrderStatus=false
+    state.orderIsPaySuccess=false
+    clearInterval(state.orderStatusCheckInterval)
+  },30*1000)
 }
 onMounted(()=>{
   useGet("/channel/groupList").then(res=>{
@@ -113,13 +139,24 @@ onMounted(()=>{
         </a-flex>
       </a-form>
       <a-flex  v-if="state.current==1" vertical justify="center" align="center" style="padding: 60px" :gap="10">
-        <vue-qrcode :color="{}" :quality="1" value="fsdfsdfdsfsdfsdfs" :width="200" :margin="0"></vue-qrcode>
+        <vue-qrcode :color="{}" :quality="1" :value="orderInfo['data']" :width="200" :margin="0"></vue-qrcode>
         <a-typography-text type="secondary">打开手机浏览器扫一扫</a-typography-text>
+      </a-flex>
+
+      <a-flex  v-if="state.current==2" vertical justify="center" align="center" style="height: 350px" :gap="10">
+        <a-flex vertical :gap="10" v-if="state.isCheckOrderStatus" >
+          <a-spin />
+          <a-typography-text type="secondary">正在检测订单支付状态</a-typography-text>
+        </a-flex>
+        <a-flex vertical :gap="10" v-else justify="center" align="center" >
+           <CloseCircleOutlined style="font-size: 24px;color: red"/>
+           <a-typography-text type="secondary">订单检测超时,请确是否已支付</a-typography-text>
+        </a-flex>
       </a-flex>
       <a-flex class="mt-4"  justify="center" align="center" :gap="10" >
         <a-button @click="createOrder" :loading="state.isCreateLoading" v-if="state.current==0" type="primary" class="mt-0" size="large" style="width: 250px">下一步</a-button>
         <a-button @click="state.current=0" v-if="state.current==1" class="mt-0" size="large" style="width: 250px">上一步</a-button>
-        <a-button @click="state.current=2" type="primary" v-if="state.current==1" class="mt-0" size="large" style="width: 250px">确认支付</a-button>
+        <a-button @click="doCheckPayOrderStatus"  type="primary" v-if="state.current==1" class="mt-0" size="large" style="width: 250px">确认支付</a-button>
       </a-flex>
     </a-flex>
   </a-flex>

@@ -1,22 +1,29 @@
-import {BasePageRequest, PageWarp, SelectOption, SignType} from "~/utils/constant.ts";
+import {BasePageRequest, PageWarp, PayChannelType, SelectOption, SignType} from "~/utils/constant.ts";
+export interface OrderReportSearch extends BasePageRequest{
+    channels?:PayChannelType[]
+    channelIds?:number[]
+}
+export interface BaseOrderReportInfo{
+
+}
 export enum OrderTableType{
-    ALL,
+    ALL=1,
     /**
      * 待支付
      */
-    WAIT_PAY,
+    WAIT_PAY=2,
     /**
      * 支付中
      */
-    PAY_ING,
+    PAY_ING=3,
     /**
      * 支付成功
      */
-    SUCCESS,
+    SUCCESS=4,
     /**
      * 失败
      */
-    FAIL
+    FAIL=5
 }
 export enum OrderStatus {
     /**
@@ -38,7 +45,7 @@ export enum OrderStatus {
     /**
      * 取消订单
      */
-    CANCEL5,
+    CANCEL=5,
     /**
      * 订单关闭
      */
@@ -54,7 +61,7 @@ export function getOrderStatusText(status:OrderStatus): string {
             return "支付成功"
         case OrderStatus.FAIL:
             return "失败"
-        case OrderStatus.CANCEL5:
+        case OrderStatus.CANCEL:
             return "取消订单"
         case OrderStatus.CLOSE:
             return "订单关闭"
@@ -78,8 +85,8 @@ export const  OrderStatusSelectOptions:SelectOption<OrderStatus>[]=[
         title:getOrderStatusText(OrderStatus.FAIL)
     },
     {
-        value:OrderStatus.CANCEL5,
-        title:getOrderStatusText(OrderStatus.CANCEL5)
+        value:OrderStatus.CANCEL,
+        title:getOrderStatusText(OrderStatus.CANCEL)
     },
     {
         value:OrderStatus.CLOSE,
@@ -89,8 +96,11 @@ export const  OrderStatusSelectOptions:SelectOption<OrderStatus>[]=[
 
 
 export interface OrderSearch extends BasePageRequest{
-
+    orderStatus?:OrderStatus[]
 }
+
+
+
 
 export function searchOrder(search:OrderSearch)   {
     return useGet<PageWarp<any>>("/order/page",search)

@@ -151,15 +151,7 @@ export default [
           hideChildrenInMenu: true
         }
       },
-      {
-        path: '/report/mch',
-        name: 'MchReport',
-        component: () => import('~/pages/report/mch/index.vue'),
-        meta: {
-          title: '商户报表',
-          hideChildrenInMenu: true
-        }
-      },
+
       {
         path: '/report/channel',
         name: 'ChannelReport',
@@ -169,15 +161,7 @@ export default [
           hideChildrenInMenu: true
         }
       },
-      {
-        path: '/report/agent',
-        name: 'AgentReport',
-        component: () => import('~/pages/report/agent/index.vue'),
-        meta: {
-          title: '代理商报表',
-          hideChildrenInMenu: true
-        }
-      },
+
       {
         path: '/report/hour',
         name: 'HourReport',

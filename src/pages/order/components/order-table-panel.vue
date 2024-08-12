@@ -82,9 +82,12 @@ const columns =shallowRef<any[]>(
       }
     ]
 )
+const searchParams=reactive<OrderSearch>({
+  page: 1,
+  limit:10
+})
 const props=defineProps<{
-  tableType: number   | OrderTableType,
-  searchParams:OrderSearch
+  tableType: number   | OrderTableType
 }>()
 const state=reactive({
   dataSourceLoading:false
@@ -104,13 +107,29 @@ const pagination = reactive<PaginationProps>({
 
   },
 })
+const getOrderStatus=():OrderStatus[]=>{
+  debugger
+  switch (props.tableType){
+    case OrderTableType.ALL:
+      return []
+    case OrderTableType.WAIT_PAY:
+      return [OrderStatus.WAIT_PAY]
+    case OrderTableType.PAY_ING:
+      return [OrderStatus.PAY_ING]
+    case OrderTableType.SUCCESS:
+      return [OrderStatus.SUCCESS]
+    case OrderTableType.FAIL:
+      return [OrderStatus.FAIL,OrderStatus.CANCEL,OrderStatus.CLOSE]
+  }
+}
 const loadData=async  ()=> {
   if (state.dataSourceLoading)
     return
   state.dataSourceLoading = true
   try {
     const { data } = await searchOrder({
-      ...props.searchParams,
+      ...searchParams,
+      orderStatus:getOrderStatus(),
       page: pagination.current,
       limit: pagination.pageSize,
     })
@@ -121,7 +140,11 @@ const loadData=async  ()=> {
     state.dataSourceLoading = false
   }
 }
-
+const refresh=async(search:OrderSearch)=>{
+    Object.assign(searchParams,search)
+    await loadData()
+}
+defineExpose({refresh})
 onMounted(()=>{
   loadData()
 })
@@ -133,33 +156,15 @@ onMounted(()=>{
     <a-table style="width: 100%" :scroll="{ x: 1200 }"  :data-source="dataSource" :pagination="pagination" :loading="state.dataSourceLoading"  :columns="columns.filter(v=>v.tableTypes.includes(OrderTableType.ALL)||v.tableTypes.includes(tableType))" size="middle" :bordered="false">
       <template #emptyText>
         <a-empty></a-empty>
-        <a-button  type="primary" @click="router.push({path:'/mch/create'})" >添加商户</a-button>
       </template>
       <template #bodyCell="{ column , record}">
-        <template v-if="column.dataIndex==='contactWay'">
-          <a-space>
-            <a-typography-text>{{getContactWayText((record["contactWay"]as ContactWay))}}</a-typography-text>
-            <a-typography-text type="secondary" >{{record["contactNumber"]}}</a-typography-text>
-          </a-space>
-        </template>
 
-<!--        <template v-if="column.dataIndex==='subject'">-->
-<!--          <a-flex vertical :gap="5">-->
-<!--            <a-typography-text >{{record['subject']}}</a-typography-text>-->
-<!--            <a-typography-text type="secondary">{{record['body']}}</a-typography-text>-->
-<!--          </a-flex>-->
-<!--        </template>-->
+
         <template v-if="column.dataIndex==='orderStatus'">
           {{getOrderStatusText(record['orderStatus'] as OrderStatus)}}
         </template>
         <template v-if="column.dataIndex==='channelCount'">
           {{record['channelCount']|| '--' }}
-        </template>
-        <template v-if="column.dataIndex==='totalOrderCount'">
-          {{record['totalOrderAmount']|| '--' }}
-        </template>
-        <template v-if="column.dataIndex==='totalOrderAmount'">
-          {{record['totalOrderAmount']|| '--' }}
         </template>
         <template v-if="column.dataIndex==='action'">
           <a-flex :gap="5">
