@@ -42,6 +42,10 @@ const columns:ColumnsType =[
     dataIndex: 'orderStatus',
   },
   {
+    title: '回调状态',
+    dataIndex: 'notifyStatus',
+  },
+  {
     title: '渠道订单号',
     dataIndex: 'channelOrderNo',
   },
@@ -151,6 +155,9 @@ onMounted(()=>{
     </a-card>
     <a-card >
       <a-tabs >
+        <a-tab-pane key="all" tab="全部">
+          <OrderTablePanel :table-type="OrderTableType.WAIT_PAY" :search-params="searchParams"/>
+        </a-tab-pane>
         <a-tab-pane key="waitPay" tab="待支付">
           <OrderTablePanel :table-type="OrderTableType.WAIT_PAY" :search-params="searchParams"/>
         </a-tab-pane>

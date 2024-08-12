@@ -18,7 +18,10 @@ const columns:ColumnsType =[
     title: '渠道类型',
     dataIndex: 'channelType',
   },
-
+  {
+    title: '渠道编码',
+    dataIndex: 'tags',
+  },
   {
     title: '启用分账',
     dataIndex: 'isEnableAllocation',
@@ -105,13 +108,13 @@ onMounted(()=>{
     <a-card :body-style="{'padding':'0px'}">
 
       <a-card style="border: none" :body-style="{padding:'15px'}">
-
+        <a-button @click="router.push({path:'/channel/edit'})" type="primary">添加渠道</a-button>
       </a-card>
         <a-table ref="tableRef" :scroll="{x: 'max-content'}" :data-source="dataSource" :pagination="pagination" :loading="state.dataSourceLoading"  :columns="columns" size="middle" :bordered="false">
-        <template #emptyText>
-          <a-empty></a-empty>
-          <a-button @click="router.push({path:'/channel/edit'})" type="primary">添加渠道</a-button>
-        </template>
+<!--        <template #emptyText>-->
+<!--          <a-empty></a-empty>-->
+<!--          <a-button @click="router.push({path:'/channel/edit'})" type="primary">添加渠道</a-button>-->
+<!--        </template>-->
         <template #bodyCell="{ column , record}">
           <template v-if="column.dataIndex==='isEnableAllocation'">
             <a-tag v-if="record['isEnableAllocation']" color="success">已配制</a-tag>

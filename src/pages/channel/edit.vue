@@ -177,6 +177,12 @@ const onSubmit =async ()=>{
                 <a-typography-text type="secondary">为了方便管理,请给渠道起个名呗.</a-typography-text>
               </a-flex>
             </a-form-item>
+            <a-form-item label="渠道编码" name="name" class="mt-5" >
+              <a-flex style="flex: 1" vertical>
+                <a-input v-model:value="formData.name" placeholder="请输入渠道编码,用于派单分组"></a-input>
+                <a-typography-text type="secondary">请输入渠道编码</a-typography-text>
+              </a-flex>
+            </a-form-item>
           </a-card>
           <a-card  v-if="current==1" :bordered="false">
 <!--            <a-typography-text strong>2.渠道配制</a-typography-text>-->
