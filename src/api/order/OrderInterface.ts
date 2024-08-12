@@ -1,129 +1,97 @@
-import {BasePageRequest, PageWarp, PayChannelType} from "~/utils/constant.ts";
-import {ChannelSimpleResponse} from "~/api/channel/ChannelInterface.ts";
-
-/**
- * 订单列表结构体
- */
-export interface OrderListResponse{
+import {BasePageRequest, PageWarp, SelectOption, SignType} from "~/utils/constant.ts";
+export enum OrderTableType{
+    ALL,
     /**
-     * 订单ID
+     * 待支付
      */
-    id:string
+    WAIT_PAY,
     /**
-     * 商户订单号
+     * 支付中
      */
-    mchOrderNo:string
+    PAY_ING,
     /**
-     * 渠道信息
+     * 支付成功
      */
-    channelInfo:ChannelSimpleResponse
-
+    SUCCESS,
     /**
-     * 支付方式
+     * 失败
      */
-    payMode:string
-    /**
-     * 支付金额
-     */
-    amount:number
-    /**
-     * 商户手续费费率
-     */
-    mchFeeRate:number|undefined
-    /**
-     * 商户手续费
-     */
-    mchFeeAmount:number|undefined
-    /**
-     * 币种
-     */
-    currency:string
-    /**
-     * 订单状态
-     */
-    orderStatus:number
-    /**
-     * 顶单回调状态
-     */
-    notifyStatus:number|undefined
-    /**
-     * 商品标题
-     */
-    subject:string
-    /**
-     * 商品描述信息
-     */
-    body:string
-    /**
-     * 渠道订单号
-     */
-    channelOrderNo:string|undefined
-    /**
-     * 订单分账模式
-     */
-    divisionMode:number|undefined
-    /**
-     * 订单分账状态
-     */
-    divisionStatus:number|undefined
-    /**
-     * 最新分账时间
-     */
-    divisionLastTime:string|undefined
-    /**
-     * 渠道支付错误码
-     */
-    errCode:string|undefined
-    /**
-     * 渠道支付错误描述
-     */
-    errMsg:string|undefined
-    /**
-     * 买家备注
-     */
-    buyerRemark:string|undefined
-    /**
-     * 卖家备注
-     */
-    sellerRemark:string|undefined
-    /**
-     * 订单支付成功时间
-     */
-    successTime:string|undefined
-    /**
-     * 创建时间
-     */
-    createdTime:string
+    FAIL
 }
+export enum OrderStatus {
+    /**
+     * 待支付
+     */
+    WAIT_PAY=1,
+    /**
+     * 支付中
+     */
+    PAY_ING=2,
+    /**
+     * 支付成功
+     */
+    SUCCESS=3,
+    /**
+     * 失败
+     */
+    FAIL=4,
+    /**
+     * 取消订单
+     */
+    CANCEL5,
+    /**
+     * 订单关闭
+     */
+    CLOSE=6
+}
+export function getOrderStatusText(status:OrderStatus): string {
+    switch (status){
+        case OrderStatus.WAIT_PAY:
+            return "待支付"
+        case OrderStatus.PAY_ING:
+            return "支付中"
+        case OrderStatus.SUCCESS:
+            return "支付成功"
+        case OrderStatus.FAIL:
+            return "失败"
+        case OrderStatus.CANCEL5:
+            return "取消订单"
+        case OrderStatus.CLOSE:
+            return "订单关闭"
+    }
+}
+export const  OrderStatusSelectOptions:SelectOption<OrderStatus>[]=[
+    {
+        value:OrderStatus.WAIT_PAY,
+        title:getOrderStatusText(OrderStatus.WAIT_PAY)
+    },
+    {
+        value:OrderStatus.PAY_ING,
+        title:getOrderStatusText(OrderStatus.PAY_ING)
+    },
+    {
+        value:OrderStatus.SUCCESS,
+        title:getOrderStatusText(OrderStatus.SUCCESS)
+    },
+    {
+        value:OrderStatus.FAIL,
+        title:getOrderStatusText(OrderStatus.FAIL)
+    },
+    {
+        value:OrderStatus.CANCEL5,
+        title:getOrderStatusText(OrderStatus.CANCEL5)
+    },
+    {
+        value:OrderStatus.CLOSE,
+        title:getOrderStatusText(OrderStatus.CLOSE)
+    }
+]
 
-/**
- * 订单查询参数
- */
+
 export interface OrderSearch extends BasePageRequest{
-    /**
-     * 订单ID
-     */
-    orderNo?:string
-    /**
-     * 商户订单号
-     */
-    mchOrderNo?:string
-    /**
-     * 渠道类型,多个渠道类型用逗号分隔
-     */
-    channelTypes:PayChannelType[]
-    /**
-     * 订单状态
-     */
-    orderStatus:number
+
 }
 
-/**
- * 分页查询订单列表
- * @param params {@link OrderSearch}
- */
-export function searchOrder(params:OrderSearch) {
-    return useGet<PageWarp<OrderListResponse>>('/order/page', params)
+export function searchOrder(search:OrderSearch)   {
+    return useGet<PageWarp<any>>("/order/page",search)
 }
-
-

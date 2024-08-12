@@ -73,7 +73,7 @@ export default [
       {
         path: '/order/list',
         name: 'OrderList',
-        component: () => import('~/pages/order/pay-order-list.vue'),
+        component: () => import('~/pages/order/index.vue'),
         meta: {
           title: '订单列表',
           hideChildrenInMenu: true
