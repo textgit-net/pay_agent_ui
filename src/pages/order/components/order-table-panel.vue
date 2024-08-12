@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import {ColumnsType} from "ant-design-vue/es/table";
-import {AccessEnum, ContactWay, getContactWayText} from "~/utils/constant.ts";
+import {AccessEnum} from "~/utils/constant.ts";
 import {getOrderStatusText, OrderSearch, OrderStatus, OrderTableType, searchOrder} from "~/api/order/OrderInterface.ts";
 import {PaginationProps} from "ant-design-vue";
 
