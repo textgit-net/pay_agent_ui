@@ -66,10 +66,20 @@ const state=reactive({
   dataSourceLoading:false,
   isConfirmLoading:false
 })
+const tableRef=ref()
 const searchParams = reactive<OrderSearch>({
   page:1,
   limit:10
 })
+
+const resetSearch=async ()=>{
+  Object.assign(searchParams,{
+    page:1,
+    limit:10
+  })
+  tableRef.value.refresh(searchParams)
+}
+
 
 onMounted(()=>{
 
@@ -87,48 +97,48 @@ onMounted(()=>{
     <a-card style="border: none" :body-style="{padding:'15px'}">
       <a-flex vertical :gap="15">
         <a-row :gutter="16">
-          <a-col class="gutter-row" :span="3">
+          <a-col class="gutter-row" :span="4">
             <a-input  v-model:value="searchParams.keywords"  allow-clear placeholder="请输入订单编号"> </a-input>
           </a-col>
-          <a-col class="gutter-row" :span="3">
+          <a-col class="gutter-row" :span="4">
             <a-select style="width: 100%">
               <a-select-option :value="null">所有</a-select-option>
               <a-select-option v-for="(item) in PayChannelTypeSelectOption" :value="item.value">{{item.title}}</a-select-option>
             </a-select>
           </a-col>
-          <a-col class="gutter-row" :span="3">
+          <a-col class="gutter-row" :span="4">
             <a-range-picker style="width: 100%" />
           </a-col>
-          <a-col class="gutter-row" :span="3">
+          <a-col class="gutter-row" :span="4">
             <a-input placeholder="请输入商户ID" allow-clear></a-input>
           </a-col>
-          <a-col class="gutter-row" :span="3">
+          <a-col class="gutter-row" :span="4">
              <a-input placeholder="请输入商户渠道ID"></a-input>
           </a-col>
         </a-row>
 
-        <a-flex justify="flex-start" :gap="0">
+        <a-flex justify="flex-start" align="center"  :gap="10" >
           <a-button type="link" style="padding-left: 0px" @click="resetSearch">重置筛选</a-button>
-
+          <a-button type="primary" size="small" style="width: 80px;height:27.99px"  @click="tableRef.refresh(searchParams)">筛选</a-button>
         </a-flex>
       </a-flex>
     </a-card>
     <a-card >
-      <a-tabs >
+      <a-tabs destroy-inactive-tab-pane >
         <a-tab-pane key="all" tab="全部">
-          <OrderTablePanel :table-type="OrderTableType.ALL" :search-params="searchParams"/>
+          <OrderTablePanel ref="tableRef" :table-type="OrderTableType.ALL" :search-params="searchParams"/>
         </a-tab-pane>
         <a-tab-pane key="waitPay" tab="待支付">
-          <OrderTablePanel :table-type="OrderTableType.WAIT_PAY" :search-params="searchParams"/>
+          <OrderTablePanel ref="tableRef" :table-type="OrderTableType.WAIT_PAY" :search-params="searchParams"/>
         </a-tab-pane>
         <a-tab-pane key="payIng" tab="支付中">
-          <OrderTablePanel :table-type="OrderTableType.PAY_ING" :search-params="searchParams"/>
+          <OrderTablePanel ref="tableRef" :table-type="OrderTableType.PAY_ING" :search-params="searchParams"/>
         </a-tab-pane>
         <a-tab-pane key="paySuccess" tab="成功">
-          <OrderTablePanel :table-type="OrderTableType.SUCCESS" :search-params="searchParams"/>
+          <OrderTablePanel ref="tableRef" :table-type="OrderTableType.SUCCESS" :search-params="searchParams"/>
         </a-tab-pane>
         <a-tab-pane key="payFail" tab="失败">
-          <OrderTablePanel :table-type="OrderTableType.FAIL" :search-params="searchParams"/>
+          <OrderTablePanel ref="tableRef" :table-type="OrderTableType.FAIL" :search-params="searchParams"/>
         </a-tab-pane>
       </a-tabs>
 

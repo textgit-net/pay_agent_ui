@@ -108,7 +108,6 @@ const pagination = reactive<PaginationProps>({
   },
 })
 const getOrderStatus=():OrderStatus[]=>{
-  debugger
   switch (props.tableType){
     case OrderTableType.ALL:
       return []

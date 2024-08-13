@@ -29,7 +29,7 @@ export default [
     path: '/channel',
     meta: {
       title: '渠道管理',
-      icon: 'RobotFilled'
+      icon: 'ThunderboltOutlined'
     },
     children: [
       {
@@ -66,7 +66,7 @@ export default [
     name: 'OrderManage',
     meta: {
       title: '订单管理',
-      icon: 'RobotFilled'
+      icon: 'PayCircleOutlined'
     },
     children: [
 
@@ -95,7 +95,7 @@ export default [
     path: '/account',
     meta: {
       title: '账户信息',
-      icon: 'RobotFilled'
+      icon: 'UserOutlined'
     },
     children: [
       {
@@ -139,7 +139,7 @@ export default [
     path: '/report',
     meta: {
       title: '报表中心',
-      icon: 'RobotFilled'
+      icon: 'BarChartOutlined'
     },
     children: [
       {
@@ -162,15 +162,15 @@ export default [
         }
       },
 
-      {
-        path: '/report/hour',
-        name: 'HourReport',
-        component: () => import('~/pages/report/hour/index.vue'),
-        meta: {
-          title: '分小时报表',
-          hideChildrenInMenu: true
-        }
-      }
+      // {
+      //   path: '/report/hour',
+      //   name: 'HourReport',
+      //   component: () => import('~/pages/report/hour/index.vue'),
+      //   meta: {
+      //     title: '分小时报表',
+      //     hideChildrenInMenu: true
+      //   }
+      // }
     ]
   },
   {

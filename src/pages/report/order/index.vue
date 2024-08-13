@@ -70,8 +70,19 @@ const searchParams = reactive<OrderReportSearch>({
   limit:10
 })
 const dataSource=shallowRef<BaseOrderReportInfo>([])
-onMounted(()=>{
+const resetSearch=async ()=>{
+  Object.assign(searchParams,{
+    page:1,
+    limit:10
+  })
+  await loadData()
+}
+const loadData=async ()=>{
+  state.dataSourceLoading=false
 
+}
+onMounted(()=>{
+  loadData()
 })
 </script>
 
@@ -86,15 +97,15 @@ onMounted(()=>{
     <a-card style="border: none" :body-style="{padding:'15px'}">
       <a-flex vertical :gap="15">
         <a-row :gutter="16">
-          <a-col class="gutter-row" :span="3">
+          <a-col class="gutter-row" :span="4">
             <a-range-picker style="width: 100%" />
           </a-col>
-          <a-col class="gutter-row" :span="3">
+          <a-col class="gutter-row" :span="4">
             <a-select style="width: 100%" v-model:value="searchParams.channels" :max-tag-count="1" placeholder="全部渠道方" allow-clear>
               <a-select-option v-for="(item) in PayChannelTypeSelectOption" :value="item.value">{{item.title}}</a-select-option>
             </a-select>
           </a-col>
-          <a-col class="gutter-row" :span="3">
+          <a-col class="gutter-row" :span="4">
             <a-select style="width: 100%" v-model:value="searchParams.channelIds" :max-tag-count="1" placeholder="全部渠道" allow-clear>
             </a-select>
           </a-col>
@@ -102,7 +113,7 @@ onMounted(()=>{
 
         <a-flex justify="flex-start" :gap="0">
           <a-button type="link" style="padding-left: 0px" @click="resetSearch">重置筛选</a-button>
-
+          <a-button type="primary" size="small" style="width: 80px;height:27.99px"  @click="loadData">筛选</a-button>
         </a-flex>
       </a-flex>
     </a-card>
