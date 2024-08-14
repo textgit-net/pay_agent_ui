@@ -18,8 +18,7 @@ const columns =shallowRef<any[]>(
       {
         title: '商家订单号',
         dataIndex: 'mchOrderNo',
-        width: '180px',
-        ellipsis:true,
+        //ellipsis:true,
         align:'left',
         fixed: 'left',
         tableTypes:[OrderTableType.ALL]
@@ -28,7 +27,13 @@ const columns =shallowRef<any[]>(
         title: '商户信息',
         align:'center',
         dataIndex: 'mchInfo',
-        tableTypes:[OrderTableType.PAY_ING,OrderTableType.SUCCESS,OrderTableType.FAIL],
+        tableTypes:[OrderTableType.ALL],
+      },
+      {
+        title: '渠道信息',
+        align:'center',
+        dataIndex: 'channelInfo',
+        tableTypes:[OrderTableType.ALL],
       },
       {
         title: '商品标题',
@@ -46,6 +51,7 @@ const columns =shallowRef<any[]>(
       {
         title: '币种',
         align:'center',
+        width: '60px',
         dataIndex: 'currency',
         tableTypes:[OrderTableType.ALL]
       },
@@ -78,6 +84,12 @@ const columns =shallowRef<any[]>(
         title: '创建时间',
         align:'center',
         dataIndex: 'createdTime',
+        tableTypes:[OrderTableType.ALL]
+      },
+      {
+        title: '操作',
+        align:'center',
+        dataIndex: 'action',
         tableTypes:[OrderTableType.ALL]
       }
     ]
@@ -158,17 +170,32 @@ onMounted(()=>{
       </template>
       <template #bodyCell="{ column , record}">
 
-
         <template v-if="column.dataIndex==='orderStatus'">
-          {{getOrderStatusText(record['orderStatus'] as OrderStatus)}}
+          <template v-if="column.dataIndex==='orderStatus'">
+            <a-tag v-if="record['orderStatus']===1" color="#0066ff" > {{getOrderStatusText(record['orderStatus'] as OrderStatus)}}</a-tag>
+            <a-tag v-if="record['orderStatus']===2" color="#ff9933" > {{getOrderStatusText(record['orderStatus'] as OrderStatus)}}</a-tag>
+            <a-tag v-if="record['orderStatus']===3" color="#009933" > {{getOrderStatusText(record['orderStatus'] as OrderStatus)}}</a-tag>
+            <a-tag v-if="record['orderStatus']===4" color="#ff0000" > {{getOrderStatusText(record['orderStatus'] as OrderStatus)}}</a-tag>
+            <a-tag v-if="record['orderStatus']===5" color="#cc0000" > {{getOrderStatusText(record['orderStatus'] as OrderStatus)}}</a-tag>
+            <a-tag v-if="record['orderStatus']===6" color="#cc0000" > {{getOrderStatusText(record['orderStatus'] as OrderStatus)}}</a-tag>
+          </template>
+        </template>
+        <template v-if="column.dataIndex==='amount'">
+          {{(parseFloat(record['amount']) / 100)}}
         </template>
         <template v-if="column.dataIndex==='channelCount'">
           {{record['channelCount']|| '--' }}
         </template>
+        <template v-if="column.dataIndex==='mchInfo'">
+          <div>ID:{{record['mchInfo'].id}}</div>
+          <div>Name:{{record['mchInfo'].name}}</div>
+        </template>
+        <template v-if="column.dataIndex==='channelInfo'">
+          <div>ID:{{record['channelInfo'].id}}</div>
+          <div>Name:{{record['channelInfo'].name}}</div>
+        </template>
         <template v-if="column.dataIndex==='action'">
-          <a-flex :gap="5">
-
-          </a-flex>
+          <a-button type="link" style="padding: 5px" >详情</a-button>
         </template>
       </template>
     </a-table>
