@@ -1,50 +1,66 @@
 <script setup lang="ts">
-import {ColumnsType} from "ant-design-vue/es/table";
-import {PaginationProps} from "ant-design-vue";
+import {ColumnsType} from "ant-design-vue/es/table"
+import {PaginationProps} from "ant-design-vue"
 import {
   OrderSearch,
   searchOrder,
   OrderTableType,
-  OrderReportSearch,
-  BaseOrderReportInfo, getOrderStatusText, OrderStatus
-} from "~/api/order/OrderInterface.ts";
-import OrderTablePanel from "~/pages/order/components/order-table-panel.vue";
-import {PayChannelTypeSelectOption} from "~/utils/constant.ts";
-
+  OrderReportSearch,getOrderStatusText, OrderStatus, getOrderReportData
+} from "~/api/order/OrderInterface.ts"
+import OrderTablePanel from "~/pages/order/components/order-table-panel.vue"
+import dayjs, { Dayjs } from 'dayjs'
+import {PayChannelTypeSelectOption} from "~/utils/constant.ts"
+const dateFormat = 'YYYY-MM-DD'
+type RangeValue = [Dayjs, Dayjs];
+const reportDate =ref<RangeValue>([
+  dayjs(dayjs().subtract(31,'day'), dateFormat),
+  dayjs(dayjs(), dateFormat),
+]);
+const disabledDate = (current: Dayjs) => {
+  if (!reportDate.value || (reportDate.value as any).length === 0) {
+    return false;
+  }
+  const tooLate = reportDate.value[0] && current.diff(reportDate.value[0], 'days') > 31;
+  const tooEarly = reportDate.value[1] && reportDate.value[1].diff(current, 'days') > 31;
+  return tooEarly || tooLate;
+};
 const router=useRouter()
-const editContentModalRef=ref(null)
 const columns:ColumnsType =[
   {
     title: '时间',
     dataIndex: 'orderDate',
   },
   {
-    title: '成交金额',
-    dataIndex: 'totalSuccessAmount',
+    title: '交易总额',
+    dataIndex: 'totalOrderAmount',
   },
   {
     title: '实收金额',
-    dataIndex: 'totalPayAmount',
+    dataIndex: 'totalSuccessOrderAmount',
   },
   {
     title: '手续费',
-    dataIndex: 'totalFree',
-  },
-  {
-    title: '成交总笔数',
-    dataIndex: 'totalRefundAmount',
+    dataIndex: 'totalFeeAmount',
   },
   {
     title: '交易笔数',
-    dataIndex: 'currency',
+    dataIndex: 'totalOrderCount',
+  },
+  {
+    title:'成交笔数',
+    dataIndex:'totalSuccessOrderCount'
+  },
+  {
+    title:'超时笔数',
+    dataIndex:'totalSuccessOrderCount'
+  },
+  {
+    title:'异常笔数',
+    dataIndex:'totalSuccessOrderCount'
   },
   {
     title: '成功率',
-    dataIndex: 'mchFeeAmount',
-  },
-  {
-    title:'渠道数量',
-    dataIndex: 'channel',
+    dataIndex: 'successRate',
   }
 ]
 const state=reactive({
@@ -69,7 +85,7 @@ const searchParams = reactive<OrderReportSearch>({
   page:1,
   limit:10
 })
-const dataSource=shallowRef<BaseOrderReportInfo>([])
+const dataSource=shallowRef<any>([])
 const resetSearch=async ()=>{
   Object.assign(searchParams,{
     page:1,
@@ -77,8 +93,25 @@ const resetSearch=async ()=>{
   })
   await loadData()
 }
-const loadData=async ()=>{
-  state.dataSourceLoading=false
+const loadData=async  ()=> {
+  if (state.dataSourceLoading)
+    return
+  state.dataSourceLoading = true
+  try {
+    const { data } = await getOrderReportData({
+      ...searchParams,
+      page: pagination.current,
+      startDate:reportDate.value[0].format(dateFormat),
+      endDate:reportDate.value[1].format(dateFormat),
+      limit: pagination.pageSize,
+    })
+    dataSource.value = data?.rows ?? []
+    pagination.total = data?.total ?? 0
+  }catch (e){
+    console.error(e)
+  }finally{
+    state.dataSourceLoading = false
+  }
 
 }
 onMounted(()=>{
@@ -98,7 +131,7 @@ onMounted(()=>{
       <a-flex vertical :gap="15">
         <a-row :gutter="16">
           <a-col class="gutter-row" :span="4">
-            <a-range-picker style="width: 100%" />
+            <a-range-picker style="width: 100%" v-model:value="reportDate" :format="dateFormat"  :disabled-date="disabledDate"/>
           </a-col>
           <a-col class="gutter-row" :span="4">
             <a-select style="width: 100%" v-model:value="searchParams.channels" :max-tag-count="1" placeholder="全部渠道方" allow-clear>
@@ -122,7 +155,11 @@ onMounted(()=>{
         <template #emptyText>
           <a-empty></a-empty>
         </template>
-
+        <template #bodyCell="{ column , record}">
+            <template v-if="column.dataIndex==='successRate'">
+              {{record.totalSuccessOrderCount/record.totalOrderCount}}%
+            </template>
+        </template>
       </a-table>
 
     </a-card>

@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import {ColumnsType} from "ant-design-vue/es/table";
-import {AccessEnum} from "~/utils/constant.ts";
+import {AccessEnum, getPayChannelTypeText, getPayModeTypeText, PayChannelType, PayModeType} from "~/utils/constant.ts";
+import {CopyOutlined,AlipaySquareFilled} from '@ant-design/icons-vue'
 import {getOrderStatusText, OrderSearch, OrderStatus, OrderTableType, searchOrder} from "~/api/order/OrderInterface.ts";
 import {PaginationProps} from "ant-design-vue";
 
@@ -10,7 +11,6 @@ const columns =shallowRef<any[]>(
       {
         title: '订单编号',
         dataIndex: 'id',
-        width: '150px',
         align:'left',
         fixed: 'left',
         tableTypes:[OrderTableType.ALL]
@@ -18,23 +18,11 @@ const columns =shallowRef<any[]>(
       {
         title: '商家订单号',
         dataIndex: 'mchOrderNo',
-        //ellipsis:true,
         align:'left',
         fixed: 'left',
         tableTypes:[OrderTableType.ALL]
       },
-      {
-        title: '商户信息',
-        align:'center',
-        dataIndex: 'mchInfo',
-        tableTypes:[OrderTableType.ALL],
-      },
-      {
-        title: '渠道信息',
-        align:'center',
-        dataIndex: 'channelInfo',
-        tableTypes:[OrderTableType.ALL],
-      },
+
       {
         title: '商品标题',
         align:'center',
@@ -69,16 +57,28 @@ const columns =shallowRef<any[]>(
         tableTypes:[OrderTableType.ALL]
       },
       {
+        title: '渠道信息',
+        align:'center',
+        dataIndex: 'channelInfo',
+        tableTypes:[OrderTableType.ALL],
+      },
+      {
+        title: '支付方式',
+        align:'center',
+        dataIndex: 'payMode',
+        tableTypes:[OrderTableType.ALL,OrderTableType.PAY_ING,OrderTableType.SUCCESS,OrderTableType.FAIL],
+      },
+      {
         title: '渠道订单号',
         align:'center',
         dataIndex: 'channelOrderNo',
-        tableTypes:[OrderTableType.PAY_ING,OrderTableType.SUCCESS,OrderTableType.FAIL],
+        tableTypes:[OrderTableType.ALL,OrderTableType.PAY_ING,OrderTableType.SUCCESS,OrderTableType.FAIL],
       },
       {
         title: '完成时间',
         align:'center',
         dataIndex: 'successTime',
-        tableTypes:[OrderTableType.PAY_ING,OrderTableType.SUCCESS,OrderTableType.FAIL],
+        tableTypes:[OrderTableType.ALL,OrderTableType.PAY_ING,OrderTableType.SUCCESS],
       },
       {
         title: '创建时间',
@@ -86,12 +86,12 @@ const columns =shallowRef<any[]>(
         dataIndex: 'createdTime',
         tableTypes:[OrderTableType.ALL]
       },
-      {
-        title: '操作',
-        align:'center',
-        dataIndex: 'action',
-        tableTypes:[OrderTableType.ALL]
-      }
+      // {
+      //   title: '操作',
+      //   align:'center',
+      //   dataIndex: 'action',
+      //   tableTypes:[OrderTableType.ALL]
+      // }
     ]
 )
 const searchParams=reactive<OrderSearch>({
@@ -164,7 +164,7 @@ onMounted(()=>{
 
 <template>
   <div style="width: 100%;">
-    <a-table style="width: 100%" :scroll="{ x: 1200 }"  :data-source="dataSource" :pagination="pagination" :loading="state.dataSourceLoading"  :columns="columns.filter(v=>v.tableTypes.includes(OrderTableType.ALL)||v.tableTypes.includes(tableType))" size="middle" :bordered="false">
+    <a-table style="width: 100%" :scroll="{ x: 1300 }"  :data-source="dataSource" :pagination="pagination" :loading="state.dataSourceLoading"  :columns="columns.filter(v=>v.tableTypes.includes(OrderTableType.ALL)||v.tableTypes.includes(tableType))" size="middle" :bordered="false">
       <template #emptyText>
         <a-empty></a-empty>
       </template>
@@ -183,16 +183,31 @@ onMounted(()=>{
         <template v-if="column.dataIndex==='amount'">
           {{(parseFloat(record['amount']) / 100)}}
         </template>
-        <template v-if="column.dataIndex==='channelCount'">
-          {{record['channelCount']|| '--' }}
+        <template v-if="column.dataIndex==='mchOrderNo'">
+          <a-flex justify="space-start" align="center" :gap="5" >
+            <a-typography-text >{{record['mchOrderNo']}}</a-typography-text>
+          </a-flex>
+
         </template>
-        <template v-if="column.dataIndex==='mchInfo'">
-          <div>ID:{{record['mchInfo'].id}}</div>
-          <div>Name:{{record['mchInfo'].name}}</div>
+        <template v-if="column.dataIndex==='payMode'">
+          <a-typography-link v-if="record['payMode']">{{getPayModeTypeText(record['payMode'])}}</a-typography-link>
+          <a-typography-text v-else>--</a-typography-text>
+        </template>
+        <template v-if="column.dataIndex==='successTime'">
+          {{record['successTime']|| '--' }}
+        </template>
+        <template v-if="column.dataIndex==='mchFeeAmount'">
+          {{record['mchFeeAmount']|| '--' }}
+        </template>
+        <template v-if="column.dataIndex==='channelOrderNo'">
+            <a-typography-text>{{record['channelOrderNo']||'--'}}</a-typography-text>
         </template>
         <template v-if="column.dataIndex==='channelInfo'">
-          <div>ID:{{record['channelInfo'].id}}</div>
-          <div>Name:{{record['channelInfo'].name}}</div>
+          <a-flex justify="center" align="center" :gap="5" v-if="record['channelInfo']">
+            <AlipaySquareFilled   style="font-size: 28px;color: dodgerblue"/>
+            <a-typography-link>{{record['channelInfo'].name}}</a-typography-link>
+          </a-flex>
+          <a-typography-text v-else>--</a-typography-text>
         </template>
         <template v-if="column.dataIndex==='action'">
           <a-button type="link" style="padding: 5px" >详情</a-button>

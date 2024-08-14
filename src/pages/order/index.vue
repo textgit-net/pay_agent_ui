@@ -1,67 +1,11 @@
 <script setup lang="ts">
 import {ColumnsType} from "ant-design-vue/es/table";
 import {PaginationProps} from "ant-design-vue";
-import {PayChannelTypeSelectOption,} from "../../utils/constant.ts";
+import {PayChannelTypeSelectOption, PayModeTypeSelectOption,} from "../../utils/constant.ts";
 import {OrderSearch, searchOrder,OrderTableType} from "~/api/order/OrderInterface.ts";
 import OrderTablePanel from "~/pages/order/components/order-table-panel.vue";
 
 const router=useRouter()
-const editContentModalRef=ref(null)
-const columns:ColumnsType =[
-  {
-    title: '订单编号',
-    dataIndex: 'id',
-  },
-  {
-    title: '商户信息',
-    dataIndex: 'mchOrderNo',
-  },
-  {
-    title: '商品信息',
-    dataIndex: 'subject',
-  },
-  {
-    title: '商家订单号',
-    dataIndex: 'mchOrderNo',
-  },
-  {
-    title: '订单金额',
-    dataIndex: 'amount',
-  },
-  {
-    title: '币种',
-    dataIndex: 'currency',
-  },
-  {
-    title: '商户手续费',
-    dataIndex: 'mchFeeAmount',
-  },
-
-  {
-    title: '订单状态',
-    dataIndex: 'orderStatus',
-  },
-  {
-    title: '回调状态',
-    dataIndex: 'notifyStatus',
-  },
-  {
-    title: '渠道订单号',
-    dataIndex: 'channelOrderNo',
-  },
-  {
-    title: '完成时间',
-    dataIndex: 'successTime',
-  },
-  {
-    title: '创建时间',
-    dataIndex: 'createdTime',
-  },
-  {
-    title:'操作',
-    dataIndex: 'action',
-  },
-]
 const state=reactive({
   dataSourceLoading:false,
   isConfirmLoading:false
@@ -98,22 +42,20 @@ onMounted(()=>{
       <a-flex vertical :gap="15">
         <a-row :gutter="16">
           <a-col class="gutter-row" :span="4">
-            <a-input  v-model:value="searchParams.keywords"  allow-clear placeholder="请输入订单编号"> </a-input>
+            <a-input  v-model:value="searchParams.orderNo"  allow-clear placeholder="请输入订单编号"> </a-input>
           </a-col>
           <a-col class="gutter-row" :span="4">
-            <a-select style="width: 100%">
-              <a-select-option :value="null">所有</a-select-option>
+            <a-select style="width: 100%" mode="multiple" allow-clear :max-tag-count="1" v-model:value="searchParams.channelTypes" placeholder="所有渠道">
               <a-select-option v-for="(item) in PayChannelTypeSelectOption" :value="item.value">{{item.title}}</a-select-option>
             </a-select>
           </a-col>
           <a-col class="gutter-row" :span="4">
-            <a-range-picker style="width: 100%" />
+            <a-select style="width: 100%" mode="multiple" allow-clear :max-tag-count="1" v-model:value="searchParams.payModes" placeholder="所有支付方式">
+              <a-select-option v-for="(item) in PayModeTypeSelectOption" :value="item.value">{{item.title}}</a-select-option>
+            </a-select>
           </a-col>
           <a-col class="gutter-row" :span="4">
-            <a-input placeholder="请输入商户ID" allow-clear></a-input>
-          </a-col>
-          <a-col class="gutter-row" :span="4">
-             <a-input placeholder="请输入商户渠道ID"></a-input>
+             <a-input placeholder="请输入渠道ID"></a-input>
           </a-col>
         </a-row>
 

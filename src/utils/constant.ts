@@ -76,7 +76,37 @@ export const  PayChannelTypeSelectOption:SelectOption<PayChannelType>[]=[
   }
 ]
 
+export enum PayModeType{
+  ALI_PAY_QR_CODE="ALI_PAY_QR_CODE",
+  ALI_PAY_FACE_TO_FACE="ALI_PAY_FACE_TO_FACE",
+  ALI_PAY_FACE_TO_FACE_TO_H5="ALI_PAY_FACE_TO_FACE_TO_H5"
+}
 
+
+export const getPayModeTypeText=(type:PayModeType)=>{
+  switch (type) {
+    case PayModeType.ALI_PAY_QR_CODE:
+      return "扫码支付"
+    case PayModeType.ALI_PAY_FACE_TO_FACE:
+      return "门店支付授权JS收银台"
+    case PayModeType.ALI_PAY_FACE_TO_FACE_TO_H5:
+      return "门店支付授权H5跳转"
+  }
+}
+export const PayModeTypeSelectOption:SelectOption<PayModeType>[]=[
+  {
+    value:PayModeType.ALI_PAY_QR_CODE,
+    title:getPayModeTypeText(PayModeType.ALI_PAY_QR_CODE)
+  },
+  {
+    value:PayModeType.ALI_PAY_FACE_TO_FACE,
+    title:getPayModeTypeText(PayModeType.ALI_PAY_FACE_TO_FACE)
+  },
+  {
+    value:PayModeType.ALI_PAY_FACE_TO_FACE_TO_H5,
+    title:getPayModeTypeText(PayModeType.ALI_PAY_FACE_TO_FACE_TO_H5)
+  }
+]
 
 
 

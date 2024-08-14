@@ -1,6 +1,15 @@
-import {BasePageRequest, DateRange, PageWarp, PayChannelType, SelectOption, SignType} from "~/utils/constant.ts";
+import {
+    BasePageRequest,
+    DateRange,
+    PageWarp,
+    PayChannelType,
+    PayModeType,
+    SelectOption,
+    SignType
+} from "~/utils/constant.ts";
 export interface BaseOrderReportSearch extends BasePageRequest{
-    dateRange?:DateRange
+    startDate?:string
+    endDate?:string
 
 }
 
@@ -100,6 +109,11 @@ export const  OrderStatusSelectOptions:SelectOption<OrderStatus>[]=[
 
 export interface OrderSearch extends BasePageRequest{
     orderStatus?:OrderStatus[]
+    orderNo?:string
+    dateRange?:DateRange
+    payModes?:PayModeType[]
+    channelTypes?:PayChannelType[]
+
 }
 
 
@@ -107,4 +121,12 @@ export interface OrderSearch extends BasePageRequest{
 
 export function searchOrder(search:OrderSearch)   {
     return useGet<PageWarp<any>>("/order/page",search)
+}
+
+/**
+ * 获取订单报表数据
+ * @param search 查询参数
+ */
+export function getOrderReportData(search:OrderReportSearch){
+    return useGet<PageWarp<any>>("/order/report",search)
 }
