@@ -6,7 +6,10 @@ export interface SelectOption<T>{
 export const uploadAction=import.meta.env.VITE_APP_BASE_API+"/oss/upload"
 
 
-
+export interface DateRange{
+  startDate:string
+  endDate:string
+}
 export  enum  SerialStatus{
   ONGOING=0,
   COMPLETE=1

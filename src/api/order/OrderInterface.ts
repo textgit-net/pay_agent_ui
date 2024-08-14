@@ -1,10 +1,12 @@
-import {BasePageRequest, PageWarp, PayChannelType, SelectOption, SignType} from "~/utils/constant.ts";
-export interface OrderReportSearch extends BasePageRequest{
+import {BasePageRequest, DateRange, PageWarp, PayChannelType, SelectOption, SignType} from "~/utils/constant.ts";
+export interface BaseOrderReportSearch extends BasePageRequest{
+    dateRange?:DateRange
+
+}
+
+export interface OrderReportSearch extends BaseOrderReportSearch{
     channels?:PayChannelType[]
     channelIds?:number[]
-}
-export interface BaseOrderReportInfo{
-
 }
 export enum OrderTableType{
     ALL=1,
@@ -51,6 +53,7 @@ export enum OrderStatus {
      */
     CLOSE=6
 }
+
 export function getOrderStatusText(status:OrderStatus): string {
     switch (status){
         case OrderStatus.WAIT_PAY:
