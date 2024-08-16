@@ -7,7 +7,6 @@ import {UploadChangeParam, UploadProps} from "ant-design-vue";
 const message = useMessage()
 
 const props = defineProps({
-
   value:{
     type:Object,
     default:{}
@@ -31,7 +30,15 @@ const props = defineProps({
     required: false
   }
 })
-const fileList = ref<UploadFile<ResponseBody<String>>[]>([])
+const fileList = ref<UploadFile<ResponseBody<String>>[]>(props.value?[{
+  name: props.value.fileName,
+  response: {
+    code:200,
+    msg:"",
+  },
+  uid: "",
+  xhr: undefined,
+}]:[])
 
 const emits = defineEmits(['update:value'])
 

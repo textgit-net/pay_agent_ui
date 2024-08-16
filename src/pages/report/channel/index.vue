@@ -2,45 +2,66 @@
 import {ColumnsType} from "ant-design-vue/es/table";
 import {PaginationProps} from "ant-design-vue";
 import {
-  OrderSearch,
-  searchOrder,
-  OrderTableType,
-  OrderReportSearch,
-  BaseOrderReportInfo, getOrderStatusText, OrderStatus
+  ChannelOrderReportSearch, getChannelOrderReportData
 } from "~/api/order/OrderInterface.ts";
-import OrderTablePanel from "~/pages/order/components/order-table-panel.vue";
 import {PayChannelType, PayChannelTypeSelectOption} from "~/utils/constant.ts";
-
+import dayjs, { Dayjs } from 'dayjs'
+const dateFormat = 'YYYY-MM-DD'
+type RangeValue = [Dayjs, Dayjs];
+const reportDate =ref<RangeValue>([
+  dayjs(dayjs().subtract(31,'day'), dateFormat),
+  dayjs(dayjs(), dateFormat),
+]);
+const disabledDate = (current: Dayjs) => {
+  if (!reportDate.value || (reportDate.value as any).length === 0) {
+    return false;
+  }
+  const tooLate = reportDate.value[0] && current.diff(reportDate.value[0], 'days') > 31;
+  const tooEarly = reportDate.value[1] && reportDate.value[1].diff(current, 'days') > 31;
+  return tooEarly || tooLate;
+};
 const router=useRouter()
 const editContentModalRef=ref(null)
 const columns:ColumnsType =[
   {
-    title: '渠道名称',
-    dataIndex: 'channelName',
+    title: '时间',
+    dataIndex: 'orderDate',
   },
   {
-    title: '成交金额',
-    dataIndex: 'totalSuccessAmount',
+    title: '渠道',
+    dataIndex: 'orderDate',
+  },
+  {
+    title: '交易总额',
+    dataIndex: 'totalOrderAmount',
   },
   {
     title: '实收金额',
-    dataIndex: 'totalPayAmount',
+    dataIndex: 'totalSuccessOrderAmount',
   },
   {
     title: '手续费',
-    dataIndex: 'totalFree',
-  },
-  {
-    title: '成交总笔数',
-    dataIndex: 'totalRefundAmount',
+    dataIndex: 'totalFeeAmount',
   },
   {
     title: '交易笔数',
-    dataIndex: 'currency',
+    dataIndex: 'totalOrderCount',
+  },
+  {
+    title:'成交笔数',
+    dataIndex:'totalSuccessOrderCount'
+  },
+  {
+    title:'超时笔数',
+    dataIndex:'totalSuccessOrderCount'
+  },
+  {
+    title:'异常笔数',
+    dataIndex:'totalSuccessOrderCount'
   },
   {
     title: '成功率',
-    dataIndex: 'mchFeeAmount',
+    dataIndex: 'successRate',
   }
 ]
 const state=reactive({
@@ -61,14 +82,41 @@ const pagination = reactive<PaginationProps>({
 
   },
 })
-const searchParams = reactive<OrderReportSearch>({
+const searchParams = reactive<ChannelOrderReportSearch>({
   page:1,
-  limit:10,
-  channels:[PayChannelType.ALI]
+  limit:10
 })
-const dataSource=shallowRef<BaseOrderReportInfo>([])
-onMounted(()=>{
+const dataSource=shallowRef<any>([])
+const resetSearch=async ()=>{
+  Object.assign(searchParams,{
+    page:1,
+    limit:10
+  })
+  await loadData()
+}
+const loadData=async  ()=> {
+  if (state.dataSourceLoading)
+    return
+  state.dataSourceLoading = true
+  try {
+    const { data } = await getChannelOrderReportData({
+      ...searchParams,
+      page: pagination.current,
+      startDate:reportDate.value[0].format(dateFormat),
+      endDate:reportDate.value[1].format(dateFormat),
+      limit: pagination.pageSize,
+    })
+    dataSource.value = data ?? []
+    // pagination.total = data?.total ?? 0
+  }catch (e){
+    console.error(e)
+  }finally{
+    state.dataSourceLoading = false
+  }
 
+}
+onMounted(()=>{
+  loadData()
 })
 </script>
 
@@ -86,11 +134,11 @@ onMounted(()=>{
           <a-col class="gutter-row" :span="3">
             <a-range-picker style="width: 100%" />
           </a-col>
-          <a-col class="gutter-row" :span="3">
-            <a-select style="width: 100%" v-model:value="searchParams.channels" :max-tag-count="1">
-                <a-select-option v-for="(item) in PayChannelTypeSelectOption" :value="item.value">{{item.title}}</a-select-option>
-            </a-select>
-          </a-col>
+<!--          <a-col class="gutter-row" :span="3">-->
+<!--            <a-select style="width: 100%" v-model:value="searchParams.channels" :max-tag-count="1">-->
+<!--                <a-select-option v-for="(item) in PayChannelTypeSelectOption" :value="item.value">{{item.title}}</a-select-option>-->
+<!--            </a-select>-->
+<!--          </a-col>-->
         </a-row>
 
         <a-flex justify="flex-start" :gap="0">

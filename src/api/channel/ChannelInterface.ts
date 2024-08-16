@@ -184,7 +184,9 @@ export function changeChannel(id:number) {
     return usePut<String>(`/channel/change/${id}`)
 }
 
-
+export function getChannelEditInfo(id:any){
+    return useGet<ChannelFormData>(`/channel/edit/${id}`)
+}
 export function channelTest(params:ChannelTestRequest){
     return usePost<ChannelTestResponse>("/channel/payTest",params)
 }

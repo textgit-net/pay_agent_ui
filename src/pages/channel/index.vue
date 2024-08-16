@@ -134,7 +134,7 @@ onMounted(()=>{
           </template>
           <template v-if="column.dataIndex==='action'">
             <a-flex :gap="10">
-              <a-button type="link" style="padding: 5px" >编辑</a-button>
+              <a-button type="link" @click="router.push({path:'/channel/edit',query:{id:record['id']}})"  style="padding: 5px" >编辑</a-button>
               <a-button  @click="router.push({path:'/channel/test',query:{id:record['id']}})" type="link" style="padding: 5px" >测式</a-button>
               <a-button  v-if="record['isEnable']" style="padding: 5px" type="link" danger>禁用</a-button>
             </a-flex>

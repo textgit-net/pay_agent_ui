@@ -8,8 +8,8 @@ import {
   OrderReportSearch,getOrderStatusText, OrderStatus, getOrderReportData
 } from "~/api/order/OrderInterface.ts"
 import OrderTablePanel from "~/pages/order/components/order-table-panel.vue"
-import dayjs, { Dayjs } from 'dayjs'
 import {PayChannelTypeSelectOption} from "~/utils/constant.ts"
+import dayjs, { Dayjs } from 'dayjs'
 const dateFormat = 'YYYY-MM-DD'
 type RangeValue = [Dayjs, Dayjs];
 const reportDate =ref<RangeValue>([

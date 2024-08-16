@@ -17,6 +17,10 @@ export interface OrderReportSearch extends BaseOrderReportSearch{
     channels?:PayChannelType[]
     channelIds?:number[]
 }
+
+export interface ChannelOrderReportSearch extends BaseOrderReportSearch{
+
+}
 export enum OrderTableType{
     ALL=1,
     /**
@@ -129,4 +133,12 @@ export function searchOrder(search:OrderSearch)   {
  */
 export function getOrderReportData(search:OrderReportSearch){
     return useGet<PageWarp<any>>("/order/report",search)
+}
+
+/**
+ * 获取渠道订单报表数据
+ * @param search
+ */
+export function getChannelOrderReportData(search:ChannelOrderReportSearch){
+    return useGet<any[]>("/channel/order/report",search)
 }
