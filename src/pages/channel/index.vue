@@ -6,33 +6,44 @@ import {ChannelListResponse, ChannelSearch, searchChannel} from "~/api/channel/C
 import {PayChannelType} from "~/utils/constant.ts";
 const router=useRouter()
 const columns:ColumnsType =[
-  {
-    title: 'ID',
-    dataIndex: 'id',
-  },
+
   {
     title: '渠道名称',
     dataIndex: 'name',
+    fixed: 'left',
   },
   {
     title: '渠道类型',
     dataIndex: 'channelType',
   },
   {
-    title: '渠道编码',
-    dataIndex: 'tags',
+    title: '支付方式',
+    dataIndex: 'successAmount',
   },
   {
     title: '启用分账',
     dataIndex: 'isEnableAllocation',
   },
+
   {
-    title: '成功金额',
+    title: '交易量',
     dataIndex: 'successAmount',
   },
   {
-    title: '成功率',
+    title: '交易额',
     dataIndex: 'successRate',
+  },
+  {
+    title: '成交量',
+    dataIndex: 'successRate',
+  },
+  {
+    title: '成交金额',
+    dataIndex: 'successRate',
+  },
+  {
+    title: '手续费',
+    dataIndex: 'successAmount',
   },
   {
     title: '启用状态',
@@ -45,6 +56,7 @@ const columns:ColumnsType =[
   {
     title:'操作',
     width:180,
+    fixed: 'right',
     dataIndex: 'action',
   },
 ]
@@ -110,12 +122,18 @@ onMounted(()=>{
       <a-card style="border: none" :body-style="{padding:'15px'}">
         <a-button @click="router.push({path:'/channel/edit'})" type="primary">添加渠道</a-button>
       </a-card>
-        <a-table ref="tableRef" :scroll="{x: 'max-content'}" :data-source="dataSource" :pagination="pagination" :loading="state.dataSourceLoading"  :columns="columns" size="middle" :bordered="false">
+        <a-table ref="tableRef" :scroll="{x: 1200}" :data-source="dataSource" :pagination="pagination" :loading="state.dataSourceLoading"  :columns="columns" size="middle" :bordered="false">
 <!--        <template #emptyText>-->
 <!--          <a-empty></a-empty>-->
 <!--          <a-button @click="router.push({path:'/channel/edit'})" type="primary">添加渠道</a-button>-->
 <!--        </template>-->
         <template #bodyCell="{ column , record}">
+          <template v-if="column.dataIndex==='name'">
+            <a-flex vertical :gap="5">
+              <a-typography-text>{{record['name']}}</a-typography-text>
+              <a-typography-link>{{record['id']}}</a-typography-link>
+            </a-flex>
+          </template>
           <template v-if="column.dataIndex==='isEnableAllocation'">
             <a-tag v-if="record['isEnableAllocation']" color="success">已配制</a-tag>
             <a-tag v-else color="#f50">未配制</a-tag>
@@ -124,8 +142,7 @@ onMounted(()=>{
             {{record['totalAmount']||'--'}}
           </template>
           <template v-if="column.dataIndex==='isEnable'">
-            <a-tag v-if="record['isEnable']" color="#389e0d" > 启用</a-tag>
-            <a-tag v-else color="#f50">禁用</a-tag>
+            <a-switch :checked="record['isEnable']" :disabled="!record['isEnable']"></a-switch>
           </template>
           <template v-if="column.dataIndex==='channelType'">
               <a-flex :gap="5" v-if="PayChannelType.ALI==record['channelType']">
@@ -136,7 +153,6 @@ onMounted(()=>{
             <a-flex :gap="10">
               <a-button type="link" @click="router.push({path:'/channel/edit',query:{id:record['id']}})"  style="padding: 5px" >编辑</a-button>
               <a-button  @click="router.push({path:'/channel/test',query:{id:record['id']}})" type="link" style="padding: 5px" >测式</a-button>
-              <a-button  v-if="record['isEnable']" style="padding: 5px" type="link" danger>禁用</a-button>
             </a-flex>
           </template>
         </template>

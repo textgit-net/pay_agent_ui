@@ -108,7 +108,7 @@ export default [
           {
             path: '/system/role/staff',
             name: 'AccountStaffManage',
-            component: () => import('~/pages/account/staff/list.vue'),
+            component: () => import('~/pages/system/staff/index.vue'),
             meta: {
               title: '人员管理',
             }
@@ -116,7 +116,7 @@ export default [
           {
             path: '/system/role/list',
             name: 'RolePermission',
-            component: () => import('~/pages/account/role/list.vue'),
+            component: () => import('~/pages/system/role/index.vue'),
             meta: {
               title: '角色权限',
             }
@@ -126,7 +126,7 @@ export default [
       {
         path: '/account/accountInfo',
         name: 'AccountInfo',
-        component: () => import('~/pages/account/account-info.vue'),
+        component: () => import('~/pages/system/role/index.vue'),
         meta: {
           title: '账号管理',
         }
