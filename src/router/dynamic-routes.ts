@@ -82,7 +82,7 @@ export default [
       {
         path: '/order/royalty',
         name: 'OrderRoyalty',
-        component: () => import('~/pages/system/domain/list.vue'),
+        component: () => import('~/pages/order/index.vue'),
         meta: {
           title: '分账单',
           hideChildrenInMenu: true
@@ -108,7 +108,7 @@ export default [
           {
             path: '/system/role/staff',
             name: 'AccountStaffManage',
-            component: () => import('~/pages/account/staff/list.vue'),
+            component: () => import('~/pages/system/staff/index.vue'),
             meta: {
               title: '人员管理',
             }
@@ -116,17 +116,26 @@ export default [
           {
             path: '/system/role/list',
             name: 'RolePermission',
-            component: () => import('~/pages/account/role/list.vue'),
+            component: () => import('~/pages/system/role/index.vue'),
             meta: {
               title: '角色权限',
+            }
+          },
+          {
+            path: '/system/role/edit',
+            name: 'AccountRoleEdit',
+            component: () => import('~/pages/system/role/edit.vue'),
+            meta: {
+              hideInMenu:true,
+              title: '编辑角色',
             }
           }
         ]
       },
       {
-        path: '/account/accountInfo',
+        path: '/account/center',
         name: 'AccountInfo',
-        component: () => import('~/pages/account/account-info.vue'),
+        component: () => import('~/pages/account/center.vue'),
         meta: {
           title: '账号管理',
         }

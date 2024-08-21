@@ -19,7 +19,7 @@ export interface OrderReportSearch extends BaseOrderReportSearch{
 }
 
 export interface ChannelOrderReportSearch extends BaseOrderReportSearch{
-
+    payModes?:PayModeType[]
 }
 export enum OrderTableType{
     ALL=1,

@@ -4,7 +4,7 @@ import {PaginationProps} from "ant-design-vue";
 import {
   ChannelOrderReportSearch, getChannelOrderReportData
 } from "~/api/order/OrderInterface.ts";
-import {PayChannelType, PayChannelTypeSelectOption} from "~/utils/constant.ts";
+import {PayChannelType, PayChannelTypeSelectOption, PayModeType, PayModeTypeSelectOption} from "~/utils/constant.ts";
 import dayjs, { Dayjs } from 'dayjs'
 const dateFormat = 'YYYY-MM-DD'
 type RangeValue = [Dayjs, Dayjs];
@@ -125,26 +125,25 @@ onMounted(()=>{
     <!--头部-->
     <a-card :body-style="{padding:'15px'}">
       <a-flex justify="space-between">
-        <a-typography-text>订单列表</a-typography-text>
+        <a-typography-text>渠道订单报表</a-typography-text>
       </a-flex>
     </a-card>
     <a-card style="border: none" :body-style="{padding:'15px'}">
       <a-flex vertical :gap="15">
         <a-row :gutter="16">
-          <a-col class="gutter-row" :span="3">
-            <a-range-picker style="width: 100%" />
+          <a-col class="gutter-row" :span="4">
+            <a-range-picker style="width: 100%" v-model:value="reportDate" :format="dateFormat"  :disabled-date="disabledDate"/>
           </a-col>
-<!--          <a-col class="gutter-row" :span="3">-->
-<!--            <a-select style="width: 100%" v-model:value="searchParams.channels" :max-tag-count="1">-->
-<!--                <a-select-option v-for="(item) in PayChannelTypeSelectOption" :value="item.value">{{item.title}}</a-select-option>-->
-<!--            </a-select>-->
-<!--          </a-col>-->
+          <a-col class="gutter-row" :span="4">
+            <a-select style="width: 100%" allow-clear placeholder="所有支付方式"  mode="multiple" v-model:value="searchParams.payModes" :max-tag-count="1">
+                <a-select-option v-for="(item) in PayModeTypeSelectOption" :value="item.value">{{item.title}}</a-select-option>
+            </a-select>
+          </a-col>
         </a-row>
 
         <a-flex justify="flex-start" :gap="0">
           <a-button type="link" style="padding-left: 0px" @click="resetSearch">重置筛选</a-button>
-
-
+          <a-button type="primary" size="small" style="width: 80px;height:27.99px"  @click="loadData">筛选</a-button>
         </a-flex>
       </a-flex>
     </a-card>

@@ -54,7 +54,9 @@ export const  SignTypeSelectOption:SelectOption<SignType>[]=[
   }
 ]
 export enum PayChannelType{
-  ALI="alipay"
+  ALI="ALI",
+  ALI_USER="ALI_USER",
+  ALI_OPEN="ALI_OPEN"
 }
 /**
  * 获取支付渠道描述文本
@@ -64,6 +66,10 @@ export const getPayChannelTypeText=(type:PayChannelType)=>{
   switch (type) {
     case PayChannelType.ALI:
       return "支付宝"
+    case PayChannelType.ALI_USER:
+      return "支付宝(个人)"
+    case PayChannelType.ALI_OPEN:
+      return "支付宝(开放平台)"
   }
 }
 /**
@@ -73,13 +79,23 @@ export const  PayChannelTypeSelectOption:SelectOption<PayChannelType>[]=[
   {
     value:PayChannelType.ALI,
     title:getPayChannelTypeText(PayChannelType.ALI)
+  },
+  {
+    value:PayChannelType.ALI_USER,
+    title:getPayChannelTypeText(PayChannelType.ALI_USER)
+  },
+  {
+    value:PayChannelType.ALI_OPEN,
+    title:getPayChannelTypeText(PayChannelType.ALI_OPEN)
   }
 ]
 
 export enum PayModeType{
   ALI_PAY_QR_CODE="ALI_PAY_QR_CODE",
   ALI_PAY_FACE_TO_FACE="ALI_PAY_FACE_TO_FACE",
-  ALI_PAY_FACE_TO_FACE_TO_H5="ALI_PAY_FACE_TO_FACE_TO_H5"
+  ALI_PAY_FACE_TO_FACE_TO_H5="ALI_PAY_FACE_TO_FACE_TO_H5",
+  ALI_PAY_TO_OPEN="ALI_PAY_TO_OPEN",
+  ALI_PAY_TO_USER="ALI_PAY_TO_USER"
 }
 
 
@@ -91,6 +107,10 @@ export const getPayModeTypeText=(type:PayModeType)=>{
       return "门店支付授权JS收银台"
     case PayModeType.ALI_PAY_FACE_TO_FACE_TO_H5:
       return "门店支付授权H5跳转"
+    case PayModeType.ALI_PAY_TO_OPEN:
+      return "支付宝转账"
+    case PayModeType.ALI_PAY_TO_USER:
+      return "支付宝转账到个人"
   }
 }
 export const PayModeTypeSelectOption:SelectOption<PayModeType>[]=[
@@ -105,6 +125,14 @@ export const PayModeTypeSelectOption:SelectOption<PayModeType>[]=[
   {
     value:PayModeType.ALI_PAY_FACE_TO_FACE_TO_H5,
     title:getPayModeTypeText(PayModeType.ALI_PAY_FACE_TO_FACE_TO_H5)
+  },
+  {
+    value:PayModeType.ALI_PAY_TO_OPEN,
+    title:getPayModeTypeText(PayModeType.ALI_PAY_TO_OPEN)
+  },
+  {
+    value:PayModeType.ALI_PAY_TO_USER,
+    title:getPayModeTypeText(PayModeType.ALI_PAY_TO_USER)
   }
 ]
 

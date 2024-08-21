@@ -3,7 +3,7 @@ import {ColumnsType} from "ant-design-vue/es/table";
 import {AlipaySquareFilled } from "@ant-design/icons-vue"
 import {PaginationProps} from "ant-design-vue";
 import {ChannelListResponse, ChannelSearch, searchChannel} from "~/api/channel/ChannelInterface.ts";
-import {PayChannelType} from "~/utils/constant.ts";
+import {getPayChannelTypeText, PayChannelType} from "~/utils/constant.ts";
 const router=useRouter()
 const columns:ColumnsType =[
   {
@@ -18,10 +18,7 @@ const columns:ColumnsType =[
     title: '渠道类型',
     dataIndex: 'channelType',
   },
-  {
-    title: '渠道编码',
-    dataIndex: 'tags',
-  },
+
   {
     title: '启用分账',
     dataIndex: 'isEnableAllocation',
@@ -128,8 +125,9 @@ onMounted(()=>{
             <a-tag v-else color="#f50">禁用</a-tag>
           </template>
           <template v-if="column.dataIndex==='channelType'">
-              <a-flex :gap="5" v-if="PayChannelType.ALI==record['channelType']">
-                <AlipaySquareFilled style="color: dodgerblue;font-size: 18px"/><a-typography-text strong  style="font-size: 12px">支付宝</a-typography-text >
+              <a-flex :gap="5" >
+                <AlipaySquareFilled v-if="[PayChannelType.ALI,PayChannelType.ALI_USER,PayChannelType.ALI_OPEN].indexOf(record['channelType'])>=0" style="color: dodgerblue;font-size: 18px"/>
+                <a-typography-text strong  style="font-size: 12px">{{getPayChannelTypeText(record['channelType'])}}</a-typography-text >
               </a-flex>
           </template>
           <template v-if="column.dataIndex==='action'">

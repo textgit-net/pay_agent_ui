@@ -124,7 +124,7 @@ onMounted(()=>{
     <!--头部-->
     <a-card :body-style="{padding:'15px'}">
       <a-flex justify="space-between">
-        <a-typography-text>订单列表</a-typography-text>
+        <a-typography-text>订单报表</a-typography-text>
       </a-flex>
     </a-card>
     <a-card style="border: none" :body-style="{padding:'15px'}">

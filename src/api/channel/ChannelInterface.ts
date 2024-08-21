@@ -1,5 +1,6 @@
 import {BasePageRequest, PageWarp, PayChannelType, SignType} from "~/utils/constant.ts";
 import {exists} from "fs-extra";
+import {AccountInfoResponse} from "~/api/account/AccountInterface.ts";
 
 
 export interface ChannelSimpleResponse{
@@ -164,6 +165,14 @@ export function searchChannel(params:ChannelSearch) {
     return useGet<PageWarp<ChannelListResponse>>('/channel/page', params)
 }
 
+/**
+ * 通过渠道类型获取商户渠道列表
+ * @param type 渠道类型
+ */
+export function getChannelListWithTye(type:PayChannelType){
+    return useGet<ChannelSimpleResponse[]>("/channel/list",{type:type})
+}
+
 
 /**
  * 保存渠道
@@ -183,6 +192,7 @@ export function saveChannel(data:ChannelFormData) {
 export function changeChannel(id:number) {
     return usePut<String>(`/channel/change/${id}`)
 }
+
 
 export function getChannelEditInfo(id:any){
     return useGet<ChannelFormData>(`/channel/edit/${id}`)

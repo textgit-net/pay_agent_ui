@@ -41,6 +41,7 @@ const orderInfo=reactive<any>({})
 const onChannelChange=()=>{
   if(fromData.channelId){
     payModes.value= channels.find(v=>v.id==fromData.channelId).payModes
+    fromData.payMode=payModes.value[0]
   }else {
     payModes.value=[]
   }
@@ -102,7 +103,7 @@ onMounted(()=>{
       <a-steps :current="state.current" :items="items"></a-steps>
       <a-form ref="formRef"  v-show="state.current==0" class="mt-4" style="width: 80%" :model="fromData"  layout="vertical"   >
         <a-form-item  class="mt-2" label="支会渠道" name="channelId" :rules="{required:true,message:'请选择支付渠道'}">
-          <a-select placeholder="选择支付渠道" v-model:value="fromData.channelId" @change="onChannelChange">
+          <a-select placeholder="选择支付渠道"  v-model:value="fromData.channelId" @change="onChannelChange">
             <a-select-opt-group v-for="(group,index) in channelGroups">
               <template #label>
                 <span> {{ group.name }} </span>
@@ -112,24 +113,24 @@ onMounted(()=>{
           </a-select>
         </a-form-item>
         <a-form-item label="跳转方式" name="isWebCashier">
-          <a-radio-group v-model:value="fromData.isWebCashier">
+          <a-radio-group :disabled="fromData.channelId==null" v-model:value="fromData.isWebCashier">
             <a-radio :value="false">直连</a-radio>
             <a-radio :value="true">Web收银台</a-radio>
           </a-radio-group>
         </a-form-item>
         <a-form-item label="支付方式" name="payMode" :rules="{required:true,message:'请选择支付渠道'}">
-          <a-select placeholder="请选择支付方式" v-model:value="fromData.payMode">
-            <a-select-option v-if="fromData.isWebCashier" value="ALL">聚合支付</a-select-option>
+          <a-select :disabled="fromData.channelId==null"  placeholder="请选择支付方式" v-model:value="fromData.payMode">
+<!--            <a-select-option v-if="fromData.isWebCashier" value="ALL">聚合支付</a-select-option>-->
             <a-select-option v-for="(item) in payModes"  :value="item.value">{{item.name}}</a-select-option>
           </a-select>
         </a-form-item>
         <a-form-item label="支付金额" name="amount" :rules="{required:true,message:'请输入订单金额'}">
-          <a-input-number v-model:value="fromData.amount" :step="1" placeholder="请输入订单金额" style="width: 100%;"></a-input-number>
+          <a-input-number :disabled="fromData.channelId==null" v-model:value="fromData.amount" :step="1" placeholder="请输入订单金额" style="width: 100%;"></a-input-number>
         </a-form-item>
-        <a-flex justify="end">
+        <a-flex justify="end" v-show="fromData.channelId!=null">
           <a-button type="link" @click="isExtend=!isExtend" > <DoubleRightOutlined :rotate="isExtend?270:90"/>{{isExtend?'收起更多选项':"展开更多选项"}} </a-button>
         </a-flex>
-        <a-flex vertical v-if="isExtend">
+        <a-flex vertical v-if="isExtend" v-show="fromData.channelId!=null">
           <a-form-item label="商品标题">
             <a-input  placeholder="请输入商品标题" v-model:value="fromData.subject" style="width: 100%;"></a-input>
           </a-form-item>
