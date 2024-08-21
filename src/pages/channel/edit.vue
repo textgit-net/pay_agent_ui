@@ -145,7 +145,12 @@ const next=(value:number)=>{
 }
 
 const newChannel=()=>{
+  if(formData.id){
+    router.replace({path:router.currentRoute.value.path})
+    return;
+  }
   formData.name=""
+  formData.id=null
   formData.allocationConfig={
     isCert:false,
   }
