@@ -242,6 +242,33 @@ onMounted(()=>{
 <!--                </a-flex>-->
 <!--              </a-form-item>-->
             </a-card>
+            <a-card  v-if="current==1&& PayChannelType.ALI_OPEN===formData.channelType" :bordered="false">
+              <a-form-item label="应用ID" name="alipayAppId"  class="mt-5" >
+                <a-flex style="flex: 1" vertical>
+                  <a-input v-model:value="formData.channelConfig['appId']" placeholder="请输入支付宝应用ID"></a-input>
+                  <a-typography-text type="secondary">支付宝平台申请的应用ID.</a-typography-text>
+                </a-flex>
+              </a-form-item>
+              <a-form-item label="PID" name="pid"  class="mt-5" required>
+                <a-flex style="flex: 1" vertical>
+                  <a-input v-model:value="formData.channelConfig['pid']" placeholder="请输入支付宝合作伙伴Id"></a-input>
+                  <a-typography-text type="secondary">支付宝平台申请的合作伙伴Id.</a-typography-text>
+                </a-flex>
+              </a-form-item>
+              <a-form-item label="开发者私钥" name="alipayPrivateKey"  class="mt-5" >
+                <a-flex style="flex: 1" vertical>
+                  <a-input v-model:value="formData.channelConfig['privateKey']" placeholder="请输入支付宝开发者私钥"></a-input>
+                  <a-typography-text type="secondary">请输入支付宝开发者私钥</a-typography-text>
+                </a-flex>
+              </a-form-item>
+              <a-form-item label="支付宝公钥" name="alipayPublicKey"  class="mt-5" >
+                <a-flex style="flex: 1" vertical>
+                  <a-input v-model:value="formData.channelConfig['alipayPublicKey']" placeholder="请输入支付宝公钥"></a-input>
+                  <a-typography-text type="secondary">支付宝平台下发的公钥.</a-typography-text>
+                </a-flex>
+              </a-form-item>
+
+            </a-card>
             <a-card  v-if="current==1&& PayChannelType.ALI===formData.channelType" :bordered="false">
               <!--            <a-typography-text strong>2.渠道配制</a-typography-text>-->
               <a-form-item label="应用ID" name="alipayAppId"  class="mt-5" >
@@ -309,14 +336,13 @@ onMounted(()=>{
                 </a-flex>
               </a-form-item>
             </a-card>
-            <a-card  v-if="current==1&& (PayChannelType.ALI_USER===formData.channelType || PayChannelType.ALI_OPEN===formData.channelType) " :bordered="false">
+            <a-card  v-if="current==1&& PayChannelType.ALI_USER===formData.channelType" :bordered="false">
               <a-form-item label="渠道"   class="mt-5" >
                 <a-flex style="flex: 1" vertical>
                   <a-select v-model:value="formData.channelConfig['channelId']" placeholder="请选择支付宝渠道">
                     <a-select-option v-for="(item) in channels" :value="item.id">{{item.name}}</a-select-option>
                   </a-select>
-                  <a-typography-text v-if="PayChannelType.ALI_USER===formData.channelType" type="secondary">随意选择一个支付宝渠道主要用于获取支付宝用户ID.</a-typography-text>
-                  <a-typography-text v-if="PayChannelType.ALI_OPEN===formData.channelType" type="secondary">绑定一个支付宝渠道.</a-typography-text>
+                  <a-typography-text type="secondary">随意选择一个支付宝渠道主要用于获取支付宝用户ID.</a-typography-text>
                 </a-flex>
               </a-form-item>
             </a-card>
