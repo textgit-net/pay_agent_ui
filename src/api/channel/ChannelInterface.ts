@@ -98,6 +98,8 @@ export interface ChannelFormData{
      * 渠道名称
      */
     name?: string
+
+    groupCode?:string
     /**
      * 渠道类型
      */

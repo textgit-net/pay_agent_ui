@@ -37,6 +37,7 @@ const commonChannelStepsItems=[
 const current=ref(0)
 const router=useRouter()
 const formRef=ref()
+const groups=shallowRef<any[]>([])
 const saveLoading=ref(false)
 const formData=reactive<ChannelFormData>({
   isEnableAllocation:false,
@@ -189,6 +190,10 @@ const getChannelOauthCode=async ()=>{
     current.value=2
   }
 }
+const loadGroups=async ()=>{
+  const { data } =await  useGet<any[]>("/channel/group/list")
+  groups.value=data??[]
+}
 const onChannelTypeChange=(value:PayChannelType|unknown)=>{
     if((PayChannelType.ALI_USER==value || PayChannelType.ALI_OPEN==value) && channels.value.length==0){
        getChannelListWithTye(PayChannelType.ALI).then(res=>{
@@ -208,6 +213,7 @@ onMounted(()=>{
        isLoading.value=false
      })
   }
+  loadGroups()
 })
 </script>
 
@@ -240,12 +246,14 @@ onMounted(()=>{
                   <a-typography-text type="secondary">为了方便管理,请给渠道起个名呗.</a-typography-text>
                 </a-flex>
               </a-form-item>
-<!--              <a-form-item label="渠道编码" name="name" class="mt-5" >-->
-<!--                <a-flex style="flex: 1" vertical>-->
-<!--                  <a-input v-model:value="formData.name" placeholder="请输入渠道编码,用于派单分组"></a-input>-->
-<!--                  <a-typography-text type="secondary">请输入渠道编码</a-typography-text>-->
-<!--                </a-flex>-->
-<!--              </a-form-item>-->
+              <a-form-item label="渠道组" name="groupCode" class="mt-5" >
+                <a-flex style="flex: 1" vertical>
+                  <a-select v-model:value="formData.groupCode" >
+                    <a-select-option v-for="(item) in groups" :value="item.groupCode">{{item.name}}</a-select-option>
+                  </a-select>
+                  <a-typography-text type="secondary">请选择渠道分组,用于派单</a-typography-text>
+                </a-flex>
+              </a-form-item>
             </a-card>
             <a-card  v-if="current==1&& PayChannelType.ALI_OPEN===formData.channelType" :bordered="false">
               <a-form-item label="应用ID" name="alipayAppId"  class="mt-5" >

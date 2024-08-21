@@ -18,7 +18,10 @@ const columns:ColumnsType =[
     title: '渠道类型',
     dataIndex: 'channelType',
   },
-
+  {
+    title: '渠道组',
+    dataIndex: 'groupInfo',
+  },
   {
     title: '启用分账',
     dataIndex: 'isEnableAllocation',
@@ -48,6 +51,7 @@ const columns:ColumnsType =[
 const state=reactive({
   isShowEditModal:false,
   dataSourceLoading:false,
+  isPageLoading:false,
 
 })
 const searchParams=reactive<ChannelSearch>({
@@ -71,6 +75,12 @@ const pagination = reactive<PaginationProps>({
 })
 const dataSource=shallowRef<ChannelListResponse[]>([])
 
+const changeEnable=async (id:number)=>{
+  state.isPageLoading=true
+  await  usePut(`/channel/change/${id}`)
+  await loadData()
+  state.isPageLoading=false
+}
 const loadData=async ()=>{
   if (state.dataSourceLoading)
     return
@@ -95,54 +105,62 @@ onMounted(()=>{
 </script>
 
 <template>
-  <a-flex vertical :gap="10" style="width: 100%;height: 100%">
-    <!--头部-->
-    <a-card :body-style="{padding:'15px'}">
-      <a-flex justify="space-between">
-        <a-typography-text>支付渠道</a-typography-text>
-      </a-flex>
-    </a-card>
-    <a-card :body-style="{'padding':'0px'}">
-
-      <a-card style="border: none" :body-style="{padding:'15px'}">
-        <a-button @click="router.push({path:'/channel/edit'})" type="primary">添加渠道</a-button>
+  <a-spin :spinning="state.isPageLoading">
+    <a-flex vertical :gap="10" style="width: 100%;height: 100%">
+      <!--头部-->
+      <a-card :body-style="{padding:'15px'}">
+        <a-flex justify="space-between">
+          <a-typography-text>支付渠道</a-typography-text>
+        </a-flex>
       </a-card>
-        <a-table ref="tableRef" :scroll="{x: 'max-content'}" :data-source="dataSource" :pagination="pagination" :loading="state.dataSourceLoading"  :columns="columns" size="middle" :bordered="false">
-<!--        <template #emptyText>-->
-<!--          <a-empty></a-empty>-->
-<!--          <a-button @click="router.push({path:'/channel/edit'})" type="primary">添加渠道</a-button>-->
-<!--        </template>-->
-        <template #bodyCell="{ column , record}">
-          <template v-if="column.dataIndex==='isEnableAllocation'">
-            <a-tag v-if="record['isEnableAllocation']" color="success">已配制</a-tag>
-            <a-tag v-else color="#f50">未配制</a-tag>
-          </template>
-          <template v-if="column.dataIndex==='amount'">
-            {{record['totalAmount']||'--'}}
-          </template>
-          <template v-if="column.dataIndex==='isEnable'">
-            <a-tag v-if="record['isEnable']" color="#389e0d" > 启用</a-tag>
-            <a-tag v-else color="#f50">禁用</a-tag>
-          </template>
-          <template v-if="column.dataIndex==='channelType'">
+      <a-card :body-style="{'padding':'0px'}">
+
+        <a-card style="border: none" :body-style="{padding:'15px'}">
+          <a-button @click="router.push({path:'/channel/edit'})" type="primary">添加渠道</a-button>
+        </a-card>
+        <a-table ref="tableRef" :scroll="{x: 'max-content'}" :data-source="dataSource" :pagination="pagination" :loading="state.dataSourceLoading && !state.isPageLoading"  :columns="columns" size="middle" :bordered="false">
+          <!--        <template #emptyText>-->
+          <!--          <a-empty></a-empty>-->
+          <!--          <a-button @click="router.push({path:'/channel/edit'})" type="primary">添加渠道</a-button>-->
+          <!--        </template>-->
+          <template #bodyCell="{ column , record}">
+            <template v-if="column.dataIndex==='isEnableAllocation'">
+              <a-tag v-if="record['isEnableAllocation']" color="success">已配制</a-tag>
+              <a-tag v-else color="#f50">未配制</a-tag>
+            </template>
+            <template v-if="column.dataIndex==='amount'">
+              {{record['totalAmount']||'--'}}
+            </template>
+            <template v-if="column.dataIndex==='isEnable'">
+              <a-switch  @click="changeEnable(record['id'] as number)" :checked="record['isEnable']" :disabled="!record['isEnable']" :checked-value="true" :un-checked-value="false"></a-switch>
+            </template>
+            <template v-if="column.dataIndex==='groupInfo'">
+              <a-flex :gap="5"  justify="space-between" align="center" >
+                <a-typography-text  v-if="record['groupCode']" >{{record['groupName']}}</a-typography-text>
+                <a-typography-text  v-else>--</a-typography-text>
+              </a-flex>
+            </template>
+            <template v-if="column.dataIndex==='channelType'">
               <a-flex :gap="5" >
                 <AlipaySquareFilled v-if="[PayChannelType.ALI,PayChannelType.ALI_USER,PayChannelType.ALI_OPEN].indexOf(record['channelType'])>=0" style="color: dodgerblue;font-size: 18px"/>
                 <a-typography-text strong  style="font-size: 12px">{{getPayChannelTypeText(record['channelType'])}}</a-typography-text >
               </a-flex>
+            </template>
+            <template v-if="column.dataIndex==='action'">
+              <a-flex :gap="10">
+                <a-button type="link" @click="router.push({path:'/channel/edit',query:{id:record['id']}})"  style="padding: 5px" >编辑</a-button>
+                <a-button  @click="router.push({path:'/channel/test',query:{id:record['id']}})" type="link" style="padding: 5px" >测式</a-button>
+                <a-button type="link" style="padding: 0"   v-if="!record['groupCode']" @click="openGroupModal(record)">添加分组</a-button>
+                <a-button type="link" style="padding: 0"   v-if="record['groupCode']" @click="openGroupModal(record)">修改分组</a-button>
+              </a-flex>
+            </template>
           </template>
-          <template v-if="column.dataIndex==='action'">
-            <a-flex :gap="10">
-              <a-button type="link" @click="router.push({path:'/channel/edit',query:{id:record['id']}})"  style="padding: 5px" >编辑</a-button>
-              <a-button  @click="router.push({path:'/channel/test',query:{id:record['id']}})" type="link" style="padding: 5px" >测式</a-button>
-              <a-button  v-if="record['isEnable']" style="padding: 5px" type="link" danger>禁用</a-button>
-            </a-flex>
-          </template>
-        </template>
-      </a-table>
-    </a-card>
+        </a-table>
+      </a-card>
 
 
-  </a-flex>
+    </a-flex>
+  </a-spin>
 </template>
 
 <style scoped lang="less">
