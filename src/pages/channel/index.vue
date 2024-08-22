@@ -142,7 +142,7 @@ onMounted(()=>{
             </template>
             <template v-if="column.dataIndex==='channelType'">
               <a-flex :gap="5" >
-                <AlipaySquareFilled v-if="[PayChannelType.ALI,PayChannelType.ALI_USER,PayChannelType.ALI_OPEN].indexOf(record['channelType'])>=0" style="color: dodgerblue;font-size: 18px"/>
+                <AlipaySquareFilled v-if="[PayChannelType.ALI,PayChannelType.ALI_USER].indexOf(record['channelType'])>=0" style="color: dodgerblue;font-size: 18px"/>
                 <a-typography-text strong  style="font-size: 12px">{{getPayChannelTypeText(record['channelType'])}}</a-typography-text >
               </a-flex>
             </template>

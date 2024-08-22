@@ -195,7 +195,7 @@ const loadGroups=async ()=>{
   groups.value=data??[]
 }
 const onChannelTypeChange=(value:PayChannelType|unknown)=>{
-    if((PayChannelType.ALI_USER==value || PayChannelType.ALI_OPEN==value) && channels.value.length==0){
+    if(PayChannelType.ALI_USER==value && channels.value.length==0){
        getChannelListWithTye(PayChannelType.ALI).then(res=>{
           channels.value=res.data??[]
        })
@@ -207,7 +207,7 @@ onMounted(()=>{
      isLoading.value=true
      getChannelEditInfo(id).then((res)=>{
        Object.assign(formData,res.data??{})
-       if(PayChannelType.ALI_USER==formData.channelType || PayChannelType.ALI_OPEN==formData.channelType){
+       if(PayChannelType.ALI_USER==formData.channelType){
          onChannelTypeChange(formData.channelType)
        }
        isLoading.value=false
@@ -254,33 +254,6 @@ onMounted(()=>{
                   <a-typography-text type="secondary">请选择渠道分组,用于派单</a-typography-text>
                 </a-flex>
               </a-form-item>
-            </a-card>
-            <a-card  v-if="current==1&& PayChannelType.ALI_OPEN===formData.channelType" :bordered="false">
-              <a-form-item label="应用ID" name="alipayAppId"  class="mt-5" >
-                <a-flex style="flex: 1" vertical>
-                  <a-input v-model:value="formData.channelConfig['appId']" placeholder="请输入支付宝应用ID"></a-input>
-                  <a-typography-text type="secondary">支付宝平台申请的应用ID.</a-typography-text>
-                </a-flex>
-              </a-form-item>
-              <a-form-item label="PID" name="pid"  class="mt-5" required>
-                <a-flex style="flex: 1" vertical>
-                  <a-input v-model:value="formData.channelConfig['pid']" placeholder="请输入支付宝合作伙伴Id"></a-input>
-                  <a-typography-text type="secondary">支付宝平台申请的合作伙伴Id.</a-typography-text>
-                </a-flex>
-              </a-form-item>
-              <a-form-item label="开发者私钥" name="alipayPrivateKey"  class="mt-5" >
-                <a-flex style="flex: 1" vertical>
-                  <a-input v-model:value="formData.channelConfig['privateKey']" placeholder="请输入支付宝开发者私钥"></a-input>
-                  <a-typography-text type="secondary">请输入支付宝开发者私钥</a-typography-text>
-                </a-flex>
-              </a-form-item>
-              <a-form-item label="支付宝公钥" name="alipayPublicKey"  class="mt-5" >
-                <a-flex style="flex: 1" vertical>
-                  <a-input v-model:value="formData.channelConfig['alipayPublicKey']" placeholder="请输入支付宝公钥"></a-input>
-                  <a-typography-text type="secondary">支付宝平台下发的公钥.</a-typography-text>
-                </a-flex>
-              </a-form-item>
-
             </a-card>
             <a-card  v-if="current==1&& PayChannelType.ALI===formData.channelType" :bordered="false">
               <!--            <a-typography-text strong>2.渠道配制</a-typography-text>-->
@@ -395,7 +368,7 @@ onMounted(()=>{
                     (PayChannelType.ALI_USER==formData.channelType && current==alipayUserChannelStepsItems.length-1)
                     ||
                     (
-                        (PayChannelType.ALI==formData.channelType  || PayChannelType.ALI_OPEN==formData.channelType )
+                        (PayChannelType.ALI==formData.channelType  )
                         && current==commonChannelStepsItems.length-1)
               )
               " :bordered="false">
@@ -418,14 +391,14 @@ onMounted(()=>{
               <a-button v-if="current==2 && PayChannelType.ALI_USER==formData.channelType" @click="onSubmit" style="width:100px" :loading="saveLoading" type="primary">保存</a-button>
 
               <a-button v-if="
-              (PayChannelType.ALI==formData.channelType  || PayChannelType.ALI_OPEN==formData.channelType )
+              (PayChannelType.ALI==formData.channelType)
                          && current==commonChannelStepsItems.length-1 && !isSaveSuccess"  @click="current=1" style="width:100px"  type="primary" >上一步</a-button>
               <a-button v-if="
               (
                     (PayChannelType.ALI_USER==formData.channelType && current==alipayUserChannelStepsItems.length-1)
                     ||
                     (
-                        (PayChannelType.ALI==formData.channelType  || PayChannelType.ALI_OPEN==formData.channelType )
+                        (PayChannelType.ALI==formData.channelType )
                         && current==commonChannelStepsItems.length-1)
                     )
                && isSaveSuccess" @click="newChannel" style="width:100px"  type="primary" >继续添加</a-button>
@@ -435,7 +408,7 @@ onMounted(()=>{
                     (PayChannelType.ALI_USER==formData.channelType && current==alipayUserChannelStepsItems.length-1)
                     ||
                     (
-                        (PayChannelType.ALI==formData.channelType  || PayChannelType.ALI_OPEN==formData.channelType )
+                        (PayChannelType.ALI==formData.channelType  )
                         && current==commonChannelStepsItems.length-1)
               )
               " @click="router.back()" style="width:100px" >返回列表</a-button>

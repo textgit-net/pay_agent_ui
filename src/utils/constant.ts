@@ -56,7 +56,6 @@ export const  SignTypeSelectOption:SelectOption<SignType>[]=[
 export enum PayChannelType{
   ALI="ALI",
   ALI_USER="ALI_USER",
-  ALI_OPEN="ALI_OPEN"
 }
 /**
  * 获取支付渠道描述文本
@@ -68,8 +67,6 @@ export const getPayChannelTypeText=(type:PayChannelType)=>{
       return "支付宝"
     case PayChannelType.ALI_USER:
       return "支付宝(个人)"
-    case PayChannelType.ALI_OPEN:
-      return "支付宝(开放平台)"
   }
 }
 /**
@@ -83,10 +80,6 @@ export const  PayChannelTypeSelectOption:SelectOption<PayChannelType>[]=[
   {
     value:PayChannelType.ALI_USER,
     title:getPayChannelTypeText(PayChannelType.ALI_USER)
-  },
-  {
-    value:PayChannelType.ALI_OPEN,
-    title:getPayChannelTypeText(PayChannelType.ALI_OPEN)
   }
 ]
 
