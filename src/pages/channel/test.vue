@@ -135,6 +135,8 @@ onMounted(()=>{
             <a-input  placeholder="请输入商品标题" v-model:value="fromData.subject" style="width: 100%;"></a-input>
           </a-form-item>
           <a-form-item label="商品描述">
+            .
+
             <a-input  placeholder="请输入商品描述"  v-model:value="fromData.body" style="width: 100%;"></a-input>
           </a-form-item>
         </a-flex>
