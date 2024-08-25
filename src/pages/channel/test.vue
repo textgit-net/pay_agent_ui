@@ -38,6 +38,8 @@ const fromData=reactive<ChannelTestRequest>({
    amount:0.1
 })
 const orderInfo=reactive<any>({})
+
+
 const onChannelChange=()=>{
   if(fromData.channelId){
     payModes.value= channels.find(v=>v.id==fromData.channelId).payModes

@@ -7,7 +7,13 @@ import {
   getChannelListWithTye,
   saveChannel
 } from "~/api/channel/ChannelInterface.ts";
-import {PayChannelType, PayChannelTypeSelectOption, ResponseBody} from "~/utils/constant.ts";
+import {
+  getPayChannelTypeText, getPayModeTypeText,
+  PayChannelType,
+  PayChannelTypeSelectOption,
+  PayModeType,
+  ResponseBody
+} from "~/utils/constant.ts";
 import type {Rule} from 'ant-design-vue/es/form';
 const alipayUserChannelStepsItems=[
   {
@@ -38,6 +44,7 @@ const current=ref(0)
 const router=useRouter()
 const formRef=ref()
 const groups=shallowRef<any[]>([])
+const payModes=shallowRef<any[]>([])
 const saveLoading=ref(false)
 const formData=reactive<ChannelFormData>({
   isEnableAllocation:false,
@@ -194,7 +201,13 @@ const loadGroups=async ()=>{
   const { data } =await  useGet<any[]>("/channel/group/list")
   groups.value=data??[]
 }
-const onChannelTypeChange=(value:PayChannelType|unknown)=>{
+
+const getPayModesWithChannelType=async (type:PayChannelType)=>{
+  const {data} =await useGet<PayModeType[]>(`/channel/payMods?channelType=${type}`)
+    payModes.value=data??[]
+}
+const onChannelTypeChange=async (value:PayChannelType|unknown)=>{
+    await getPayModesWithChannelType(value)
     if(PayChannelType.ALI_USER==value && channels.value.length==0){
        getChannelListWithTye(PayChannelType.ALI).then(res=>{
           channels.value=res.data??[]
@@ -207,11 +220,11 @@ onMounted(()=>{
      isLoading.value=true
      getChannelEditInfo(id).then((res)=>{
        Object.assign(formData,res.data??{})
-       if(PayChannelType.ALI_USER==formData.channelType){
-         onChannelTypeChange(formData.channelType)
-       }
+       onChannelTypeChange(res.data.channelType)
        isLoading.value=false
      })
+  }else {
+    getPayModesWithChannelType(formData.channelType)
   }
   loadGroups()
 })
@@ -238,6 +251,16 @@ onMounted(()=>{
                     <a-select-option v-for="(item) in PayChannelTypeSelectOption"  :value="item.value">{{item.title}}</a-select-option>
                   </a-select>
                   <a-typography-text type="secondary">目前系统支持平台:支付宝,微信.</a-typography-text>
+                </a-flex>
+              </a-form-item>
+              <a-form-item label="支付方试" name="payModes" class="mt-5" :rules="{required:true,message:'请选择支付方式'}">
+                <a-flex style="flex: 1" vertical align="start" justify="start">
+                  <a-checkbox-group v-model:value="formData.payModes">
+                    <template v-for="(item) in payModes">
+                      <a-checkbox :value="item">{{getPayModeTypeText(item)}}</a-checkbox>
+                    </template>
+                  </a-checkbox-group>
+                  <a-typography-text type="secondary">请选择渠道分组,用于派单</a-typography-text>
                 </a-flex>
               </a-form-item>
               <a-form-item label="渠道名称" name="name" class="mt-5" >
