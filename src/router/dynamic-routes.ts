@@ -25,6 +25,88 @@ export default [
     component: () => import('~/pages/dashboard/analysis/index.vue')
   },
   {
+    name: 'AgentManage',
+    path: '/agent',
+    meta: {
+      title: '代理管理',
+      icon: 'TeamOutlined'
+    },
+    redirect: '/agent/list',
+    component: basicRouteMap.RouteView,
+    children: [
+      {
+        path: '/agent/list',
+        name: 'AgentList',
+
+        component: () => import('~/pages/agent/list.vue'),
+        meta: {
+          title: '代理列表',
+          hideChildrenInMenu: true
+        }
+      },
+      {
+        path: '/agent/edit',
+        name: 'AgentEdit',
+        component: () => import('~/pages/agent/edit.vue'),
+        meta: {
+          title: '代理商户',
+          hideInMenu:true
+        }
+      },
+      {
+        path: '/agent/info',
+        name: 'AgentInfo',
+        component: () => import('~/pages/agent/info.vue'),
+        meta: {
+          title: '代理商',
+          hideInMenu:true
+        }
+      }
+    ]
+  },
+
+  {
+    name: 'MchManage',
+    path: '/mch',
+    meta: {
+      title: '商户管理',
+      icon: 'TeamOutlined'
+    },
+    component: basicRouteMap.RouteView,
+    children: [
+      {
+        path: '/mch/list',
+        name: 'MchList',
+
+        component: () => import('~/pages/mch/index.vue'),
+        meta: {
+          title: '商户列表',
+          hideChildrenInMenu: true
+        }
+      },
+      {
+        path: '/mch/edit',
+        name: 'MchEdit',
+        component: () => import('~/pages/mch/edit.vue'),
+        meta: {
+          parentKeys: ['/mch','/mch/list'],
+          title: '新增商户',
+          hideInMenu:true
+        }
+      },
+      {
+        path: '/mch/info',
+        name: 'MchInfo',
+        component: () => import('~/pages/mch/info.vue'),
+        meta: {
+          parentKeys: ['/mch','/mch/list'],
+          title: '商户详情',
+          hideInMenu:true
+        }
+      }
+    ]
+  },
+  {
     name: 'ChannelManage',
     path: '/channel',
     meta: {
@@ -38,6 +120,16 @@ export default [
         component: () => import('~/pages/channel/index.vue'),
         meta: {
           title: '渠道列表',
+          hideChildrenInMenu: true
+        }
+      },
+      {
+        path: '/channel/info',
+        name: 'ChannelInfo',
+        component: () => import('~/pages/channel/info.vue'),
+        meta: {
+          title: '渠道信息',
+          hideInMenu: true,
           hideChildrenInMenu: true
         }
       },
@@ -57,6 +149,29 @@ export default [
         component: () => import('~/pages/channel/test.vue'),
         meta: {
           title: '渠道测式',
+        }
+      }
+    ]
+  },
+
+  {
+    name: 'debt',
+    path: '/debt',
+    meta: {
+      title: '分账管理',
+      icon: 'PayCircleOutlined'
+    },
+    redirect: '/debt/account-list',
+    component: basicRouteMap.RouteView,
+    children: [
+      {
+        path: '/debt/account-list',
+        name: 'DebtAccountList',
+
+        component: () => import('~/pages/debt/accountList.vue'),
+        meta: {
+          title: '分账账户',
+          hideChildrenInMenu: true
         }
       }
     ]

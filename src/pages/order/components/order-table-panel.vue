@@ -1,9 +1,21 @@
 <script setup lang="ts">
 import {ColumnsType} from "ant-design-vue/es/table";
 import {AccessEnum, getPayChannelTypeText, getPayModeTypeText, PayChannelType, PayModeType} from "~/utils/constant.ts";
-import {CopyOutlined,AlipaySquareFilled} from '@ant-design/icons-vue'
+import CopyTextBtn from '~/components/copy-text-btn/index.vue'
+
+import {
+  CheckCircleOutlined,
+  SyncOutlined,
+  CloseCircleOutlined,
+  ExclamationCircleOutlined,
+  ClockCircleOutlined,
+  MinusCircleOutlined,
+  AlipaySquareFilled,
+} from '@ant-design/icons-vue';
 import {getOrderStatusText, OrderSearch, OrderStatus, OrderTableType, searchOrder} from "~/api/order/OrderInterface.ts";
 import {PaginationProps} from "ant-design-vue";
+
+const router = useRouter()
 
 
 const columns =shallowRef<any[]>(
@@ -13,6 +25,7 @@ const columns =shallowRef<any[]>(
         dataIndex: 'id',
         align:'left',
         fixed: 'left',
+        width: '160px',
         tableTypes:[OrderTableType.ALL]
       },
       {
@@ -74,17 +87,18 @@ const columns =shallowRef<any[]>(
         dataIndex: 'channelOrderNo',
         tableTypes:[OrderTableType.ALL,OrderTableType.PAY_ING,OrderTableType.SUCCESS,OrderTableType.FAIL],
       },
-      {
-        title: '完成时间',
-        align:'center',
-        dataIndex: 'successTime',
-        tableTypes:[OrderTableType.ALL,OrderTableType.PAY_ING,OrderTableType.SUCCESS],
-      },
+     
       {
         title: '创建时间',
         align:'center',
         dataIndex: 'createdTime',
         tableTypes:[OrderTableType.ALL]
+      },
+      {
+        title: '完成时间',
+        align:'center',
+        dataIndex: 'successTime',
+        tableTypes:[OrderTableType.ALL,OrderTableType.PAY_ING,OrderTableType.SUCCESS],
       },
       // {
       //   title: '操作',
@@ -169,43 +183,56 @@ onMounted(()=>{
         <a-empty></a-empty>
       </template>
       <template #bodyCell="{ column , record}">
-
+        <template v-if="column.dataIndex==='id'">
+          <a-flex justify="space-start" align="center" :gap="5" >
+            <a-typography-text > {{ record.id }}</a-typography-text>
+            <copy-text-btn :copytext="record.id"></copy-text-btn>
+          </a-flex>
+        </template>
+        <template v-if="column.dataIndex==='mchOrderNo'">
+          <a-flex justify="space-start" align="center" :gap="5" >
+            <a-typography-text > {{ record.mchOrderNo }}</a-typography-text>
+            <copy-text-btn :copytext="record.mchOrderNo"></copy-text-btn>
+          </a-flex>
+        </template>
         <template v-if="column.dataIndex==='orderStatus'">
           <template v-if="column.dataIndex==='orderStatus'">
-            <a-tag v-if="record['orderStatus']===1" color="#0066ff" > {{getOrderStatusText(record['orderStatus'] as OrderStatus)}}</a-tag>
-            <a-tag v-if="record['orderStatus']===2" color="#ff9933" > {{getOrderStatusText(record['orderStatus'] as OrderStatus)}}</a-tag>
-            <a-tag v-if="record['orderStatus']===3" color="#009933" > {{getOrderStatusText(record['orderStatus'] as OrderStatus)}}</a-tag>
-            <a-tag v-if="record['orderStatus']===4" color="#ff0000" > {{getOrderStatusText(record['orderStatus'] as OrderStatus)}}</a-tag>
-            <a-tag v-if="record['orderStatus']===5" color="#cc0000" > {{getOrderStatusText(record['orderStatus'] as OrderStatus)}}</a-tag>
-            <a-tag v-if="record['orderStatus']===6" color="#cc0000" > {{getOrderStatusText(record['orderStatus'] as OrderStatus)}}</a-tag>
+            <a-tag v-if="record['orderStatus']===1" :bordered="false" color="processing" > {{getOrderStatusText(record['orderStatus'] as OrderStatus)}}</a-tag>
+            <a-tag v-if="record['orderStatus']===2" :bordered="false" color="warning" > {{getOrderStatusText(record['orderStatus'] as OrderStatus)}}</a-tag>
+            <a-tag v-if="record['orderStatus']===3" :bordered="false" color="success" >
+              <template #icon>
+                <check-circle-outlined />
+              </template>{{getOrderStatusText(record['orderStatus'] as OrderStatus)}}
+            </a-tag>
+            <a-tag v-if="record['orderStatus']===4" :bordered="false" color="error" >
+              <template #icon>
+                <close-circle-outlined />
+              </template>{{getOrderStatusText(record['orderStatus'] as OrderStatus)}}
+            </a-tag>
+            <a-tag v-if="record['orderStatus']===5":bordered="false" color="error" > {{getOrderStatusText(record['orderStatus'] as OrderStatus)}}</a-tag>
+            <a-tag v-if="record['orderStatus']===6" :bordered="false" color="error" > {{getOrderStatusText(record['orderStatus'] as OrderStatus)}}</a-tag>
           </template>
         </template>
         <template v-if="column.dataIndex==='amount'">
           {{(parseFloat(record['amount']) / 100)}}
         </template>
-        <template v-if="column.dataIndex==='mchOrderNo'">
-          <a-flex justify="space-start" align="center" :gap="5" >
-            <a-typography-text >{{record['mchOrderNo']}}</a-typography-text>
-          </a-flex>
-
-        </template>
         <template v-if="column.dataIndex==='payMode'">
-          <a-typography-link v-if="record['payMode']">{{getPayModeTypeText(record['payMode'])}}</a-typography-link>
-          <a-typography-text v-else>--</a-typography-text>
+          <a-typography-text v-if="record['payMode']">{{getPayModeTypeText(record['payMode'])}}</a-typography-text>
+          <a-typography-text v-else>/</a-typography-text>
         </template>
         <template v-if="column.dataIndex==='successTime'">
-          {{record['successTime']|| '--' }}
+          {{record['successTime']|| '/' }}
         </template>
         <template v-if="column.dataIndex==='mchFeeAmount'">
-          {{record['mchFeeAmount']|| '--' }}
+          {{record['mchFeeAmount']|| '/' }}
         </template>
         <template v-if="column.dataIndex==='channelOrderNo'">
-            <a-typography-text>{{record['channelOrderNo']||'--'}}</a-typography-text>
+            <a-typography-text>{{record['channelOrderNo']||'/'}}</a-typography-text>
         </template>
         <template v-if="column.dataIndex==='channelInfo'">
           <a-flex justify="center" align="center" :gap="5" v-if="record['channelInfo']">
-            <AlipaySquareFilled   style="font-size: 28px;color: dodgerblue"/>
-            <a-typography-link>{{record['channelInfo'].name}}</a-typography-link>
+            <AlipaySquareFilled  style="font-size: 28px;color: dodgerblue"/>
+            <a-typography-link  @click="router.push({path:'/channel/info',query:{id:record['channelInfo'].id}})">{{record['channelInfo'].name}}</a-typography-link>
           </a-flex>
           <a-typography-text v-else>--</a-typography-text>
         </template>

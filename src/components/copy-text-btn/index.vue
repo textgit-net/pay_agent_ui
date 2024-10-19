@@ -1,0 +1,53 @@
+<script setup lang="ts">
+import { type StyleValue } from "vue"
+import { message } from "ant-design-vue";
+import {
+    CopyFilled
+} from '@ant-design/icons-vue';
+import useClipboard from "vue-clipboard3";
+const { toClipboard } = useClipboard();
+
+
+export interface PropsType {
+  copytext: string;
+  isShowText: boolean;
+  text: string;
+  iconStyle: Partial<StyleValue>;
+  textStyle: Partial<StyleValue>;
+}
+
+
+const props = withDefaults(defineProps<Partial<PropsType>>(), {
+  copytext: '',
+  text: "复制",
+  isShowText: false,
+  iconStyle: () => ({
+    color: "#1677ff"
+  }),
+  textStyle: () => ({
+    color: "#1677ff"
+  }),
+});
+
+const handleCopyText = async () => {
+    await toClipboard(`${props.copytext}`);
+    message.success('复制成功');
+}
+
+</script>
+
+<template>
+    <a-space @click="handleCopyText">
+        <a-tooltip>
+          <template #title>复制</template>
+          <CopyFilled :style="props.iconStyle" class="icon" />
+          <a v-if="props.isShowText" :style="props.textStyle">{{ props.text }}</a>
+        </a-tooltip>
+    </a-space>
+</template>
+
+<style lang="less" scoped>
+  .icon {
+    cursor: pointer;
+  }
+</style>

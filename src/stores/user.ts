@@ -5,12 +5,12 @@ import type { MenuData } from '~@/layouts/basic-layout/typing'
 import {rootRoute} from '~@/router/dynamic-routes'
 import { generateFlatRoutes, generateRoutes, generateTreeRoutes } from '~@/router/generate-route'
 import {BaseSelectOption, DYNAMIC_LOAD_WAY, DynamicLoadEnum, SelectOption} from '~@/utils/constant'
-import {AccountInfo, getAccountInfo} from "~/api/account/AccountInterface.ts";
+import {AccountInfoResponse, getAccountInfo} from "~/api/account/AccountInterface.ts";
 
 export const useUserStore = defineStore('user', () => {
   const routerData = shallowRef()
   const menuData = shallowRef<MenuData>([])
-  const userInfo = shallowRef<AccountInfo>()
+  const userInfo = shallowRef<AccountInfoResponse>()
   const token = useAuthorization()
   const avatar = computed(() => userInfo.value?.avatar)
   const nickname = computed(() => userInfo.value?.nickName ?? userInfo.value?.loginName)

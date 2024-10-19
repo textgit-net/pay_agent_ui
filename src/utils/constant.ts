@@ -21,6 +21,43 @@ export enum CommonEnable{
   DISABLE=2
 }
 
+export enum ContactWay{
+  Wechat="Wechat",
+  QQ="QQ",
+  Telegram="Telegram",
+  Phone="Phone"
+}
+export const getContactWayText=(type:ContactWay)=>{
+  switch (type) {
+    case ContactWay.QQ:
+      return "QQ"
+    case ContactWay.Wechat:
+      return "微信"
+    case ContactWay.Telegram:
+      return "Telegram"
+    case ContactWay.Phone:
+      return "手机"
+  }
+}
+export const  ContactWaySelectOption:SelectOption<ContactWay>[]=[
+  {
+    value:ContactWay.Wechat,
+    title:getContactWayText(ContactWay.Wechat)
+  },
+  {
+    value:ContactWay.QQ,
+    title:getContactWayText(ContactWay.QQ)
+  },
+  {
+    value:ContactWay.Telegram,
+    title:getContactWayText(ContactWay.Telegram)
+  },
+  {
+    value:ContactWay.Phone,
+    title:getContactWayText(ContactWay.Phone)
+  }
+]
+
 /**
  * 签名类型
  */

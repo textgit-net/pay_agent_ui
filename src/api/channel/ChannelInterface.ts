@@ -1,4 +1,4 @@
-import {BasePageRequest, PageWarp, PayChannelType, SignType} from "~/utils/constant.ts";
+import {BasePageRequest, ResponseBody, PageWarp, PayChannelType, SignType, PayModeType} from "~/utils/constant.ts";
 import {exists} from "fs-extra";
 import {AccountInfoResponse} from "~/api/account/AccountInterface.ts";
 
@@ -7,15 +7,19 @@ export interface ChannelSimpleResponse{
     /**
      * 渠道ID
      */
-    id: number
+    id?: number
     /**
      * 渠道名称
      */
-    name: string
+    name?: string
     /**
      * 渠道类型
      */
-    channelType: PayChannelType
+    channelType?: PayChannelType
+}
+
+export interface ChannelInfo extends ChannelListResponse {
+    
 }
 
 /**
@@ -26,24 +30,29 @@ export interface ChannelListResponse extends ChannelSimpleResponse{
     /**
      * 签名类型
      */
-    signType:SignType
+    signType?:SignType
     /**
      * 是否启用
      */
-    isEnable:boolean
+    isEnable?:boolean
     /**
      * 是否启用分账
      */
-    isEnableAllocation:boolean
+    isEnableRoyalty?:boolean
     /**
      * 订单支付成功金额
      */
-    successAmount:number
+    successAmount?:number
     /**
      * 订单支付累计金额
      */
-    totalAmount:number
-    createTime:string
+    // 渠道支付方式
+    payModes?: PayModeType[]
+
+    successCount?: number
+    totalCount?: number
+    totalAmount?:number
+    createTime?:string
 }
 
 
@@ -116,8 +125,10 @@ export interface ChannelFormData{
     /**
      * 是否启用分账
      */
-    isEnableAllocation:boolean
-
+    isEnableRoyalty?:boolean
+    payModes?: any,
+    //商户id
+    mchId?: number;
 }
 
 
@@ -133,7 +144,22 @@ export interface ChannelSearch extends BasePageRequest{
     /**
      * 渠道类型,多个渠道类型用逗号分隔
      */
-    channelTypes?:PayChannelType[]
+    channelTypes?: string
+    /**
+     * 是否忽略禁用的渠道
+     */
+    isIgnoreDisable:boolean
+}
+
+export interface ALLChannelListRequest {
+    /**
+     * ID/名称
+     */
+    keyword?:string
+    /**
+     * 渠道类型,多个渠道类型用逗号分隔
+     */
+    channelTypes?: string
     /**
      * 是否忽略禁用的渠道
      */
@@ -146,7 +172,7 @@ export interface ChannelTestRequest{
     body?:string
     subject?:string
     isWebCashier?:boolean
-    payMode?:string
+    payMode?:PayModeType
 }
 export enum PayDataType{
     app="app",
@@ -171,10 +197,18 @@ export function searchChannel(params:ChannelSearch) {
  * 通过渠道类型获取商户渠道列表
  * @param type 渠道类型
  */
-export function getChannelListWithTye(type:PayChannelType){
-    return useGet<ChannelSimpleResponse[]>("/channel/list",{type:type})
+export function getChannelListWithType(type:PayChannelType){
+    return useGet<ChannelSimpleResponse[]>("/channel/list",{channelTypes:type})
 }
 
+
+/**
+ * 查询ALL渠道列表
+ * @param {ALLChannelListRequest} params
+ */
+export function getALLChannelList(params: ALLChannelListRequest): Promise<ResponseBody<ChannelListResponse[]>>{
+    return useGet<ChannelListResponse[]>("/channel/list",params)
+}
 
 /**
  * 保存渠道
@@ -204,4 +238,11 @@ export function channelTest(params:ChannelTestRequest){
 }
 
 
+/**
+ * 获取渠道详情
+ * @param id
+ */
+export function getChannelInfo(id:string):Promise<ResponseBody<ChannelInfo>> {
+    return useGet<ChannelInfo>(`/channel/info/${id}`)
+}
 

@@ -38,16 +38,16 @@ const submit=async function (){
 
 <template>
   <section class="w3l-hotair-form">
-    <h1>商户后台管理系统</h1>
+    <h1>代理后台管理系统</h1>
     <div class="container">
       <div class="workinghny-form-grid">
         <div class="main-hotair">
           <div class="content-wthree">
-            <h2>Log In</h2>
+            <h2>登  录</h2>
             <div class="form">
               <input v-model="loginName" autocomplete="off" type="text" class="text" name="text" placeholder="User Name" >
               <input v-model="password"  autocomplete="new-password" type="password" class="password" placeholder="User Password" >
-              <a-button type="primary" size="large" class="button" :loading="state.isLoading" @click="submit" >Login</a-button>
+              <a-button type="primary" size="large" class="button" :loading="state.isLoading" @click="submit" >立即登录</a-button>
 
             </div>
           </div>

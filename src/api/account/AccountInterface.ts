@@ -6,20 +6,13 @@ export interface AuthToken {
     refreshToken:string
 }
 
-export interface AccountInfo{
-    id:number
-    nickName:string
-    avatar?:string
-    loginName:string
-    roles?:any
-}
-
 
 export interface AccountInfoResponse {
     id:number
     loginName:string
     nickName:string
     avatar?:string
+    permissions?:any
     accountStatus:number
     lastLoginTime:string
     isAdmin:boolean
@@ -27,6 +20,8 @@ export interface AccountInfoResponse {
     roleId:number
     roleName:string
     createTime:string
+    // 是否允许发展子代理
+    isAllowInviteUser: boolean
 }
 
 export interface RoleInfoResponse{
@@ -59,7 +54,7 @@ export function login(loginName:string,password:string){
  * 获取登录的用户信息
  */
 export function getAccountInfo(){
-    return useGet<AccountInfo>("/account/info")
+    return useGet<AccountInfoResponse>("/account/info")
 }
 
 /**
