@@ -8,13 +8,17 @@ defineProps({
     type: String,
     default: '',
   },
+  valueColor: {
+    type: String,
+    default: '',
+  }
 })
 </script>
 
 <template>
   <div class="field">
     <span class="label">{{ label }}</span>
-    <span class="number">{{ value }}</span>
+    <span class="number" :style="{color: valueColor}">{{ value }}</span>
   </div>
 </template>
 
@@ -24,6 +28,9 @@ defineProps({
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
+  .label {
+    color: #999;
+  }
   .label,
   .number {
     font-size: 14px;

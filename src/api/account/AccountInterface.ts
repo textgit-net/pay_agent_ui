@@ -1,27 +1,32 @@
-import {PageWarp, PayChannelType} from "~/utils/constant.ts";
+import {PageWarp, PayChannelType, ResponseBody} from "~/utils/constant.ts";
 
 export interface AuthToken {
-    accessToken:string
-    expiresIn:string
-    refreshToken:string
+    accessToken:string;
+    expiresIn:string;
+    refreshToken:string;
+    isNeedCheckGoogleVerify?: boolean;
+    isNeedUpdatePassword?: boolean;
 }
 
 
 export interface AccountInfoResponse {
-    id:number
-    loginName:string
-    nickName:string
+    id?:number
+    loginName?:string
+    nickName?:string
     avatar?:string
     permissions?:any
-    accountStatus:number
-    lastLoginTime:string
-    isAdmin:boolean
-    isEnableGoogleVerify:boolean
-    roleId:number
-    roleName:string
-    createTime:string
+    accountStatus?:number
+    lastLoginTime?:string
+    isAdmin?:boolean
+    roleId?:number
+    roleName?:string
+    createTime?:string
     // 是否允许发展子代理
-    isAllowInviteUser: boolean
+    isAllowInviteUser?: boolean
+    // 是否已绑定google验证器
+    isBindGoogleSecretKey?: boolean
+    // 是否开启google验证器
+    isEnableGoogleVerify?: boolean
 }
 
 export interface RoleInfoResponse{
@@ -46,7 +51,7 @@ export interface PermissionsMetadata{
  * @param loginName loginName
  * @param password 密码
  */
-export function login(loginName:string,password:string){
+export function login(loginName:string,password:string):Promise<ResponseBody<AuthToken>>{
     return usePost<AuthToken>('/auth/token', {"loginName":loginName,"password":password})
 }
 
@@ -79,3 +84,12 @@ export function getPermissionResource(){
     return useGet<PermissionsGroup[]>("/system/permissions")
 }
 
+
+/**
+ * 登录
+ * @param loginName loginName
+ * @param password 密码
+ */
+export function resetPassword(password:string):Promise<ResponseBody<AuthToken>>{
+    return usePost<AuthToken>('/auth/resetPassword', {"password":password})
+}

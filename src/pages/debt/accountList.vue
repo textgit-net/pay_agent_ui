@@ -161,14 +161,12 @@ onMounted(()=>{
   <a-flex vertical :gap="10" style="width: 100%;height: 100%">
     <a-modal
       v-model:open="state.isShowEditModal"
-      :mask-closable="false"
-      :closable="false" centered :width="420" :title="formData.id?'编辑分账账户':'创建分账账户'"
+      :mask-closable="false" centered :width="420" :title="formData.id?'编辑分账账户':'创建分账账户'"
     >
     <template #footer>
-      <a-button key="back" @click="state.isShowEditModal =false">取 消</a-button>
-      <a-button key="submit" type="primary" :loading="state.isSaveLoading" :disabled="isDisAbledChannelGroupForm" @click="onSubmit">确 认</a-button>
+      <a-button key="submit" type="primary" :loading="state.isSaveLoading" :disabled="isDisAbledChannelGroupForm" @click="onSubmit" style="width: 100%;">提 交</a-button>
     </template>
-    <a-form ref="formRef" :model="formData" layout="vertical">
+    <a-form ref="formRef" :model="formData" layout="vertical"  style="padding: 20px 0;">
       <a-form-item name="realName" :rules="{required:true,message:'请输入真实姓名'}"  label="真实姓名" >
         <a-input placeholder="请输入真实姓名" v-model:value="formData.realName" allow-clear></a-input>
       </a-form-item>

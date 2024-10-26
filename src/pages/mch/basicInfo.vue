@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { reactive} from 'vue';
+import type { Rule } from 'ant-design-vue/es/form';
 import { message } from 'ant-design-vue';
 import {ContactWay, ContactWaySelectOption,getContactWayText} from "~/utils/constant.ts";
 import {MerchantInfo, modifyMerchant, getMerchantInfo, resetMerchantPwd,MerchantResetPwdRequset } from '~/api/merchant'
@@ -24,6 +25,7 @@ const state = reactive<{
 
 })
 const formRef = ref();
+const PwdFormRef = ref();
 const resetPwdForm = ref<MerchantResetPwdRequset>({});
 
 
@@ -68,7 +70,22 @@ const handleShowConcatInfo = () => {
 }
 const handleShowSettingPwd = () => {
   state.ShowSettingPwdDialog = true;
+  nextTick(() => {
+    PwdFormRef.value.resetFields();
+  })
 }
+
+const isDisAbledPwdBtn = computed(()=> {
+  return !(resetPwdForm.value.password && resetPwdForm.value.confirmPassword) || (resetPwdForm.value.password.trim().length < 6 ||  resetPwdForm.value.confirmPassword.trim().length < 6);
+})
+
+const validatePwd =  async (_rule: Rule, value: string) => {
+  if (!value || value.trim().length < 6) {
+    return Promise.reject(`请输入至少6位数的密码`);
+  } else {
+    return Promise.resolve();
+  }
+};
 
 const handleBaseInfoOk = async () => {
 
@@ -135,18 +152,16 @@ onMounted(async ()=>{
 <template>
   <div>
 
-    <a-modal v-model:open="state.showBaseInfoDialog" title="设置基础信息">
+    <a-modal v-model:open="state.showBaseInfoDialog" title="设置基础信息" style="width: 480px;">
       <template #footer>
-        <a-button key="back" @click="state.showBaseInfoDialog = false">取 消</a-button>
-        <a-button key="submit" type="primary" :loading="state.dialogBtnLoading" @click="handleBaseInfoOk">保 存</a-button>
+        <a-button key="submit" type="primary" :loading="state.dialogBtnLoading" @click="handleBaseInfoOk" style="width: 100%;">保 存</a-button>
       </template>
       <a-form
          ref="formRef"
         style="padding: 30px 0;"
         :model="copyFormData"
         name="basic"
-        :label-col="{ span: 8 }"
-        :wrapper-col="{ span: 16 }"
+        layout="vertical"
         autocomplete="off"
       >
         <a-form-item
@@ -166,18 +181,16 @@ onMounted(async ()=>{
       </a-form>
     </a-modal>
 
-    <a-modal v-model:open="state.showConcatDialog" title="设置联系人信息">
+    <a-modal v-model:open="state.showConcatDialog" title="设置联系人信息" style="width: 480px;">
       <template #footer>
-        <a-button key="back" @click="state.showConcatDialog = false">取 消</a-button>
-        <a-button key="submit" type="primary" :disabled="!copyFormData.contactName || !copyFormData.contactNumber" :loading="state.dialogBtnLoading" @click="handleBaseInfoOk">保 存</a-button>
+        <a-button key="submit" type="primary" :disabled="!copyFormData.contactName || !copyFormData.contactNumber" :loading="state.dialogBtnLoading" @click="handleBaseInfoOk" style="width: 100%;">保 存</a-button>
       </template>
       <a-form
          ref="formRef"
         style="padding: 30px 0;"
         :model="copyFormData"
         name="basic"
-        :label-col="{ span: 8 }"
-        :wrapper-col="{ span: 16 }"
+        layout="vertical"
         autocomplete="off"
       >
         <a-form-item
@@ -207,32 +220,48 @@ onMounted(async ()=>{
       </a-form>
     </a-modal>
 
-    <a-modal v-model:open="state.ShowSettingPwdDialog" title="设置新密码">
+
+    <a-modal v-model:open="state.ShowSettingPwdDialog" :mask-closable="false" style="width: 420px;" title="重置密码">
       <template #footer>
-        <a-button key="back" @click="state.ShowSettingPwdDialog = false">取 消</a-button>
-        <a-button key="submit" :disabled="!resetPwdForm.password || !resetPwdForm.confirmPassword" type="primary" :loading="state.dialogBtnLoading" @click="handleResetPwdOk">保 存</a-button>
+        <a-flex align="center">
+          <a-button key="submit" style="width: 100%;":disabled="isDisAbledPwdBtn" type="primary" :loading="state.dialogBtnLoading" @click="handleResetPwdOk">保 存</a-button>
+        </a-flex>
+       
       </template>
       <a-form
         style="padding: 30px 0;"
         :model="resetPwdForm"
+        ref="PwdFormRef"
         name="basic"
-        :label-col="{ span: 8 }"
-        :wrapper-col="{ span: 16 }"
+        layout="vertical"
         autocomplete="off"
       >
+
+
+        <a-form-item
+            label="用户名"
+          >
+            <a-typography-text>{{ formData.loginName }}</a-typography-text>
+        </a-form-item>
         <a-form-item
           label="新密码"
           name="password"
-          :rules="[{ required: true, message: '新密码!' }]"
+          :rules="[
+            { required: true, validator: validatePwd }
+          ]"
         >
-          <a-input-password v-model:value="resetPwdForm.password" placeholder="请输入新密码" />
+          <a-input-password v-model:value="resetPwdForm.password" placeholder="请输入新密码" allow-clear />
+          <a-typography-text  type="secondary">密码规则：</a-typography-text>
+          <a-typography-text  type="secondary">最少6个字符</a-typography-text>
         </a-form-item>
         <a-form-item
           label="确认新密码"
           name="confirmPassword"
-          :rules="[{ required: true, message: '确认新密码!' }]"
+          :rules="[
+            { required: true, validator: validatePwd }
+          ]"
         >
-          <a-input-password v-model:value="resetPwdForm.confirmPassword" placeholder="请输入确认新密码" />
+          <a-input-password v-model:value="resetPwdForm.confirmPassword" placeholder="请输入确认新密码" allow-clear />
         </a-form-item>
       </a-form>
     </a-modal>
@@ -299,7 +328,7 @@ onMounted(async ()=>{
           <!-- <a-input-password v-model:value="formState.password" placeholder="新密码" /> -->
         </a-descriptions-item>
 
-        <a-descriptions-item class="mt-2" :labelStyle="{'color':'#999','alignItems': 'center'}" label="Google安全码"><a-switch></a-switch></a-descriptions-item>
+        
       </a-descriptions>
     </a-card>
 

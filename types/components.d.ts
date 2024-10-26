@@ -107,6 +107,7 @@ declare module 'vue' {
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
     SelectLang: typeof import('./../src/components/select-lang/index.vue')['default']
+    SetPasswordDialog: typeof import('./../src/components/set-password/set-password-dialog.vue')['default']
     SingFileUpload: typeof import('./../src/components/sing-file-upload.vue')['default']
     TokenProvider: typeof import('./../src/components/token-provider/index.vue')['default']
     Tooltip: typeof import('ant-design-vue/es')['Tooltip']

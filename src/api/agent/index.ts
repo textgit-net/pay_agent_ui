@@ -21,6 +21,8 @@ export interface AgentInfo {
     contactName?:string
     contactNumber?: string
     contactWay?: ContactWay
+    mchCount?: number;
+    childAgentCount?: number;
     isAllowInviteUser?: AllowInviteUserEnum
     isEnable?: boolean
     remark?: string

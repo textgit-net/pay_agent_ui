@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { LogoutOutlined, ProfileOutlined, UserOutlined } from '@ant-design/icons-vue'
-
+import { Modal } from 'ant-design-vue';
 const message = useMessage()
 const userStore = useUserStore()
 const multiTabStore = useMultiTab()
@@ -9,19 +9,38 @@ const router = useRouter()
 const { avatar, nickname } = storeToRefs(userStore)
 async function handleClick({ key }: any) {
   if (key === 'logout') {
-    const hide = message.loading('退出登录...', 0)
+   
     try {
-      await userStore.logout()
+      Modal.confirm({
+        title: '温馨提示',
+        content: `确认【 ${nickname.value} 】退出登录吗？`,
+        okText: '确认',
+        type: 'info',
+        cancelText: '取消',
+        async onOk() {
+          const hide = message.loading('退出登录...', 0)
+          try {
+            
+            await userStore.logout()
+          } catch {
+            
+          } finally {
+            hide()
+            message.success('退出登录成功', 3)
+            router.push({
+              path: '/login',
+            }).then(() => {
+              multiTabStore.clear()
+              layoutMenuStore.clear()
+            })
+          }
+        },
+        onCancel() {},
+      });
+     
     }
     finally {
-      hide()
-      message.success('退出登录成功', 3)
-      router.push({
-        path: '/login',
-      }).then(() => {
-        multiTabStore.clear()
-        layoutMenuStore.clear()
-      })
+      
     }
   }
 }
@@ -41,14 +60,6 @@ async function handleClick({ key }: any) {
           </template>
           <RouterLink to="/account/center">
             个人中心
-          </RouterLink>
-        </a-menu-item>
-        <a-menu-item key="1">
-          <template #icon>
-            <ProfileOutlined />
-          </template>
-          <RouterLink to="/account/settings">
-            个人设置
           </RouterLink>
         </a-menu-item>
         <a-menu-divider />

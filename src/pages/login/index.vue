@@ -1,38 +1,89 @@
 <script setup lang="ts">
-import {notification} from "ant-design-vue";
-import {login} from "~/api/account/AccountInterface.ts";
+import {message, notification} from "ant-design-vue";
+import { UserOutlined, LockOutlined } from '@ant-design/icons-vue';
+import {AuthToken, login} from "~/api/account/AccountInterface.ts";
 import {getQueryParam} from "~/utils/tools.ts";
 const token = useAuthorization()
 const router = useRouter()
-const loginName=ref("")
-const password=ref("")
 const state=reactive({
   isLoading:false
 })
-const submit=async function (){
-  console.log("LoginName:"+loginName.value)
-  if(!loginName.value && !password.value){
-    notification.open({
-      message: `系统提示`,
-      duration:1,
-      description:"请输入账号/密码",
-      placement:'top',
-    });
-    return
-  }
+
+interface FormState {
+  loginName: string;
+  password: string;
+}
+const formState = reactive<FormState>({
+  loginName: '',
+  password: '',
+});
+
+const disabled = computed(() => {
+  return !(formState.loginName && formState.password);
+});
+
+
+const onFinish = (values: any) => {
+  submit();
+};
+
+const onFinishFailed = (errorInfo: any) => {
+  console.log('Failed:', errorInfo);
+};
+
+const submit= async () => {
+
+  // if(!loginName.value && !password.value){
+  //   notification.open({
+  //     message: `系统提示`,
+  //     duration:1,
+  //     description:"请输入账号/密码",
+  //     placement:'top',
+  //   });
+  //   return
+  // }
   state.isLoading=true
-  login(loginName.value,password.value).then((res)=>{
-    state.isLoading=false
-    token.value=res.data.accessToken
+  try {
+    let res  = await login(formState.loginName,formState.password)
+    let authInfo: AuthToken = res.data
+    
+    token.value=authInfo.accessToken
     // 获取当前是否存在重定向的链接，如果存在就走重定向的地址
-    const redirect = getQueryParam('redirect', '/')
-    router.push({
-      path: redirect,
-      replace: true,
-    })
-  }).catch(e=>{
+    if (authInfo.isNeedUpdatePassword) {
+      message.warning('首次登录需要重置密码')
+      router.push({
+        path: '/setting-pwd',
+        query: {
+          loginName: formState.loginName,
+          redirect: getQueryParam('redirect', '/')
+        },
+        replace: false,
+      })
+    } else if (authInfo.isNeedCheckGoogleVerify) {
+      
+      router.push({
+        path: '/google-verify',
+        query: {
+          loginName: formState.loginName,
+          redirect: getQueryParam('redirect', '/')
+        },
+        replace: false,
+      })
+    } else {
+      router.push({
+        path: getQueryParam('redirect', '/'),
+        replace: true,
+      })
+    }
+
+    
+   
+  } catch (error) {
+    
+  } finally {
     state.isLoading=false
-  })
+  }
+   
 }
 </script>
 
@@ -44,11 +95,46 @@ const submit=async function (){
         <div class="main-hotair">
           <div class="content-wthree">
             <h2>登  录</h2>
-            <div class="form">
-              <input v-model="loginName" autocomplete="off" type="text" class="text" name="text" placeholder="User Name" >
-              <input v-model="password"  autocomplete="new-password" type="password" class="password" placeholder="User Password" >
-              <a-button type="primary" size="large" class="button" :loading="state.isLoading" @click="submit" >立即登录</a-button>
 
+          
+
+            <div class="form">
+              <a-form
+                :model="formState"
+                name="horizontal_login"
+                layout="vertical"
+                autocomplete="off"
+                @finish="onFinish"
+                @finishFailed="onFinishFailed"
+              >
+                <a-form-item
+                  label="用户名"
+                  name="loginName"
+                  :rules="[{ required: true, message: '请输入用户名!' }]"
+                >
+                  <a-input v-model:value="formState.loginName">
+                    <template #prefix>
+                      <UserOutlined class="site-form-item-icon" />
+                    </template>
+                  </a-input>
+                </a-form-item>
+
+                <a-form-item
+                  label="登录密码"
+                  name="password"
+                  :rules="[{ required: true, message: '请输入登录密码!' }]"
+                >
+                  <a-input-password v-model:value="formState.password">
+                    <template #prefix>
+                      <LockOutlined class="site-form-item-icon" />
+                    </template>
+                  </a-input-password>
+                </a-form-item>
+
+                <a-form-item>
+                  <a-button type="primary" size="large" class="button" :loading="state.isLoading" html-type="submit">立即登录</a-button>
+                </a-form-item>
+              </a-form>
             </div>
           </div>
           <div class="w3l_form align-self">
@@ -124,13 +210,19 @@ const submit=async function (){
     margin: 0 auto;
   }
   .button {
-    font-size: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
+    font-size: 16px;
+    letter-spacing: 2px;
     color: #fff;
     width: 100%;
     -webkit-border-radius: 36px;
     border-radius: 36px;
     background: #0568C1;
     border: none;
+    margin-top: 20px;
 
   }
   .main-hotair {

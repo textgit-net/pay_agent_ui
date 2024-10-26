@@ -1,7 +1,11 @@
 <script setup lang="ts">
+
+import SettingPassword from '@/components/set-password/set-password-dialog.vue'
+
 const appStore = useAppStore()
 const { theme } = storeToRefs(appStore)
 const { antd } = useI18nLocale()
+
 </script>
 
 <template>
@@ -16,6 +20,8 @@ const { antd } = useI18nLocale()
       <TokenProvider>
         <RouterView />
       </TokenProvider>
+
+      <SettingPassword />
     </a-app>
   </a-config-provider>
 </template>

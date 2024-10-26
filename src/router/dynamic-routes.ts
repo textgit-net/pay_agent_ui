@@ -206,6 +206,15 @@ export default [
     ]
   },
   {
+    path: '/account/center',
+    name: 'AccountInfo',
+    component: () => import('~/pages/account/center/index.vue'),
+    meta: {
+      hideInMenu:true,
+      title: '账号中心',
+    }
+  },
+  {
     name: 'AccountManage',
     path: '/account',
     meta: {
@@ -247,14 +256,7 @@ export default [
           }
         ]
       },
-      {
-        path: '/account/center',
-        name: 'AccountInfo',
-        component: () => import('~/pages/account/center.vue'),
-        meta: {
-          title: '账号管理',
-        }
-      },
+     
 
     ]
   },

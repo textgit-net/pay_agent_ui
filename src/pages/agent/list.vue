@@ -35,7 +35,7 @@ const columns:ColumnsType =[
   },
   {
     title: '商户数量',
-    dataIndex: 'merchantCount',
+    dataIndex: 'mchCount',
   },
   {
     title: '订单数量',
@@ -196,14 +196,14 @@ onMounted(()=>{
           <template v-if="column.dataIndex==='isEnable'">
               <a-switch checked-children="是" un-checked-children="否" :checked="record.isEnable" disabled></a-switch>
           </template>
-          <template v-if="column.dataIndex==='channelCount'">
-             {{record.channelCount || '--' }}
+          <template v-if="column.dataIndex==='mchCount'">
+             {{record.mchCount ?? '/' }}
           </template>
           <template v-if="column.dataIndex==='totalOrderCount'">
-            {{record.totalOrderAmount || '--' }}
+            {{record.totalOrderAmount ?? '/' }}
           </template>
           <template v-if="column.dataIndex==='totalOrderAmount'">
-            {{record.totalOrderAmount || '--' }}
+            {{record.totalOrderAmount ?? '/' }}
           </template>
           <template v-if="column.dataIndex==='action'">
             <a-flex :gap="5">

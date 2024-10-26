@@ -281,7 +281,7 @@ onMounted(() => {
               </a-form-item>
               <a-form-item label="渠道名称" name="name" class="mt-5">
                 <a-flex style="flex: 1" vertical>
-                  <a-input v-model:value="formData.name" placeholder="请输入渠道名称" style="width: 320px;"></a-input>
+                  <a-input v-model:value="formData.name" placeholder="请输入渠道名称" style="width: 320px;" allow-clear></a-input>
                   <a-typography-text type="secondary">为了方便管理渠道</a-typography-text>
                 </a-flex>
               </a-form-item>
@@ -299,21 +299,21 @@ onMounted(() => {
               <a-form-item label="应用ID" name="alipayAppId" class="mt-5">
                 <a-flex style="flex: 1" vertical>
                   <a-input v-model:value="formData.channelConfig['appId']" placeholder="请输入支付宝应用ID"
-                    style="width: 320px;"></a-input>
+                    style="width: 320px;" allow-clear></a-input>
                   <a-typography-text type="secondary">支付宝平台申请的应用ID.</a-typography-text>
                 </a-flex>
               </a-form-item>
               <a-form-item label="PID" name="pid" class="mt-5" required>
                 <a-flex style="flex: 1" vertical>
                   <a-input v-model:value="formData.channelConfig['pid']" placeholder="请输入支付宝合作伙伴Id"
-                    style="width: 320px;"></a-input>
+                    style="width: 320px;" allow-clear></a-input>
                   <a-typography-text type="secondary">支付宝平台申请的合作伙伴Id.</a-typography-text>
                 </a-flex>
               </a-form-item>
               <a-form-item label="开发者私钥" name="alipayPrivateKey" class="mt-5">
                 <a-flex style="flex: 1" vertical>
                   <a-input v-model:value="formData.channelConfig['privateKey']" placeholder="请输入支付宝开发者私钥"
-                    style="width: 320px;"></a-input>
+                    style="width: 320px;" allow-clear></a-input>
                   <a-typography-text type="secondary">请输入支付宝开发者私钥</a-typography-text>
                 </a-flex>
               </a-form-item>
@@ -327,7 +327,7 @@ onMounted(() => {
               <a-form-item v-if="!formData.channelConfig['isCert']" label="支付宝公钥" name="alipayPublicKey" class="mt-5">
                 <a-flex style="flex: 1" vertical>
                   <a-input v-model:value="formData.channelConfig['alipayPublicKey']" placeholder="请输入支付宝公钥"
-                    style="width: 320px;"></a-input>
+                    style="width: 320px;" allow-clear></a-input>
                   <a-typography-text type="secondary">支付宝平台下发的公钥证书.</a-typography-text>
                 </a-flex>
               </a-form-item>
@@ -388,7 +388,7 @@ onMounted(() => {
               <a-form-item label="支付宝用户ID" name="alipayUserId">
                 <a-flex style="flex: 1" vertical>
                   <a-input v-model:value="formData.channelConfig['userId']" placeholder="请扫码/手动填写支付宝用户ID"
-                    style="width: 320px;"></a-input>
+                    style="width: 320px;" allow-clear></a-input>
                   <a-typography-text type="secondary">支持扫码获取用户ID以及手动填写用户ID.</a-typography-text>
                 </a-flex>
               </a-form-item>
@@ -402,7 +402,7 @@ onMounted(() => {
                 name="alipayUserCookie">
                 <a-flex style="flex: 1" vertical>
                   <a-input v-model:value="formData.channelConfig['userCookie']" placeholder="请填写支付宝用户Cookie"
-                    style="width: 320px;"></a-input>
+                    style="width: 320px;" allow-clear></a-input>
                   <a-flex :gap="5">
                     <a-typography-text type="secondary">需要填写与用户ID一致的支付宝账号Cookie.</a-typography-text>
                     <a-typography-link>怎么获取Cookie?</a-typography-link>

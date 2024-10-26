@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { message } from 'ant-design-vue';
+import type { Rule } from 'ant-design-vue/es/form';
 import {ContactWay, ContactWaySelectOption} from "~/utils/constant.ts";
 import {PayChannelInfo, AgentInfo, modifyAgent, getAgentInfo, AllowInviteUserEnum } from '~/api/agent/index'
 const router=useRouter()
@@ -71,6 +72,14 @@ const initPayChannelInfo = ():PayChannelInfo => {
     return payChannelInfo;
 }
 
+const validatePwd =  async (_rule: Rule, value: string) => {
+  if (!value || value.trim().length < 6) {
+    return Promise.reject(`请输入至少6位数的密码`);
+  } else {
+    return Promise.resolve();
+  }
+};
+
 onMounted(async ()=>{
   if(id){
     
@@ -104,13 +113,13 @@ onMounted(async ()=>{
             <a-typography-text strong>1.基础信息</a-typography-text>
             <a-form-item label="代理名称：" name="name"  class="mt-5" :rules="[{required:true,message:'请输入代理名称'}]">
               <a-flex style="flex: 1" vertical>
-                <a-input v-model:value="formData.name" placeholder="请输入代理名称"  style="width: 320px"/>
+                <a-input v-model:value="formData.name" placeholder="请输入代理名称" allow-clear style="width: 320px"/>
                 <a-typography-text type="secondary">为了更好的管理请规范输入</a-typography-text>
               </a-flex>
             </a-form-item>
             <a-form-item label="代理简称：" name="shortName"  class="mt-5" :rules="[{required:false,message:'请输入代理简称'}]">
               <a-flex style="flex: 1" vertical>
-                <a-input v-model:value="formData.shortName" placeholder="请输入代理简称"  style="width: 320px"/>
+                <a-input v-model:value="formData.shortName" placeholder="请输入代理简称" allow-clear style="width: 320px"/>
                 <a-typography-text type="secondary">为了更好的管理请规范输入</a-typography-text>
               </a-flex>
             </a-form-item>
@@ -122,30 +131,34 @@ onMounted(async ()=>{
               </a-radio-group>
             </a-form-item>
             <a-form-item label="联系人：" name="contactName" class="mt-5" :rules="[{required:true,message:'请输入联系人'}]">
-              <a-input v-model:value="formData.contactName" placeholder="请输入联系人"  style="width: 320px"></a-input>
+              <a-input v-model:value="formData.contactName" placeholder="请输入联系人" allow-clear style="width: 320px"></a-input>
             </a-form-item>
            
             <a-form-item label="联系账号：" name="contactNumber" class="mt-5" :rules="[{required:true,message:'请输入联系账号'}]">
-              <a-input v-model:value="formData.contactNumber" placeholder="请输入联系账号"  style="width: 320px"></a-input>
+              <a-input v-model:value="formData.contactNumber" placeholder="请输入联系账号" allow-clear style="width: 320px"></a-input>
             </a-form-item>
             <a-form-item label="备注：" name="remark" class="mt-5" :rules="[{required:false,message:'请输入备注信息'}]">
-              <a-input v-model:value="formData.remark" placeholder="请输入备注信息"  style="width: 320px"></a-input>
+              <a-input v-model:value="formData.remark" placeholder="请输入备注信息" allow-clear style="width: 320px"></a-input>
             </a-form-item>
           </a-card>
           <a-card >
             <a-typography-text strong>2.账号信息</a-typography-text>
             <a-form-item label="登录账号："  name="loginName"  class="mt-5" :rules="[{required:formData.id==null,message:'请输入登录账号'}]">
               <a-flex style="flex: 1" vertical>
-                <a-input v-model:value="formData.loginName" placeholder="请输入登录账号" :disabled="formData.id!=null"  style="width: 320px"/>
-                <a-typography-text type="secondary">登录账号用于商户登录商户管理系统</a-typography-text>
+                <a-input v-model:value="formData.loginName" placeholder="请输入登录账号" :disabled="formData.id!=null" allow-clear style="width: 320px"/>
+                <a-typography-text type="secondary">登录账号用于子代理登录代理管理系统</a-typography-text>
               </a-flex>
             </a-form-item>
          
-            <a-form-item label="登录密码：" name="password" v-show="formData.id==null" class="mt-5" :rules="[{required:formData.id==null,message:'请输入登录密码'}]">
+            <a-form-item label="登录密码：" name="password" v-show="formData.id==null" class="mt-5" :rules="[{ required: true, validator: validatePwd }]">
               <a-flex :gap="10">
                 <a-flex style="flex: 1" vertical>
-                  <a-input v-model:value="formData.password" placeholder="请输入登录密码"  style="width: 320px"></a-input>
-                  <a-typography-text type="secondary" v-show="formData.id==null">登录密码用于商户首次登录。</a-typography-text>
+                  <a-input-password v-model:value="formData.password" placeholder="请输入新密码"  style="width: 320px" allow-clear />
+                  <a-typography-text type="secondary" v-show="formData.id==null">登录密码用于子代理首次登录。</a-typography-text>
+                  <a-flex>
+                    <a-typography-text  type="secondary">密码规则：</a-typography-text>
+                    <a-typography-text  type="secondary">最少6个字符</a-typography-text>
+                  </a-flex>
                 </a-flex>
               </a-flex>
             </a-form-item>

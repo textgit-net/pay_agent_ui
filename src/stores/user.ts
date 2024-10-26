@@ -41,6 +41,11 @@ export const useUserStore = defineStore('user', () => {
     userInfo.value=data
   }
 
+  // 设置用户信息
+  const setUserInfo = async (info: AccountInfoResponse) => {
+    userInfo.value= JSON.parse(JSON.stringify(info))
+  }
+
 
   const logout = async () => {
     // 退出登录
@@ -60,6 +65,7 @@ export const useUserStore = defineStore('user', () => {
     userInfo,
     permissions,
     getUserInfo,
+    setUserInfo,
     logout,
     routerData,
     menuData,

@@ -12,6 +12,10 @@ const props = defineProps({
     type: String,
     default: '',
   },
+  title2: {
+    type: String,
+    default: '',
+  },
   titleColor: {
     type: String,
     default: '',
@@ -26,8 +30,8 @@ const props = defineProps({
 </script>
 
 <template>
-  <a-card :bind="props" :body-style="{ padding: '20px 24px 8px 24px' }">
-    <div class="chartCard">
+  <a-card :bind="props" :body-style="{ padding: '20px 24px 8px 24px' }" :loading="loading">
+    <div class="commonCard">
       <div class="chartTop">
         <div class="metaWrap">
           <div class="meta">
@@ -41,20 +45,26 @@ const props = defineProps({
           </div>
         </div>
       </div>
-      <div class="content" :style="{ height: `${contentHeight}px` || 'auto' }">
-        <div class="contentFixed">
-          <slot />
+
+      <div class="chartTop" style="padding-top: 20px;">
+        <div class="metaWrap">
+          <div class="meta">
+            <span class="title" :style="{color: titleColor}">{{ title2 }}</span>
+            <span class="action">
+              <slot name="action" />
+            </span>
+          </div>
+          <div class="total">
+            <slot name="total2" />
+          </div>
         </div>
-      </div>
-      <div class="footer">
-        <slot name="footer" />
       </div>
     </div>
   </a-card>
 </template>
 
 <style scoped lang="less">
-.chartCard {
+.commonCard {
   position: relative;
   .chartTop {
     position: relative;
@@ -118,7 +128,6 @@ const props = defineProps({
   .footer {
     margin-top: 8px;
     padding-top: 9px;
-    border-top: 1px solid var(--pro-ant-color-border);
     & > * {
       position: relative;
     }

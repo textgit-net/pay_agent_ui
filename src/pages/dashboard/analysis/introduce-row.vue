@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { InfoCircleOutlined } from '@ant-design/icons-vue'
-import { Progress, TinyArea, TinyColumn } from '@antv/g2plot'
+import { TinyArea, TinyColumn } from '@antv/g2plot'
 import ChartCard from '~/pages/dashboard/analysis/components/chart-card.vue'
 import Field from '~/pages/dashboard/analysis/components/field.vue'
 import Trend from '~/pages/dashboard/analysis/trend.vue'
@@ -27,7 +27,6 @@ const topColResponsiveProps = {
 
 const tinyAreaContainer = ref()
 const tinyColumnContainer = ref()
-const progressContainer = ref()
 
 const visitData = [7, 5, 4, 2, 4, 7, 5, 6, 5, 9, 6, 3, 1, 5, 3, 6, 5]
 
@@ -57,15 +56,6 @@ onMounted(() => {
     data: visitData,
   })
   tinyColumn.value?.render()
-
-  progress.value = new Progress(progressContainer.value, {
-    height: 46,
-    autoFit: true,
-    percent: 0.78,
-    barWidthRatio: 0.2,
-    color: '#13C2C2',
-  })
-  progress.value?.render()
 })
 
 onBeforeUnmount(() => {
@@ -135,32 +125,6 @@ onBeforeUnmount(() => {
           <Field label="转化率" value="60%" />
         </template>
         <div ref="tinyColumnContainer" />
-      </ChartCard>
-    </a-col>
-
-    <a-col v-bind="{ ...topColResponsiveProps }">
-      <ChartCard :bordered="false" title="运营活动效果" :loading="loading" :content-height="46">
-        <template #action>
-          <a-tooltip title="指标说明">
-            <InfoCircleOutlined />
-          </a-tooltip>
-        </template>
-        <template #total>
-          <span>{{ '78%' }}</span>
-        </template>
-        <template #footer>
-          <div :style="{ whiteSpace: 'nowrap', overflow: 'hidden' }">
-            <Trend flag="up" :style="{ marginRight: '16px' } ">
-              周同比
-              <span class="trendText">12%</span>
-            </Trend>
-            <Trend flag="down">
-              日同比
-              <span class="trendText">11%</span>
-            </Trend>
-          </div>
-        </template>
-        <div ref="progressContainer" />
       </ChartCard>
     </a-col>
   </a-row>

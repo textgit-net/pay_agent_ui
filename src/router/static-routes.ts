@@ -11,6 +11,25 @@ export default [
     },
   },
 
+
+  {
+    path: '/setting-pwd',
+    name: 'settingPwd',
+    component: () => import('~/pages/auth/setting-pwd.vue'),
+    meta: {
+      title: '授权已过期',
+    },
+  },
+
+  {
+    path: '/google-verify',
+    name: 'googleVerify',
+    component: () => import('~/pages/auth/google-verify.vue'),
+    meta: {
+      title: 'google验证',
+    },
+  },
+
   {
     path: '/401',
     name: 'Error401',
