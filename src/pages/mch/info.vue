@@ -45,7 +45,7 @@ const onTabClick=(key)=>{
           <a-tabs  v-model:activeKey="state.activeTabKey" @tabClick="onTabClick">
             <a-tab-pane key="basicInfo"  tab="商户信息"/>
             <a-tab-pane key="ratesConfig" tab="费率信息"/>
-            <a-tab-pane key="channels" tab="渠道信息"/>
+            <!-- <a-tab-pane key="channels" tab="渠道信息"/> -->
             <a-tab-pane key="orderData" tab="订单数据"/>
             <a-tab-pane key="riskControl" tab="风险监控"/>
           </a-tabs>
@@ -54,13 +54,13 @@ const onTabClick=(key)=>{
 
     </a-card>
     <a-card :body-style="{padding:0}">
-      <basic-info v-show="state.activeTabKey=='basicInfo'"/>
+      <basic-info v-if="state.activeTabKey=='basicInfo'"/>
     </a-card>
-    <channels v-show="state.activeTabKey=='channels'">
+    <channels v-if="state.activeTabKey=='channels'">
     </channels>
-    <order-data v-show="state.activeTabKey=='orderData'"></order-data>
-    <rates-config v-show="state.activeTabKey=='ratesConfig'"/>
-    <risk-control v-show="state.activeTabKey=='riskControl'"/>
+    <order-data v-if="state.activeTabKey=='orderData'"></order-data>
+    <rates-config v-if="state.activeTabKey=='ratesConfig'"/>
+    <risk-control v-if="state.activeTabKey=='riskControl'"/>
   </a-flex>
 
 </template>

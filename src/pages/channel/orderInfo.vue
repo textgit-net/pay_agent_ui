@@ -54,7 +54,7 @@ onMounted(()=>{
             <a-input  v-model:value="searchParams.orderNo"  allow-clear placeholder="请输入订单编号"> </a-input>
           </a-col>
           <a-col class="gutter-row" :span="4">
-            <a-select style="width: 100%" mode="multiple" allow-clear :max-tag-count="1" v-model:value="searchParams.channelTypes" placeholder="所有渠道">
+            <a-select style="width: 100%" mode="multiple" allow-clear :max-tag-count="2" v-model:value="searchParams.channelTypes" placeholder="所有渠道">
               <a-select-option v-for="(item) in PayChannelTypeSelectOption" :value="item.value">{{item.title}}</a-select-option>
             </a-select>
           </a-col>

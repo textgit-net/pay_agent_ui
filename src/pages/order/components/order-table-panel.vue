@@ -214,7 +214,7 @@ onMounted(()=>{
           </template>
         </template>
         <template v-if="column.dataIndex==='amount'">
-          {{(parseFloat(record['amount']) / 100)}}
+          ￥{{(parseFloat(record['amount']))}}
         </template>
         <template v-if="column.dataIndex==='payMode'">
           <a-typography-text v-if="record['payMode']">{{getPayModeTypeText(record['payMode'])}}</a-typography-text>

@@ -30,10 +30,10 @@ const visitData = ref([])
     <TransactionDataCard style="margin-bottom: 20px" />
     <TransactionDataAgentCard style="margin-bottom: 20px" />
     <TransactionDataMchCard style="margin-bottom: 20px" />
-    <TransactionData style="margin-bottom: 20px" />
+    <!-- <TransactionData style="margin-bottom: 20px" />
    
 
-    <TransactionStatistics style="margin-bottom: 20px" />
+    <TransactionStatistics style="margin-bottom: 20px" /> -->
    
     <!-- <Suspense :fallback="null">
       <SalesCard />

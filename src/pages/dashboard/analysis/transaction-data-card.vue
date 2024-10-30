@@ -1,13 +1,12 @@
 <script setup lang="ts">
 import CountUp from 'vue-countup-v3'
-import Trend from "~/pages/dashboard/analysis/trend.vue";
 import CommonCard from "~/pages/dashboard/analysis/components/common-card.vue";
-import Field from "~/pages/dashboard/analysis/components/field.vue";
-import { InfoCircleOutlined,  SyncOutlined} from "@ant-design/icons-vue";
-import { TinyArea, TinyColumn } from "@antv/g2plot";
+import {  SyncOutlined} from "@ant-design/icons-vue";
 import { SelectOption } from '~/utils/constant'
+import {OrderStatisticsEnum,OrderStatisticsRequest, OrderStatisticsResponse,getOrderStatistics } from '@/api/dashboard'
+
 enum RefreshIntervalEnum {
-    _30s = 2 * 1000,
+    _30s = 30 * 1000,
     _60s = 60 * 1000,
     _120s = 120 * 1000,
     _180s = 180 * 1000,
@@ -53,7 +52,28 @@ const state = reactive<{
     dataLoading: false
 })
 
+const query = ref<OrderStatisticsRequest>({
+    type: OrderStatisticsEnum.total
+})
 
+const initDataValue = (): OrderStatisticsResponse => {
+    return {
+        totalAmount: 0,
+        todayAmount: 0,
+        yesterdayAmount: 0,
+        totalCount: 0,
+        todayCount: 0,
+        yesterdayCount: 0,
+        totalSuccessCount: 0,
+        todaySuccessCount: 0,
+        yesterdaySuccessCount: 0,
+        totalFailCount: 0,
+        todayFailCount: 0,
+        yesterdayFailCount: 0,
+    }
+}
+const originStatisticsData = ref<OrderStatisticsResponse>(initDataValue())
+const statisticsData = ref<OrderStatisticsResponse>(initDataValue())
 
 const refreshInterval = ref(RefreshIntervalEnum._60s)
 let refreshTimer = null
@@ -65,19 +85,10 @@ const countUpRef5 = ref()
 const countUpRef6 = ref()
 const countUpRef7 = ref()
 const countUpRef8 = ref()
-
-
-const initDataValue = () => {
-    return {
-        todayTotalAmount: 1,
-        yestodayTotalAmount: 1,
-    }
-}
-
-
-const originDataVal = ref(initDataValue())
-const newDataVal = ref(initDataValue())
-
+const countUpRef9 = ref()
+const countUpRef10 = ref()
+const countUpRef11 = ref()
+const countUpRef12 = ref()
 
 
 const handleRefresh = () => {
@@ -86,19 +97,19 @@ const handleRefresh = () => {
     getData()
 }
 
-const getData = () => {
+const getData = async () => {
     state.dataLoading = true;
-    let timer = null;
-    clearTimeout(timer)
-    originDataVal.value =JSON.parse(JSON.stringify(newDataVal.value))
-    timer = setTimeout(() => {
-        clearTimeout(timer)
-        state.dataLoading = false;
+    originStatisticsData.value = JSON.parse(JSON.stringify(statisticsData.value))
+    try {
+        let res = await getOrderStatistics(query.value)
+        statisticsData.value = res.data
         restartCountUp();
         handleRefreshTimer();
-        newDataVal.value.todayTotalAmount = 1000 * Math.random() + newDataVal.value.todayTotalAmount
-        newDataVal.value.yestodayTotalAmount =  100 * Math.random() + newDataVal.value.yestodayTotalAmount
-    }, 1000)
+    } catch (error) {
+        
+    } finally {
+        state.dataLoading = false;
+    }
     
 }
 
@@ -120,6 +131,10 @@ const restartCountUp = () => {
     countUpRef6.value.restart()
     countUpRef7.value.restart()
     countUpRef8.value.restart()
+    countUpRef9.value.restart()
+    countUpRef10.value.restart()
+    countUpRef11.value.restart()
+    countUpRef12.value.restart()
 }
 
 
@@ -139,7 +154,7 @@ const handleRefreshTimer = () => {
 
 
 onMounted(() => {
-   
+    getData()
 })
 </script>
 
@@ -158,11 +173,7 @@ onMounted(() => {
                                             <SyncOutlined :spin="state.dataLoading" style="font-size: 12px; font-weight: bold;" />刷新
                                         </a-button>
                                     </a-tooltip>
-                                    
                                 </a-flex>
-                            
-
-                            
                             </a-tooltip>
                         </a-flex>
                         <a-flex align="center" justify="center" style="padding-left: 50px;">
@@ -181,106 +192,193 @@ onMounted(() => {
             </template>
             <a-row :gutter="24">
                 <a-col :span="6">
-                    <CommonCard title="今日总交易额" title2="昨日总交易额" title-color="rgb(22,119,255)" :loading="false">
-                        <template #total>
-                            <count-up ref="countUpRef1" :start-val="originDataVal.todayTotalAmount" :end-val="newDataVal.todayTotalAmount" :duration=".3">
-                                <template #prefix>
-                                    ¥
-                                </template>
-                                <template #suffix>
-                                    rmb
-                                </template>
-                            </count-up>
-                            
-                        </template>
-                        <template #total2>
-                            <count-up ref="countUpRef2" :start-val="originDataVal.yestodayTotalAmount" :end-val="newDataVal.yestodayTotalAmount" :duration=".4">
-                                <template #prefix>
-                                    ¥
-                                </template>
-                                <template #suffix>
-                                    rmb
-                                </template>
-                            </count-up>
-                        </template>
-                    </CommonCard>
+                    <a-spin :spinning="state.dataLoading" tip="更新数据中...">
+                        <CommonCard :loading="false">
+                            <template #title1>
+                                <span style="color: #666;">总交易额</span>
+                            </template>
+                            <template #title2>
+                                <span style="color: #666;">今日总交易额</span>
+                            </template>
+                            <template #title3>
+                                <span style="color: #666;">昨日总交易额</span>
+                            </template>
+                            <template #total1 >
+                                <count-up ref="countUpRef1" style="color: rgb(22,119,255);" :start-val="originStatisticsData.totalAmount" :end-val="statisticsData.totalAmount" :duration=".2">
+                                    <template #prefix>
+                                        ¥
+                                    </template>
+                                    <template #suffix>
+                                    
+                                    </template>
+                                </count-up>
+                                
+                            </template>
+                            <template #total2>
+                                <count-up ref="countUpRef2" style="color: rgb(22,119,255);" :start-val="originStatisticsData.todayAmount" :end-val="statisticsData.todayAmount" :duration=".3">
+                                    <template #prefix>
+                                        ¥
+                                    </template>
+                                    <template #suffix>
+                                    
+                                    </template>
+                                </count-up>
+                            </template>
+                            <template #total3>
+                                <count-up ref="countUpRef3" style="color: rgb(22,119,255);" :start-val="originStatisticsData.yesterdayAmount" :end-val="statisticsData.yesterdayAmount" :duration=".3">
+                                    <template #prefix>
+                                        ¥
+                                    </template>
+                                    <template #suffix>
+                                        
+                                    </template>
+                                </count-up>
+                            </template>
+                        </CommonCard>
+                    </a-spin>
+                   
                     
                 </a-col>
                 <a-col :span="6">
-
-
-                    <CommonCard title="今日交易笔数" title2="昨日交易笔数" title-color="rgb(22,119,255)" :loading="false">
-                        <template #total>
-                            <count-up ref="countUpRef3" :end-val="2022" :duration=".4">
-                                <template #prefix>
-                                 
-                                </template>
-                                <template #suffix>
-                                    笔
-                                </template>
-                            </count-up>
-                        </template>
-                        <template #total2>
-                            <count-up ref="countUpRef4" :end-val="2022" :duration=".5">
-                                <template #prefix>
-                                 
-                                </template>
-                                <template #suffix>
-                                    笔
-                                </template>
-                            </count-up>
-                        </template>
-                    </CommonCard>
-                   
+                    <a-spin :spinning="state.dataLoading" tip="更新数据中...">
+                        <CommonCard :loading="false">
+                            <template #title1>
+                                <span style="color: #666">总交易笔数</span>
+                            </template>
+                            <template #title2>
+                                <span style="color: #666;">今日交易笔数</span>
+                            </template>
+                            <template #title3>
+                                <span style="color:#666;">昨日交易笔数</span>
+                            </template>
+                            <template #total1>
+                                <count-up ref="countUpRef4" style="color:purple;" :start-val="originStatisticsData.totalCount" :end-val="statisticsData.totalCount" :duration=".3">
+                                    <template #prefix>
+                                    
+                                    </template>
+                                    <template #suffix>
+                                    
+                                    </template>
+                                </count-up>
+                                
+                            </template>
+                            <template #total2>
+                                <count-up ref="countUpRef5" style="color:purple;" :start-val="originStatisticsData.todayCount" :end-val="statisticsData.todayCount" :duration=".4">
+                                    <template #prefix>
+                                    
+                                    </template>
+                                    <template #suffix>
+                                    
+                                    </template>
+                                </count-up>
+                            </template>
+                            <template #total3>
+                                <count-up ref="countUpRef6" style="color:purple;" :start-val="originStatisticsData.yesterdayCount" :end-val="statisticsData.yesterdayCount" :duration=".4">
+                                    <template #prefix>
+                                    
+                                    </template>
+                                    <template #suffix>
+                                    
+                                    </template>
+                                </count-up>
+                            </template>
+                        </CommonCard>
+                    </a-spin>
                 </a-col>
-                <a-col :span="6">
 
-                    <CommonCard title="今日成交笔数" title2="昨日成交笔数" title-color="rgb(51,187,176)" :loading="false">
-                        <template #total>
-                            <count-up ref="countUpRef5" :end-val="2022" :duration=".5">
-                                <template #prefix>
-                                 
-                                </template>
-                                <template #suffix>
-                                    笔
-                                </template>
-                            </count-up>
-                        </template>
-                        <template #total2>
-                            <count-up ref="countUpRef6" :end-val="2022" :duration=".6">
-                                <template #prefix>
-                                 
-                                </template>
-                                <template #suffix>
-                                    笔
-                                </template>
-                            </count-up>
-                        </template>
-                    </CommonCard>
-                </a-col>
                 <a-col :span="6">
-                    <CommonCard title="今日失败笔数" title2="昨日失败笔数" title-color="rgb(255,77,79)" :loading="false">
-                        <template #total>
-                            <count-up ref="countUpRef7" :end-val="2022" :duration=".6">
-                                <template #prefix>
-                                 
-                                </template>
-                                <template #suffix>
-                                    笔
-                                </template>
-                            </count-up>
-                        </template>
-                        <template #total2>
-                            <count-up ref="countUpRef8" :end-val="2022" :duration=".7">
-                                <template #prefix>
-                                 
-                                </template>
-                                <template #suffix>
-                                    笔
-                                </template>
-                            </count-up>
-                        </template>
-                    </CommonCard>
+                    <a-spin :spinning="state.dataLoading" tip="更新数据中...">
+                        <CommonCard :loading="false">
+                            <template #title1>
+                                <span style="color: #666;">总成交笔数</span>
+                            </template>
+                            <template #title2>
+                                <span style="color: #666;">今日成交笔数</span>
+                            </template>
+                            <template #title3>
+                                <span style="color: #666;">昨日成交笔数</span>
+                            </template>
+                            <template #total1>
+                                <count-up ref="countUpRef7" style="color: rgb(51,187,176);" :start-val="originStatisticsData.totalSuccessCount" :end-val="statisticsData.totalSuccessCount" :duration=".4">
+                                    <template #prefix>
+                                    
+                                    </template>
+                                    <template #suffix>
+                                    
+                                    </template>
+                                </count-up>
+                                
+                            </template>
+                            <template #total2>
+                                <count-up ref="countUpRef8" style="color: rgb(51,187,176);" :start-val="originStatisticsData.todaySuccessCount" :end-val="statisticsData.todaySuccessCount" :duration=".5">
+                                    <template #prefix>
+                                    
+                                    </template>
+                                    <template #suffix>
+                                    
+                                    </template>
+                                </count-up>
+                            </template>
+                            <template #total3>
+                                <count-up ref="countUpRef9" style="color: rgb(51,187,176);" :start-val="originStatisticsData.yesterdaySuccessCount" :end-val="statisticsData.yesterdaySuccessCount" :duration=".5">
+                                    <template #prefix>
+                                    
+                                    </template>
+                                    <template #suffix>
+                                    
+                                    </template>
+                                </count-up>
+                            </template>
+                        </CommonCard>
+                    </a-spin>
+                </a-col>
+
+
+                <a-col :span="6">
+                    <a-spin :spinning="state.dataLoading" tip="更新数据中...">
+                        <CommonCard :loading="false">
+                            <template #title1>
+                                <span style="color: #666;">总失败笔数</span>
+                            </template>
+                            <template #title2>
+                                <span style="color: #666;">今日失败笔数</span>
+                            </template>
+                            <template #title3>
+                                <span style="color: #666;">昨日失败笔数</span>
+                            </template>
+                            <template #total1>
+                                <count-up ref="countUpRef10" style="color: rgb(255,77,79);" :start-val="originStatisticsData.totalFailCount" :end-val="statisticsData.totalFailCount" :duration=".5">
+                                    <template #prefix>
+                                    
+                                    </template>
+                                    <template #suffix>
+                                    
+                                    </template>
+                                </count-up>
+                                
+                            </template>
+                            <template #total2>
+                                <count-up ref="countUpRef11" style="color: rgb(255,77,79);" :start-val="originStatisticsData.todayFailCount" :end-val="statisticsData.todayFailCount" :duration=".6">
+                                    <template #prefix>
+                                    
+                                    </template>
+                                    <template #suffix>
+                                    
+                                    </template>
+                                </count-up>
+                            </template>
+                            <template #total3>
+                                <count-up ref="countUpRef12" style="color: rgb(255,77,79);" :start-val="originStatisticsData.yesterdayFailCount" :end-val="statisticsData.yesterdayFailCount" :duration=".6">
+                                    <template #prefix>
+                                    
+                                    </template>
+                                    <template #suffix>
+                                    
+                                    </template>
+                                </count-up>
+                            </template>
+                        </CommonCard>
+                    </a-spin>
                 </a-col>
             </a-row>
         </a-card>

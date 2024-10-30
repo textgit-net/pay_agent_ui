@@ -1,6 +1,7 @@
 import {BasePageRequest, ResponseBody, PageWarp, PayChannelType, SignType, PayModeType} from "~/utils/constant.ts";
 import {exists} from "fs-extra";
 import {AccountInfoResponse} from "~/api/account/AccountInterface.ts";
+import { ChannelGroupSimpleResponse} from '@/api/channel/group'
 
 
 export interface ChannelSimpleResponse{
@@ -53,6 +54,7 @@ export interface ChannelListResponse extends ChannelSimpleResponse{
     totalCount?: number
     totalAmount?:number
     createTime?:string
+    group?: ChannelGroupSimpleResponse
 }
 
 
@@ -144,7 +146,7 @@ export interface ChannelSearch extends BasePageRequest{
     /**
      * 渠道类型,多个渠道类型用逗号分隔
      */
-    channelTypes?: string
+    channelTypes?: string[]
     /**
      * 是否忽略禁用的渠道
      */

@@ -9,6 +9,12 @@ const state=reactive({
   activeTabKey:'basicInfo'
 })
 
+let  { tabKey } = route.query
+if (tabKey) {
+  state.activeTabKey = tabKey as string;
+}
+
+
 const onTabClick=(key: string)=>{
   route.query['tabKey']=key
   console.log('route.query', route.query, route.path, router)

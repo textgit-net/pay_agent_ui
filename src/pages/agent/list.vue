@@ -3,7 +3,7 @@ const userStore = useUserStore()
 import {ColumnsType} from "ant-design-vue/es/table";
 import {PaginationProps} from "ant-design-vue";
 import {ContactWay, getContactWayText} from "../../utils/constant.ts";
-import {getAgentList, AgentPageReq, AgentInfo } from '~/api/agent/index'
+import {getAgentList, AgentPageReq, AgentInfo, changeAgentEnable } from '~/api/agent/index'
 
 const isHasPermission = computed(()=> {
   return userStore.userInfo.isAllowInviteUser
@@ -124,6 +124,11 @@ const loadData=async  ()=> {
   }
 }
 
+const changeAgentEnableStatus = async (id:string) => {
+  let res = await changeAgentEnable(id)
+  loadData()
+}
+
 onMounted(()=>{
   Object.assign(searchParams,router.currentRoute.value.query??{page:1,limit:1})
   pagination.current=searchParams.page
@@ -194,10 +199,19 @@ onMounted(()=>{
             </a-space>
           </template>
           <template v-if="column.dataIndex==='isEnable'">
-              <a-switch checked-children="是" un-checked-children="否" :checked="record.isEnable" disabled></a-switch>
+              <a-switch @change="changeAgentEnableStatus(record.id)" checked-children="是" un-checked-children="否" :checked="record.isEnable" ></a-switch>
           </template>
           <template v-if="column.dataIndex==='mchCount'">
-             {{record.mchCount ?? '/' }}
+            <a-felx align="center" justify="start">
+
+              <a-tooltip>
+                <template #title >查看当前代理的商户信息</template>
+                <a-button style="padding-left: 0" type="link" @click="router.push({path:'/agent/info',query:{id:record.id, tabKey: 'merchantInfo'}})">
+                  {{record.mchCount ?? '/' }}
+                </a-button>
+              </a-tooltip>
+             
+            </a-felx>
           </template>
           <template v-if="column.dataIndex==='totalOrderCount'">
             {{record.totalOrderAmount ?? '/' }}
@@ -207,7 +221,25 @@ onMounted(()=>{
           </template>
           <template v-if="column.dataIndex==='action'">
             <a-flex :gap="5">
-              <a-button style="padding-left: 0" type="link" @click="router.push({path:'/agent/edit',query:{id:record.id}})">编辑</a-button>
+
+              <a-dropdown :trigger="['click']">
+                <a class="ant-dropdown-link" @click.prevent>
+                  更多操作
+                  <DownOutlined />
+                </a>
+                <template #overlay>
+                  <a-menu>
+                    <a-menu-item key="0">
+                      <a-button style="padding-left: 0" type="link" @click="router.push({path:'/agent/info',query:{id:record.id}})">查看代理</a-button>
+                    </a-menu-item>
+                    <!-- <a-menu-divider /> -->
+                    <!-- <a-menu-item key="3">
+                      <a-button danger style="padding-left: 0" type="link" @click="handleDel(record)">删除当前商户</a-button>
+                    </a-menu-item> -->
+                  </a-menu>
+                </template>
+              </a-dropdown>
+              <!-- <a-button style="padding-left: 0" type="link" @click="router.push({path:'/agent/edit',query:{id:record.id}})">编辑</a-button> -->
             </a-flex>
           </template>
         </template>

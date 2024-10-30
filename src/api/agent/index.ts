@@ -107,5 +107,15 @@ export function getAgentInfo(id: string):Promise<ResponseBody<AgentInfo>>{
  * @returns {Promise<ResponseBody<any>>}
  */
 export function resetAgentPwd(data: AgentResetPwdRequset):Promise<ResponseBody<any>>{
-    return usePut<any>(`/agent/password`, data)
+    return usePut<any>(`/agent/resetPwd`, data)
+}
+
+
+/**
+ * 启用-禁用代理商
+ * @param { string } id 
+ * @returns {Promise<ResponseBody<any>>}
+ */
+export function changeAgentEnable(id: string):Promise<ResponseBody<any>>{
+    return useGet<any>(`/agent/changeEnable/${id}`)
 }

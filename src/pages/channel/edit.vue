@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ArrowLeftOutlined, CheckCircleOutlined, CloseCircleOutlined, UploadOutlined } from "@ant-design/icons-vue";
+import { Empty } from 'ant-design-vue';
 import {
   ChannelFormData,
   ChannelSimpleResponse,
@@ -15,6 +16,10 @@ import {
   ResponseBody
 } from "~/utils/constant.ts";
 import type { Rule } from 'ant-design-vue/es/form';
+
+import { fetchChannelGroups,ChannelGroupSimpleResponse } from '@/api/channel/group'
+
+const simpleImage = Empty.PRESENTED_IMAGE_SIMPLE;
 const alipayUserChannelStepsItems = [
   {
     title: '基础信息',
@@ -44,7 +49,7 @@ const current = ref(0)
 const router = useRouter()
 const route = useRoute()
 const formRef = ref()
-const groups = shallowRef<any[]>([])
+const groups = shallowRef<ChannelGroupSimpleResponse[]>([])
 const payModes = shallowRef<any[]>([])
 const saveLoading = ref(false)
 const formData = reactive<ChannelFormData>({
@@ -199,7 +204,7 @@ const getChannelOauthCode = async () => {
   }
 }
 const loadGroups = async () => {
-  const { data } = await useGet<any[]>("/channel/group/list")
+  const { data } = await fetchChannelGroups()
   groups.value = data ?? []
 }
 
@@ -232,6 +237,9 @@ onMounted(() => {
   }
   loadGroups()
 })
+const filterOption = (input: string, option: any) => {
+  return option.name.toLowerCase().indexOf(input.toLowerCase()) >= 0;
+};
 </script>
 
 <template>
@@ -287,8 +295,15 @@ onMounted(() => {
               </a-form-item>
               <a-form-item label="渠道组" name="groupCode" class="mt-5">
                 <a-flex style="flex: 1" vertical>
-                  <a-select v-model:value="formData.groupCode" style="width: 320px;" allowClear>
+                  <a-select v-model:value="formData.groupCode" show-search :filter-option="filterOption" style="width: 320px;" allowClear>
                     <a-select-option v-for="(item) in groups" :value="item.groupCode">{{ item.name }}</a-select-option>
+
+                    <template #notFoundContent>
+                      <a-flex align="center" vertical justify="center">
+                        <a-empty :image="simpleImage"></a-empty>
+                        <a-button style="margin-top: -30px;" @click="router.push({path:'/channel/group'})" type="link">去添加渠道分组</a-button>
+                      </a-flex>
+                    </template>
                   </a-select>
                   <a-typography-text type="secondary">请选择渠道分组,用于派单</a-typography-text>
                 </a-flex>

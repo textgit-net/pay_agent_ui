@@ -1,5 +1,13 @@
-import {PageWarp, ResponseBody, BasePageRequest, ContactWay} from "~/utils/constant.ts";
+import {PageWarp, ResponseBody, BasePageRequest, ContactWay, PayModeType} from "~/utils/constant.ts";
 import {AgentInfo} from "~/api/agent";
+
+export interface PayModeRateItem {
+    isEnable?: boolean
+    isDisable?: boolean
+    payMode?: PayModeType
+    payModeName?:string
+    rates?:number
+}
 
 export interface PayChannelInfo {
    
@@ -21,7 +29,8 @@ export interface MerchantInfo {
     loginName?: string
     password?: string
     isResetPassword?: boolean
-    agentInfo?: AgentInfo
+    agentInfo?: AgentInfo,
+    payModeRates?: PayModeRateItem[]
 }
 
 export interface MerchantInfoRequest extends MerchantInfo  {
@@ -104,10 +113,10 @@ export function delMerchant(id: string):Promise<ResponseBody<MerchantInfo>>{
 
 
 /**
- * 重置代理商登录密码
+ * 重置商户登录密码
  * @param { MerchantResetPwdRequset } data 
  * @returns {Promise<ResponseBody<any>>}
  */
 export function resetMerchantPwd(data: MerchantResetPwdRequset):Promise<ResponseBody<any>>{
-    return usePut<any>(`/mch/password`, data)
+    return usePut<any>(`/mch/resetPwd`, data)
 }

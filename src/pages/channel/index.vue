@@ -1,17 +1,18 @@
 <script setup lang="ts">
 import { h, createVNode  } from 'vue';
 import {ColumnsType} from "ant-design-vue/es/table";
-import {AlipaySquareFilled, ExclamationCircleOutlined, FormOutlined } from "@ant-design/icons-vue"
+import {AlipaySquareFilled, ExclamationCircleOutlined, FormOutlined, FundViewOutlined } from "@ant-design/icons-vue"
 import {PaginationProps,Modal,message} from "ant-design-vue";
+import { ChannelGroupSimpleResponse} from '@/api/channel/group'
 
 import {ChannelListResponse, ChannelSearch, searchChannel} from "~/api/channel/ChannelInterface.ts";
-import {getPayChannelTypeText, PayChannelType, PayModeType, getPayModeTypeText} from "~/utils/constant.ts";
+import {getPayChannelTypeText, PayChannelType, PayModeType, getPayModeTypeText, PayChannelTypeSelectOption} from "~/utils/constant.ts";
 import { calcFloat } from '~/utils/calcFloat'
 const router=useRouter()
 const columns:ColumnsType =[
   {
-    title: '渠道组',
-    dataIndex: 'groupInfo',
+    title: '所属渠道组',
+    dataIndex: 'group',
   },
   {
     title: '渠道名称',
@@ -50,11 +51,6 @@ const columns:ColumnsType =[
     dataIndex:'createTime'
   },
   {
-    title:'渠道测试',
-    dataIndex:'test',
-    width: '100px'
-  },
-  {
     title:'操作',
     width:180,
     dataIndex: 'action',
@@ -66,11 +62,18 @@ const state=reactive({
   isPageLoading:false,
 
 })
-const searchParams=reactive<ChannelSearch>({
-  page:1,
-  limit:10,
-  isIgnoreDisable:true
-})
+const initSearchParams = ():ChannelSearch => {
+  return {
+    page:1,
+    limit:10,
+    isIgnoreDisable:true,
+    keyword: null,
+    channelTypes: []
+  }
+}
+const searchParams=ref<ChannelSearch>(initSearchParams())
+
+
 const pagination = reactive<PaginationProps>({
   pageSize: 10,
   pageSizeOptions: ['10', '20', '30', '40'],
@@ -82,7 +85,7 @@ const pagination = reactive<PaginationProps>({
   onChange(current, pageSize) {
     pagination.pageSize = pageSize
     pagination.current = current
-
+    loadData()
   },
 })
 const dataSource=shallowRef<ChannelListResponse[]>([])
@@ -107,7 +110,6 @@ const changeEnable=async (id:number)=>{
     },
     onCancel() {},
   });
- 
 }
 const loadData=async ()=>{
   if (state.dataSourceLoading)
@@ -115,7 +117,7 @@ const loadData=async ()=>{
   state.dataSourceLoading = true
   try {
     const { data } = await searchChannel({
-      ...searchParams,
+      ...searchParams.value,
       page: pagination.current,
       limit: pagination.pageSize,
     })
@@ -144,6 +146,26 @@ const showPayModelDialog = (record: ChannelListResponse) => {
   });
 }
 
+const filterSearch=()=>{
+  // Object.assign(searchParams,{
+  //   page:1,
+  //   limit:10
+  // })
+  // await loadData()
+
+  loadData()
+}
+
+watch(()=> searchParams.value.isIgnoreDisable, () => {
+  pagination.current = 1;
+  loadData()
+})
+
+const resetSearch=()=>{
+  searchParams.value = initSearchParams();
+  loadData()
+}
+
 onMounted(()=>{
   loadData()
 })
@@ -158,7 +180,43 @@ onMounted(()=>{
           <a-typography-text>支付渠道</a-typography-text>
         </a-flex>
       </a-card>
-      <a-card :body-style="{'padding':'0px'}">
+
+      <a-card style="border: none" :body-style="{padding:'15px'}">
+        <a-flex vertical :gap="15">
+          <a-row :gutter="16">
+
+            <a-col class="gutter-row" :span="4">
+              <a-input v-model:value="searchParams.keyword" allow-clear  placeholder="ID/名称" ></a-input>
+            </a-col>
+
+
+            
+            <a-col class="gutter-row" :span="4">
+              <a-select
+                v-model:value="searchParams.channelTypes"
+                mode="multiple"
+                style="width: 100%"
+                placeholder="请选择渠道类型"
+                allow-clear
+              >
+                <a-select-option v-for="item in PayChannelTypeSelectOption" :value="item.value">{{ item.title }}</a-select-option>
+              </a-select>
+            </a-col>
+            
+          </a-row>
+
+          <a-flex  :gap="0" justify="start">
+            <a-button type="link" style="padding-left: 0" @click="resetSearch">重置筛选</a-button>
+            <a-button  size="small"  @click="filterSearch"  type="primary"  style="width: 80px;height:28px"  >筛选</a-button>
+            <a-space style="padding-left: 20px;">
+              <a-typography-text type="secondary">是否忽略禁用的渠道</a-typography-text>
+              <a-checkbox v-model:checked="searchParams.isIgnoreDisable"></a-checkbox>
+            </a-space>
+          </a-flex>
+        </a-flex>
+      </a-card>
+
+      <a-card :body-style="{'padding':'0px'}" >
 
         <a-card style="border: none" :body-style="{padding:'15px'}">
           <a-button @click="router.push({path:'/channel/edit'})" type="primary">添加渠道</a-button>
@@ -171,35 +229,53 @@ onMounted(()=>{
           <template #bodyCell="{ column , record}">
 
             <template v-if="column.dataIndex==='successCount'">
-              <a-flex :gap="5" align="start">
-                <div v-if="record.totalCount">
-                  <a-typography-text type="success" strong>  {{ record.successCount }}</a-typography-text> /
-                  <a-typography-text type="danger" strong> {{ record.totalCount }}</a-typography-text>
-                </div>
-                <a-typography-text v-else type="danger" strong>/</a-typography-text>
+              <a-flex :gap="5" align="center" justify="start">
+                <a-typography-text type="success" strong>  {{ record.successCount }}</a-typography-text> /
+                <a-typography-text type="danger" strong> {{ record.totalCount }}</a-typography-text>
+                <a-tooltip>
+                  <template #title>查看当前渠道订单信息</template>
+                  <FundViewOutlined @click="router.push({path:'/channel/info',query:{id:record.id, tabKey: 'orderInfo'}})" style="color: #1677ff;padding-left: 3px" />
+                </a-tooltip>
               </a-flex>
             </template>
             <template v-if="column.dataIndex==='successAmount'">
-              <a-flex :gap="5" align="start">
-                <div v-if="record.totalAmount">
-                  <a-typography-text type="success" strong>  {{ record.successAmount }}</a-typography-text> /
-                  <a-typography-text type="danger" strong> {{ record.totalAmount }}</a-typography-text>
-                </div>
-                <a-typography-text v-else type="danger" strong>/</a-typography-text>
+              <a-flex :gap="5" align="center" justify="start">
+                <a-typography-text type="success" strong>  {{ record.successAmount }}</a-typography-text> /
+                <a-typography-text type="danger" strong> {{ record.totalAmount }}</a-typography-text>
+                <a-tooltip>
+                  <template #title>查看当前渠道订单信息</template>
+                  <FundViewOutlined @click="router.push({path:'/channel/info',query:{id:record.id, tabKey: 'orderInfo'}})" style="color: #1677ff;padding-left: 3px" />
+                </a-tooltip>
               </a-flex>
             </template>
 
             <template v-if="column.dataIndex==='successRate'">
-              <a-flex :gap="5" align="start">
+              <a-flex :gap="5" align="center">
                 <a-typography-text v-if="record.totalCount" type="success" strong>  {{ (calcFloat.div(record.successCount, record.totalCount) * 100).toFixed(2) }}%</a-typography-text>
                 <a-typography-text v-else type="success" strong> /</a-typography-text>
+               
               </a-flex>
             </template>
+
+            <template v-if="column.dataIndex==='group'">
+              <a-typography-text v-if="!record.group" type="secondary">/</a-typography-text>
+              <a-flex v-else vertical :gap="5" align="start">
+                
+                <a-tooltip>
+                  <template #title>查看渠道组【{{(record.group as ChannelGroupSimpleResponse).name}}】详情</template>
+                  <a-button style="padding-left: 0" type="link" @click="router.push({path:'/channel/info',query:{id:record.id}})">{{(record.group as ChannelGroupSimpleResponse).name}}</a-button>
+                </a-tooltip>
+                
+                <a-typography-text type="secondary">编号:{{(record.group as ChannelGroupSimpleResponse).groupCode}}</a-typography-text>
+              </a-flex>
+            </template>
+
+
 
             <template v-if="column.dataIndex==='name'">
               <a-flex vertical :gap="5" align="start">
                 <a-tooltip>
-                  <template #title>查看渠道 | {{record.name}}详情</template>
+                  <template #title>查看渠道【{{record.name}}】详情</template>
                   <a-button style="padding-left: 0" type="link" @click="router.push({path:'/channel/info',query:{id:record.id}})">{{record.name}}</a-button>
                 </a-tooltip>
                 
@@ -214,8 +290,15 @@ onMounted(()=>{
             </template>
 
             <template v-if="column.dataIndex==='isEnableRoyalty'">
-              <a-tag v-if="record['isEnableRoyalty']" :bordered="false" color="success">已配制</a-tag>
-              <a-tag v-else :bordered="false" color="processing">未配制</a-tag>
+              <a-flex align="center" justify="start">
+                <a-tag v-if="record.isEnableRoyalty" :bordered="false" color="success">已配制</a-tag>
+                <a-tag v-else :bordered="false" color="processing">未配制</a-tag>
+
+                <a-tooltip>
+                  <template #title>编辑渠道分账信息</template>
+                  <FormOutlined @click="router.push({path:'/channel/info',query:{id:record.id, tabKey: 'channelAccountInfo'}})" style="color: #1677ff;" />
+                </a-tooltip>
+              </a-flex>
             </template>
             <template v-if="column.dataIndex==='amount'">
               {{record['totalAmount']||'/'}}
@@ -257,16 +340,33 @@ onMounted(()=>{
               </a-flex>
             </template>
             <template v-if="column.dataIndex==='test'">
-              <a-flex :gap="10">
-                <a-typography-text v-if="!record.isEnable" strong>/</a-typography-text>
-                <a-button v-else type="primary" size="small" :disabled="!record.isEnable" @click="router.push({path:'/channel/test',query:{id:record.id}})" style="padding: 0 10px" >去测试</a-button>
-              </a-flex>
+              
             </template>
             <template v-if="column.dataIndex==='action'">
               <a-flex :gap="10">
-                <a-button type="link" @click="router.push({path:'/channel/edit',query:{id:record['id']}})"  style="padding: 5px" >编辑</a-button>
-                <a-button type="link" style="padding: 0"   v-if="!record['groupCode']" @click="openGroupModal(record)">添加分组</a-button>
-                <a-button type="link" style="padding: 0"   v-if="record['groupCode']" @click="openGroupModal(record)">修改分组</a-button>
+
+                <a-dropdown :trigger="['click']">
+                  <a class="ant-dropdown-link" @click.prevent>
+                    更多操作
+                    <DownOutlined />
+                  </a>
+                  <template #overlay>
+                    <a-menu>
+                      <a-menu-item key="0">
+                        <a-button style="padding-left: 0" type="link" @click="router.push({path:'/channel/info',query:{id:record.id}})">查看详情</a-button>
+                      </a-menu-item>
+                      <a-menu-divider />
+                      <a-menu-item key="1">
+                        <a-button type="link" @click="router.push({path:'/channel/edit',query:{id:record['id']}})"  style="padding: 5px" >编辑渠道</a-button>
+                      </a-menu-item>
+                      <a-menu-divider v-if="record.isEnable" />
+                      <a-menu-item v-if="record.isEnable" key="2">
+                        <a-button type="primary" size="small" :disabled="!record.isEnable" @click="router.push({path:'/channel/test',query:{id:record.id}})" style="padding: 0 10px" >渠道测试</a-button>
+                      </a-menu-item>
+                    </a-menu>
+                  </template>
+                </a-dropdown>
+                
               </a-flex>
             </template>
           </template>

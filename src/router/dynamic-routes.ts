@@ -114,6 +114,16 @@ export default [
       icon: 'ThunderboltOutlined'
     },
     children: [
+
+      {
+        path: '/channel/group',
+        name: 'ChannelGroup',
+        component: () => import('~/pages/channel/group/index.vue'),
+        meta: {
+          title: '渠道分组',
+          hideChildrenInMenu: true
+        }
+      },
       {
         path: '/channel/list',
         name: 'ChannelList',
@@ -143,6 +153,7 @@ export default [
           hideChildrenInMenu: true
         }
       },
+     
       {
         path: '/channel/test',
         name: 'ChannelTest',

@@ -301,8 +301,8 @@ onMounted(async ()=>{
           </a-flex>
         </template>
         <a-descriptions-item  style="padding-bottom: 4px" :labelStyle="{'color':'#999'}" label="所属代理商">
-         
-         <a-button style="padding-left: 0" type="link" @click="router.push({path:'/agent/info',query:{id:formData.agentInfo.id}})"> {{ formData.agentInfo.name }}</a-button>
+          {{ formData.agentInfo.name }}
+         <!-- <a-button style="padding-left: 0" type="link" @click="router.push({path:'/agent/info',query:{id:formData.agentInfo.id}})"> {{ formData.agentInfo.name }}</a-button> -->
        </a-descriptions-item>
 
 

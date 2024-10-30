@@ -32,33 +32,59 @@ const props = defineProps({
 <template>
   <a-card :bind="props" :body-style="{ padding: '20px 24px 8px 24px' }" :loading="loading">
     <div class="commonCard">
-      <div class="chartTop">
-        <div class="metaWrap">
-          <div class="meta">
-            <span class="title" :style="{color: titleColor}">{{ title }}</span>
-            <span class="action">
-              <slot name="action" />
-            </span>
+      <a-flex vertical>
+        <a-flex>
+          <div class="chartTop">
+            <div class="metaWrap">
+              <div class="meta">
+                <span class="title">
+                  <slot name="title1" />
+                </span>
+                <span class="action">
+                  <slot name="action1" />
+                </span>
+              </div>
+              <div class="total">
+                <slot name="total1" />
+              </div>
+            </div>
           </div>
-          <div class="total">
-            <slot name="total" />
+        </a-flex>
+        <a-flex style="padding-top: 20px;">
+          <div class="chartTop">
+            <div class="metaWrap">
+              <div class="meta">
+                <span class="title">
+                  <slot name="title2" />
+                </span>
+                <span class="action">
+                  <slot name="action2" />
+                </span>
+              </div>
+              <div class="total">
+                <slot name="total2" />
+              </div>
+            </div>
           </div>
-        </div>
-      </div>
 
-      <div class="chartTop" style="padding-top: 20px;">
-        <div class="metaWrap">
-          <div class="meta">
-            <span class="title" :style="{color: titleColor}">{{ title2 }}</span>
-            <span class="action">
-              <slot name="action" />
-            </span>
+          <div class="chartTop" >
+            <div class="metaWrap">
+              <div class="meta">
+                <span class="title">
+                  <slot name="title3" />
+                </span>
+                <span class="action">
+                  <slot name="action3" />
+                </span>
+              </div>
+              <div class="total">
+                <slot name="total3" />
+              </div>
+            </div>
           </div>
-          <div class="total">
-            <slot name="total2" />
-          </div>
-        </div>
-      </div>
+        </a-flex>
+      </a-flex>
+      
     </div>
   </a-card>
 </template>

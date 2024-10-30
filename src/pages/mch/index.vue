@@ -10,10 +10,10 @@ import { ref, createVNode } from 'vue';
 const router=useRouter()
 
 const columns:ColumnsType =[
-  {
-    title: '所属代理',
-    dataIndex: 'agentInfo',
-  },
+  // {
+  //   title: '所属代理',
+  //   dataIndex: 'agentInfo',
+  // },
   {
     title: '商户名称',
     dataIndex: 'name',
@@ -226,34 +226,34 @@ onMounted(()=>{
               <a-switch :checked-value="true" :un-checked-value="false" :checked="record['isEnable']"></a-switch>
           </template>
           <template v-if="column.dataIndex==='channelCount'">
-             {{record['channelCount']|| '--' }}
+             {{record.channelCount?? '/' }}
           </template>
           <template v-if="column.dataIndex==='totalOrderCount'">
-            {{record['totalOrderAmount']|| '--' }}
+            {{record.totalOrderAmount || '/' }}
           </template>
           <template v-if="column.dataIndex==='totalOrderAmount'">
-            {{record['totalOrderAmount']|| '--' }}
+            {{record.totalOrderAmount|| '/' }}
           </template>
           <template v-if="column.dataIndex==='action'">
             <a-flex :gap="5">
 
               <a-dropdown :trigger="['click']">
-              <a class="ant-dropdown-link" @click.prevent>
-                更多操作
-                <DownOutlined />
-              </a>
-              <template #overlay>
-                <a-menu>
-                  <a-menu-item key="0">
-                    <a-button style="padding-left: 0" type="link" @click="router.push({path:'/mch/info',query:{id:record.id}})">查看商户</a-button>
-                  </a-menu-item>
-                  <a-menu-divider />
-                  <a-menu-item key="3">
-                    <a-button danger style="padding-left: 0" type="link" @click="handleDel(record)">删除当前商户</a-button>
-                  </a-menu-item>
-                </a-menu>
-              </template>
-            </a-dropdown>
+                <a class="ant-dropdown-link" @click.prevent>
+                  更多操作
+                  <DownOutlined />
+                </a>
+                <template #overlay>
+                  <a-menu>
+                    <a-menu-item key="0">
+                      <a-button style="padding-left: 0" type="link" @click="router.push({path:'/mch/info',query:{id:record.id}})">查看商户</a-button>
+                    </a-menu-item>
+                    <a-menu-divider />
+                    <a-menu-item key="3">
+                      <a-button danger style="padding-left: 0" type="link" @click="handleDel(record)">删除当前商户</a-button>
+                    </a-menu-item>
+                  </a-menu>
+                </template>
+              </a-dropdown>
               
             </a-flex>
           </template>
