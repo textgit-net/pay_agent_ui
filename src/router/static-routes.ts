@@ -17,7 +17,7 @@ export default [
     name: 'settingPwd',
     component: () => import('~/pages/auth/setting-pwd.vue'),
     meta: {
-      title: '授权已过期',
+      title: '设置登录密码',
     },
   },
 
