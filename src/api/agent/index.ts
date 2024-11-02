@@ -29,6 +29,8 @@ export interface AgentInfo {
     loginName?: string
     password?: string
     payChannelConfig?: PayChannelInfo[]
+    totalOrderAmount?: number
+    totalOrderCount?: number
 }
 
 export interface AgentInfoReq extends AgentInfo  {

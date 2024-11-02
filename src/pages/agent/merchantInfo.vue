@@ -61,11 +61,15 @@ const state=reactive({
   dataSourceLoading:false,
   isConfirmLoading:false
 })
-const searchParams = reactive<MerchantRequest>({
-  page:1,
-  limit:10,
-  agentId: Number(id)
-})
+
+const initSearchParams = ():MerchantRequest => {
+  return {
+    page:1,
+    limit:10,
+    agentId: Number(id)
+  }
+}
+const searchParams = ref<MerchantRequest>(initSearchParams())
 const pagination = reactive<PaginationProps>({
   pageSize: 10,
   pageSizeOptions: ['10', '20', '30', '40'],
@@ -77,36 +81,24 @@ const pagination = reactive<PaginationProps>({
   onChange(current, pageSize) {
     pagination.pageSize = pageSize
     pagination.current = current
-    searchParams.page=pagination.current
-    searchParams.limit=pagination.pageSize
-    router.replace({query: searchParams})
+    loadData()
   },
 })
 const dataSource=shallowRef<MerchantInfo[]>([])
 const resetSearch=()=>{
-  Object.assign(searchParams,{
-    keywords:null,
-    page:1,
-    limit:10
-  })
-  router.replace({query: searchParams})
+  searchParams.value = initSearchParams()
+  handleSearch()
 }
-const filterSearch=()=>{
-  // Object.assign(searchParams,{
-  //   page:1,
-  //   limit:10
-  // })
-  // await loadData()
-
-  router.push({query: searchParams})
+const handleSearch = () => {
+  pagination.onChange(1, pagination.pageSize)
 }
-const loadData=async  ()=> {
+const loadData = async  ()=> {
   if (state.dataSourceLoading)
     return
   state.dataSourceLoading = true
   try {
     const { data } = await getMerchantList({
-      ...searchParams,
+      ...searchParams.value,
       page: pagination.current,
       limit: pagination.pageSize,
     })
@@ -119,9 +111,6 @@ const loadData=async  ()=> {
 }
 
 onMounted(()=>{
-  Object.assign(searchParams,router.currentRoute.value.query??{page:1,limit:1})
-  pagination.current=searchParams.page
-  pagination.pageSize=searchParams.limit
   loadData()
 })
 </script>
@@ -132,14 +121,14 @@ onMounted(()=>{
       <a-flex vertical :gap="15">
         <a-row :gutter="16">
 
-          <a-col class="gutter-row" :span="4">
-            <a-input v-model:value="searchParams.keywords" allow-clear  placeholder="商户名称/ID" ></a-input>
+          <a-col class="gutter-row" :span="5">
+            <a-input v-model:value="searchParams.keywords" allow-clear  placeholder="按商户名称/ID搜索" ></a-input>
           </a-col>
         </a-row>
 
-        <a-flex  :gap="0"  justify="flex-end">
+        <a-flex  :gap="0"  justify="flex-start">
           <a-button type="link" style="padding-left: 0" @click="resetSearch">重置筛选</a-button>
-          <a-button  size="small"   @click="filterSearch"  type="primary"  style="width: 80px;height:28px"  >筛选</a-button>
+          <a-button  size="small"   @click="handleSearch"  type="primary"  style="width: 80px;height:28px"  >筛选</a-button>
         </a-flex>
       </a-flex>
     </a-card>

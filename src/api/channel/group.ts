@@ -13,13 +13,13 @@ export  interface ChannelGroupSimpleResponse {
     id?:number,
     groupCode?:string
     name?:string
-    isEnable:boolean
+    isEnable?:boolean
 }
 
 export interface ChannelGroupListResponse extends ChannelGroupSimpleResponse{
-    description:string
-    channelCount:number
-    createTime:string
+    description?:string
+    channelCount?:number
+    createTime?:string
 }
 
 
@@ -32,14 +32,22 @@ export function searchChannelGroup(params:ChannelGroupSearch) :Promise<ResponseB
 }
 
 /**
+ * 查询渠道组详情
+ */
+export function getChannelGroupInfo(code:string) :Promise<ResponseBody<ChannelGroupListResponse>> {
+    return useGet<ChannelGroupListResponse>('/channel/group/info', { code })
+}
+
+/**
  * 加载所有渠道分组列表
  */
-export function fetchChannelGroups(keyword?: string):Promise<ResponseBody<ChannelGroupSimpleResponse[]>> {
+export function getChannelGroups(keyword?: string):Promise<ResponseBody<ChannelGroupSimpleResponse[]>> {
     return useGet<ChannelGroupSimpleResponse[]>('/channel/group/query', {keyword: keyword})
 }
 
 export interface ChannelGroupFormData extends ChannelGroupSimpleResponse{
-    description?:string
+    description?:string,
+    isEdit?: boolean
 }
 
 /**

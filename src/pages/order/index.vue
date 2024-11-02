@@ -1,32 +1,66 @@
 <script setup lang="ts">
 import {ColumnsType} from "ant-design-vue/es/table";
 import {PaginationProps} from "ant-design-vue";
-import {PayChannelTypeSelectOption, PayModeTypeSelectOption,} from "../../utils/constant.ts";
+import { DateRange, PayChannelTypeSelectOption, PayModeTypeSelectOption, } from '@/utils/constant'
 import {OrderSearch, searchOrder,OrderTableType} from "~/api/order/OrderInterface.ts";
 import OrderTablePanel from "~/pages/order/components/order-table-panel.vue";
-
+import DateSearchWrap from '@/components/date-search-wrap/index.vue'
+import { getALLChannelList,ChannelListResponse, ALLChannelListRequest, } from "~/api/channel/ChannelInterface.ts";
+import {FileSearchOutlined } from '@ant-design/icons-vue';
+const DateSearchWrapRef = ref()
 const router=useRouter()
 const state=reactive({
   dataSourceLoading:false,
   isConfirmLoading:false
 })
 const tableRef=ref()
-const searchParams = reactive<OrderSearch>({
-  page:1,
-  limit:10
-})
+
+const inntSearchParams = ():OrderSearch => {
+    return {
+        page:1,
+        limit:10,
+    } as OrderSearch
+}
+const searchParams = ref<OrderSearch>(inntSearchParams())
 
 const resetSearch=async ()=>{
-  Object.assign(searchParams,{
-    page:1,
-    limit:10
-  })
+  searchParams.value = inntSearchParams()
+  DateSearchWrapRef.value.handleFormReset()
+  tableRef.value.resetSearch(searchParams.value)
+}
+
+const handleSearch = () => {
   tableRef.value.refresh(searchParams)
 }
 
+const allChannelListRequest = ref<ALLChannelListRequest>({
+  isIgnoreDisable: true
+})
+const channelOpts = ref<ChannelListResponse[]>([])
+
+const fetchALLChannelList = async () => {
+  let res = await getALLChannelList(allChannelListRequest.value)
+  channelOpts.value = res.data
+}
+
+const filterOption = (input: string, option: any) => {
+  console.log('option', option)
+  return option.label.toLowerCase().indexOf(input.toLowerCase()) >= 0;
+};
+
+const dateChange = (dateRange: DateRange) => {
+  searchParams.value.dateRange = dateRange
+  tableRef.value.refresh(searchParams.value)
+}
+
+
+watch(() => searchParams.value.orderStatus, () => {
+  tableRef.value.refresh(searchParams.value)
+})
 
 onMounted(()=>{
-
+  
+  fetchALLChannelList()
 })
 </script>
 
@@ -42,26 +76,44 @@ onMounted(()=>{
       <a-flex vertical :gap="15">
         <a-row :gutter="16">
           <a-col class="gutter-row" :span="4">
-            <a-input  v-model:value="searchParams.orderNo"  allow-clear placeholder="请输入订单编号"> </a-input>
+            <a-input  v-model:value="searchParams.orderNo"  allow-clear placeholder="按订单编号查询"> </a-input>
           </a-col>
           <a-col class="gutter-row" :span="4">
-            <a-select style="width: 100%" mode="multiple" allow-clear :max-tag-count="1" v-model:value="searchParams.channelTypes" placeholder="所有渠道">
+            <a-input  v-model:value="searchParams.mchOrderNo"  allow-clear placeholder="按商家订单号查询"> </a-input>
+          </a-col>
+          <a-col class="gutter-row" :span="4">
+            <a-input  v-model:value="searchParams.channelOrderNo"  allow-clear placeholder="按渠道订单号查询"> </a-input>
+          </a-col>
+          <!-- <a-col class="gutter-row" :span="4">
+            <a-select style="width: 100%" mode="multiple" allow-clear :max-tag-count="2" v-model:value="searchParams.channelTypes" placeholder="按渠道类型查询">
               <a-select-option v-for="(item) in PayChannelTypeSelectOption" :value="item.value">{{item.title}}</a-select-option>
+            </a-select>
+          </a-col> -->
+          <a-col class="gutter-row" :span="4">
+            <a-select placeholder="按支付渠道筛选" :filter-option="filterOption"  show-search v-model:value="searchParams.channelId"  allow-clear style="width: 100%;">
+              <a-select-option v-for="(item) in channelOpts" :value="item.id" :label="item.name" >{{item.name}}</a-select-option>
             </a-select>
           </a-col>
           <a-col class="gutter-row" :span="4">
-            <a-select style="width: 100%" mode="multiple" allow-clear :max-tag-count="1" v-model:value="searchParams.payModes" placeholder="所有支付方式">
+            <a-select style="width: 100%" mode="multiple" allow-clear :max-tag-count="1" v-model:value="searchParams.payModes" placeholder="按支付方式查询">
               <a-select-option v-for="(item) in PayModeTypeSelectOption" :value="item.value">{{item.title}}</a-select-option>
             </a-select>
           </a-col>
-          <a-col class="gutter-row" :span="4">
-             <a-input placeholder="请输入渠道ID"></a-input>
+
+          <a-col class="gutter-row" :span="24">
+            <date-search-wrap @date-change="dateChange" ref="DateSearchWrapRef" />
           </a-col>
+          
         </a-row>
 
         <a-flex justify="flex-start" align="center"  :gap="10" >
           <a-button type="link" style="padding-left: 0px" @click="resetSearch">重置筛选</a-button>
-          <a-button type="primary" size="small" style="width: 80px;height:27.99px"  @click="tableRef.refresh(searchParams)">筛选</a-button>
+          <a-button type="primary" size="small" style="width: 80px;height:27.99px"  @click="handleSearch">
+            <template #icon>
+              <FileSearchOutlined />
+            </template>
+            筛选
+          </a-button>
         </a-flex>
       </a-flex>
     </a-card>

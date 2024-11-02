@@ -30,7 +30,15 @@ export interface MerchantInfo {
     password?: string
     isResetPassword?: boolean
     agentInfo?: AgentInfo,
-    payModeRates?: PayModeRateItem[]
+    payModeRates?: PayModeRateItem[],
+    totalOrderAmount?: number
+    totalOrderCount?: number
+    //可用金额
+    amount?: number
+    // 冻结金额
+    freezeAmount?: number
+    // 用于加载动画
+    isItemLoadSpinning?: boolean
 }
 
 export interface MerchantInfoRequest extends MerchantInfo  {
@@ -79,7 +87,7 @@ export function modifyMerchant(data: MerchantInfoRequest):Promise<ResponseBody<a
  * @param { MerchantPageSearch } params 
  * @returns {ResponseBody<MerchantOptItem[]>}
  */
-export function getAllAgentList(params?: MerchantPageSearch):Promise<ResponseBody<MerchantOptItem[]>>{
+export function getAllMerchantList(params?: MerchantPageSearch):Promise<ResponseBody<MerchantOptItem[]>>{
     return useGet<MerchantOptItem[]>('/mch/query', params)
 }
 

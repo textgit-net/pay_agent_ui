@@ -55,6 +55,12 @@ export interface ChannelListResponse extends ChannelSimpleResponse{
     totalAmount?:number
     createTime?:string
     group?: ChannelGroupSimpleResponse
+    //可用金额
+    channelAmount?: number
+    // 冻结金额
+    channelFreezeAmount?: number
+    // 用于加载动画
+    isItemLoadSpinning?: boolean
 }
 
 
@@ -133,6 +139,11 @@ export interface ChannelFormData{
     mchId?: number;
 }
 
+export interface ChannelWallat {
+    amount?: number;
+    freezeAmount?: number;
+}
+
 
 
 /**
@@ -150,7 +161,9 @@ export interface ChannelSearch extends BasePageRequest{
     /**
      * 是否忽略禁用的渠道
      */
-    isIgnoreDisable:boolean
+    isIgnoreDisable?:boolean
+    // 渠道组
+    groupCodes?: string[]
 }
 
 export interface ALLChannelListRequest {
@@ -165,7 +178,9 @@ export interface ALLChannelListRequest {
     /**
      * 是否忽略禁用的渠道
      */
-    isIgnoreDisable:boolean
+    isIgnoreDisable:boolean,
+    // 渠道组
+    groupCodes?: string[]
 }
 
 export interface ChannelTestRequest{
@@ -248,3 +263,10 @@ export function getChannelInfo(id:string):Promise<ResponseBody<ChannelInfo>> {
     return useGet<ChannelInfo>(`/channel/info/${id}`)
 }
 
+/**
+ * 获取渠道钱包详情
+ * @param id
+ */
+export function getChannelWalletInfo(id:number):Promise<ResponseBody<ChannelWallat>> {
+    return useGet<ChannelWallat>(`/channel/getChannelWalletInfo/${id}`)
+}

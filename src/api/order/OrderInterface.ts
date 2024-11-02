@@ -67,16 +67,48 @@ export enum OrderStatus {
     CLOSE=6
 }
 
+export enum OrderNotifyStatusEnum {
+    //未开始
+    NO_NEED=0,
+    //待处理
+    WAIT_HANDLE=1,
+    //处理中
+    HANDLE_ING=2,
+    //回调成功 
+    SUCCESS=3,
+    //失败重试
+    FAIL_RETRY=4,
+    //回调失败
+    FAIL=5
+}
+
+export function getOrderNotifyStatusEnumText(status:OrderNotifyStatusEnum): string {
+    switch (status){
+        case OrderNotifyStatusEnum.NO_NEED:
+            return "未开始"
+        case OrderNotifyStatusEnum.WAIT_HANDLE:
+            return "待处理"
+        case OrderNotifyStatusEnum.HANDLE_ING:
+            return "处理中"
+        case OrderNotifyStatusEnum.SUCCESS:
+            return "回调成功"
+        case OrderNotifyStatusEnum.FAIL_RETRY:
+            return "失败重试"
+        case OrderNotifyStatusEnum.FAIL:
+            return "回调失败"
+    }
+}
+
 export function getOrderStatusText(status:OrderStatus): string {
     switch (status){
         case OrderStatus.WAIT_PAY:
             return "待支付"
         case OrderStatus.PAY_ING:
-            return "支付中"
+            return "支付中.."
         case OrderStatus.SUCCESS:
             return "支付成功"
         case OrderStatus.FAIL:
-            return "失败"
+            return "支付失败"
         case OrderStatus.CANCEL:
             return "取消订单"
         case OrderStatus.CLOSE:
@@ -112,19 +144,29 @@ export const  OrderStatusSelectOptions:SelectOption<OrderStatus>[]=[
 
 
 export interface OrderSearch extends BasePageRequest{
+    // 渠道ID
+    channelId?: string;
+    // 商户订单号
+    mchOrderNo?: string;
+    // 渠道订单号
+    channelOrderNo?: string;
+    // 商户Id
+    mchId?: string;
+    // 代理Id
+    agentId?: string;
     orderStatus?:OrderStatus[]
     orderNo?:string
     dateRange?:DateRange
+    //支付方式
     payModes?:PayModeType[]
     channelTypes?:PayChannelType[]
-
 }
 
 
 
 
 export function searchOrder(search:OrderSearch)   {
-    return useGet<PageWarp<any>>("/order/page",search)
+    return usePost<PageWarp<any>>("/order/page",search)
 }
 
 /**

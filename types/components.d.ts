@@ -76,6 +76,7 @@ declare module 'vue' {
     CopyText: typeof import('./../src/components/copy-text/index.vue')['default']
     CopyTextBtn: typeof import('./../src/components/copy-text-btn/index.vue')['default']
     CubeSpin: typeof import('./../src/components/base-loading/spin/cube-spin.vue')['default']
+    DateSearchWrap: typeof import('./../src/components/date-search-wrap/index.vue')['default']
     DocLink: typeof import('./../src/components/doc-link/index.vue')['default']
     DotSpin: typeof import('./../src/components/base-loading/spin/dot-spin.vue')['default']
     Editor: typeof import('./../src/components/editor/index.vue')['default']

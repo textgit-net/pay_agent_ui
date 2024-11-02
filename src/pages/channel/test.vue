@@ -114,6 +114,7 @@ const doCheckPayOrderStatus=()=>{
 
 const id=<string>route.query['id'] ?? ""
 const isShowBackIcon = computed(()=> {
+  console.log('!!id', !!id)
   return !!id
 })
 onMounted(()=>{
@@ -135,15 +136,19 @@ onMounted(()=>{
    
 
     <a-flex vertical justify="center" align="center" style="width: 800px;padding: 15px;border-radius: 4px" >
-
+      
       <a-card style="width: 100%;margin-bottom: 10px;">
-        <a-page-header title="渠道测试" class="site-page-header" sub-title="" style="padding: 0;">
+        <a-flex align="center" justify="flex-start">
+          <ArrowLeftOutlined v-show="isShowBackIcon"  @click="() => router.back()" style="font-size: 20px;padding-right: 10px;" />
+          <a-page-header title="渠道测试" class="site-page-header" sub-title="" style="padding: 0;">
 
-          <template #backIcon>
-          
-            <ArrowLeftOutlined v-if="isShowBackIcon"  @click="() => router.back()" style="font-size: 20px;" />
-          </template>
-        </a-page-header>
+            <template #backIcon>
+            
+              
+            </template>
+          </a-page-header>
+        </a-flex>
+       
       </a-card>
       <a-card style="width: 100%;padding: 15px;">
         <a-steps :current="state.current" :items="items"></a-steps>

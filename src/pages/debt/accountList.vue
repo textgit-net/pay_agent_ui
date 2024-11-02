@@ -3,9 +3,11 @@ import {ColumnsType} from "ant-design-vue/es/table";
 import {PaginationProps} from "ant-design-vue";
 import { PayChannelType, getPayChannelTypeText} from "~/utils/constant.ts";
 
-
+import { FileSearchOutlined} from "@ant-design/icons-vue"
 import {DebtAccountInfo, DebtAccountRequset, modifyDebtAccount, getDebtAccountList } from '~/api/debt/account'
 import { changeChannel } from "~@/api/channel/ChannelInterface";
+import { center } from "@antv/g2plot/lib/plots/sankey/sankey";
+import { updateParamsToUrl, getParamsFromUrl} from '@/utils/tools'
 
 const router=useRouter()
 const route = useRoute()
@@ -15,6 +17,7 @@ const columns:ColumnsType =[
   {
     title: 'ID',
     dataIndex: 'id',
+    align: 'center'
   },
   {
     title: '真实姓名',
@@ -59,12 +62,13 @@ const isDisAbledChannelGroupForm = computed(() => {
   return !formData.value.realName || !formData.value.accountNo || !formData.value.channelType || state.isSaveLoading
 })
 
-
-const searchParams = reactive<DebtAccountRequset>({
-  page:1,
-  limit:10,
-  channelType: null
-})
+const initSearchParams = ():DebtAccountRequset => {
+  return {
+    page:1,
+    limit:10,
+  }
+}
+const searchParams = ref<DebtAccountRequset>(initSearchParams())
 const pagination = reactive<PaginationProps>({
   pageSize: 10,
   pageSizeOptions: ['10', '20', '30', '40'],
@@ -76,32 +80,21 @@ const pagination = reactive<PaginationProps>({
   onChange(current, pageSize) {
     pagination.pageSize = pageSize
     pagination.current = current
-    searchParams.page=pagination.current
-    searchParams.limit=pagination.pageSize
-    router.replace({query: searchParams})
+    router.replace({ query: {...searchParams.value, timestamp: new Date().getTime()}})
+    // loadData()
   },
 })
 const dataSource=ref<DebtAccountInfo[]>([])
 const resetSearch=()=>{
-  Object.assign(searchParams,{
-    keyword:null,
-    page:1,
-    limit:10
-  })
-  router.replace({query: searchParams})
+  searchParams.value = initSearchParams()
+  filterSearch()
 }
 const filterSearch=()=>{
-  // Object.assign(searchParams,{
-  //   page:1,
-  //   limit:10
-  // })
-  // await loadData()
 
-  router.push({query: searchParams})
+  pagination.onChange(1, pagination.pageSize)
 }
 const loadData=async  ()=> {
-  if (state.dataSourceLoading)
-    return
+  if (state.dataSourceLoading) return
   state.dataSourceLoading = true
   try {
     const { data } = await getDebtAccountList({
@@ -146,13 +139,13 @@ const onSubmit = async () => {
 }
 const changeChannelType = () => {
   pagination.current=1
-  loadData()
+  filterSearch()
 }
 
 onMounted(()=>{
-  Object.assign(searchParams,route.query??{page:1,limit:1})
-  pagination.current=searchParams.page
-  pagination.pageSize=searchParams.limit
+  if (getParamsFromUrl()) {
+    searchParams.value = Object.assign(searchParams.value, getParamsFromUrl())
+  }
   loadData()
 })
 </script>
@@ -176,7 +169,7 @@ onMounted(()=>{
       <a-form-item name="channelType" :rules="{required:true,message:'请选择渠道类型'}" label="渠道类型">
         <a-radio-group :disabled="!formData.channelType" v-model:value="formData.channelType">
           <a-radio :value="PayChannelType.ALI">{{ getPayChannelTypeText(PayChannelType.ALI) }}</a-radio>
-          <a-radio :value="PayChannelType.ALI_USER">{{ getPayChannelTypeText(PayChannelType.ALI_USER) }}</a-radio>
+          <!-- <a-radio :value="PayChannelType.ALI_USER">{{ getPayChannelTypeText(PayChannelType.ALI_USER) }}</a-radio> -->
         </a-radio-group>
       </a-form-item>
      
@@ -195,28 +188,33 @@ onMounted(()=>{
       <a-flex vertical :gap="15">
         <a-row :gutter="16">
 
-          <a-col class="gutter-row" :span="4">
-            <a-input v-model:value="searchParams.realName" allow-clear  placeholder="真实姓名" ></a-input>
+          <a-col class="gutter-row" :span="5">
+            <a-input v-model:value="searchParams.realName" allow-clear  placeholder="按真实姓名筛选" ></a-input>
           </a-col>
-          <a-col class="gutter-row" :span="4">
-            <a-input v-model:value="searchParams.accountNo" allow-clear  placeholder="分账账号" ></a-input>
+          <a-col class="gutter-row" :span="5">
+            <a-input v-model:value="searchParams.accountNo" allow-clear  placeholder="按分账账号筛选" ></a-input>
           </a-col>
         </a-row>
 
-        <a-flex  :gap="0"  justify="flex-end">
+        <a-flex  :gap="0"  justify="flex-start">
           <a-button type="link" style="padding-left: 0" @click="resetSearch">重置筛选</a-button>
-          <a-button  size="small"   @click="filterSearch"  type="primary"  style="width: 80px;height:28px"  >筛选</a-button>
+          <a-button  size="small"  @click="filterSearch"  type="primary"  style="width: 80px;height:28px" >
+            <template #icon>
+              <FileSearchOutlined />
+            </template>
+            筛选
+          </a-button>
         </a-flex>
       </a-flex>
     </a-card>
     <a-card :body-style="{'padding':'0px'}">
       <template #title>
-        <a-radio-group v-model:value="searchParams.channelType" @change="changeChannelType">
+        <!-- <a-radio-group v-model:value="searchParams.channelType" @change="changeChannelType">
           <a-radio :value="null">全部</a-radio>
           <a-radio :value="PayChannelType.ALI">{{ getPayChannelTypeText(PayChannelType.ALI) }}</a-radio>
           <a-radio :value="PayChannelType.ALI_USER">{{ getPayChannelTypeText(PayChannelType.ALI_USER) }}</a-radio>
-        </a-radio-group>
-        <a-button @click="handleAddAccount(null)" type="primary" style="margin-left: 30px;">添加账户</a-button>
+        </a-radio-group> -->
+        <a-button @click="handleAddAccount(null)" type="primary">添加账户</a-button>
       </template>
       <template #extra>
      

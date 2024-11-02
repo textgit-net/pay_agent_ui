@@ -4,7 +4,7 @@ import { message } from 'ant-design-vue';
 import {AlipaySquareFilled } from "@ant-design/icons-vue"
 import {ContactWay, ContactWaySelectOption,getContactWayText} from "~/utils/constant.ts";
 import { getChannelInfo, ChannelInfo, saveChannel,ChannelFormData } from '~/api/channel/ChannelInterface'
-import {getPayChannelTypeText, PayChannelType} from "~/utils/constant.ts";
+import {getPayChannelTypeText, PayChannelType, PayModeType, getPayModeTypeText} from "~/utils/constant.ts";
 // import {MerchantInfo, modifyMerchant, getMerchantInfo, resetMerchantPwd,MerchantResetPwdRequset } from '~/api/merchant'
 const route = useRoute()
 const router = useRouter()
@@ -94,8 +94,17 @@ const getInfo=async (id:string)=>{
   state.isLoading=true
   const {data} =await getChannelInfo(id)
   info.value = data
-  
+  getPayModelName(data.payModes)
   state.isLoading=false
+}
+
+const payModelNames = ref<string[]>([])
+const getPayModelName = (payModes: PayModeType[]) => {
+  if (payModes.length) {
+    payModes.map((item: PayModeType, index: number) => {
+      payModelNames.value.push(`${index + 1}、${getPayModeTypeText(item)}`)
+    })
+  }
 }
 
 const {id}= route.query
@@ -159,6 +168,48 @@ onMounted(async ()=>{
 
       </a-descriptions>
     </a-card>
+
+    <a-card :body-style="{padding: '15px'}">
+      <a-descriptions :column="4" layout="vertical">
+        <template #title>
+          <a-flex  align="center">
+            <a-typography-text>所属渠道组</a-typography-text>
+            <!-- <a-button @click="handleShowBaseInfo" type="link">编辑</a-button> -->
+          </a-flex>
+
+        </template>
+       
+        <a-descriptions-item style="padding-bottom: 4px" :labelStyle="{'color':'#999'}" label="渠道组名称">
+          
+          <a-typography-link v-if="info.group"  @click="router.push({path:'/channel/group-info',query:{groupCode:info.group.groupCode}})">{{info.group.name}}</a-typography-link>
+          <a-typography-text v-else type="secondary">/</a-typography-text>
+        </a-descriptions-item>
+        <a-descriptions-item style="padding-bottom: 4px" :labelStyle="{'color':'#999'}" label="渠道组编码">{{  info.group ? info.group.groupCode : '/'  }}</a-descriptions-item>
+        
+
+      </a-descriptions>
+    </a-card>
+
+    <a-card :body-style="{padding: '15px'}">
+      <a-descriptions :column="1" layout="vertical">
+        <template #title>
+          <a-flex  align="center">
+            <a-typography-text>支付方式</a-typography-text>
+            <!-- <a-button @click="handleShowBaseInfo" type="link">编辑</a-button> -->
+          </a-flex>
+
+        </template>
+       
+        <a-descriptions-item style="padding-bottom: 4px" :labelStyle="{'color':'#999'}" label="支持的支付方式">
+          <a-space>
+            <a-typography-text v-for="i in payModelNames" style="padding-right: 20px;">{{ i }}</a-typography-text>
+          </a-space>
+        </a-descriptions-item>
+        
+
+      </a-descriptions>
+    </a-card>
+
     <a-card :body-style="{padding: '15px'}">
 
 

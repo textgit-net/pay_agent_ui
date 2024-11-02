@@ -2,14 +2,17 @@
 const userStore = useUserStore()
 import {ColumnsType} from "ant-design-vue/es/table";
 import {PaginationProps} from "ant-design-vue";
-import {ContactWay, getContactWayText} from "../../utils/constant.ts";
+import {ContactWay, getContactWayText} from "@/utils/constant.ts";
 import {getAgentList, AgentPageReq, AgentInfo, changeAgentEnable } from '~/api/agent/index'
+import { FundViewOutlined,FileSearchOutlined } from '@ant-design/icons-vue';
+import { updateParamsToUrl, getParamsFromUrl} from '@/utils/tools'
 
 const isHasPermission = computed(()=> {
   return userStore.userInfo.isAllowInviteUser
 })
 
 const router=useRouter()
+const route = useRoute()
 
 const columns:ColumnsType =[
 
@@ -21,18 +24,18 @@ const columns:ColumnsType =[
     title: '代理账号',
     dataIndex: 'loginName',
   },
-  {
-    title: '联系人',
-    dataIndex: 'contactName',
-  },
-  {
-    title: '联系方式',
-    dataIndex: 'contactWay',
-  },
-  {
-    title:'联系号码',
-    dataIndex:'contactNumber'
-  },
+  // {
+  //   title: '联系人',
+  //   dataIndex: 'contactName',
+  // },
+  // {
+  //   title: '联系方式',
+  //   dataIndex: 'contactWay',
+  // },
+  // {
+  //   title:'联系号码',
+  //   dataIndex:'contactNumber'
+  // },
   {
     title: '商户数量',
     dataIndex: 'mchCount',
@@ -67,11 +70,14 @@ const state=reactive({
   dataSourceLoading:false,
   isConfirmLoading:false
 })
-const searchParams = reactive<AgentPageReq>({
-  page:1,
-  limit:10,
-  keyword: ''
-})
+const initSearchParams = ():AgentPageReq => {
+  return {
+    page:1,
+    limit:10
+  }
+}
+
+const searchParams = ref<AgentPageReq>(initSearchParams())
 const pagination = reactive<PaginationProps>({
   pageSize: 10,
   pageSizeOptions: ['10', '20', '30', '40'],
@@ -83,19 +89,15 @@ const pagination = reactive<PaginationProps>({
   onChange(current, pageSize) {
     pagination.pageSize = pageSize
     pagination.current = current
-    searchParams.page=pagination.current
-    searchParams.limit=pagination.pageSize
-    router.replace({query: searchParams})
+    router.replace({ query: {...searchParams.value, timestamp: new Date().getTime()}})
+    // loadData()
   },
 })
 const dataSource=ref<AgentInfo[]>([])
 const resetSearch=()=>{
-  Object.assign(searchParams,{
-    keyword:null,
-    page:1,
-    limit:10
-  })
-  router.replace({query: searchParams})
+  searchParams.value = initSearchParams()
+  pagination.onChange(1, pagination.pageSize)
+  // router.replace({query: searchParams})
 }
 const filterSearch=()=>{
   // Object.assign(searchParams,{
@@ -103,16 +105,17 @@ const filterSearch=()=>{
   //   limit:10
   // })
   // await loadData()
-
-  router.push({query: searchParams})
+  
+  pagination.onChange(1, pagination.pageSize)
 }
-const loadData=async  ()=> {
+
+const loadData = async  ()=> {
   if (state.dataSourceLoading)
     return
   state.dataSourceLoading = true
   try {
     const { data } = await getAgentList({
-      ...searchParams,
+      ...searchParams.value,
       page: pagination.current,
       limit: pagination.pageSize,
     })
@@ -120,6 +123,7 @@ const loadData=async  ()=> {
     pagination.total = data?.total ?? 0
   }
   finally {
+    // updateParamsToUrl(searchParams.value)
     state.dataSourceLoading = false
   }
 }
@@ -130,10 +134,10 @@ const changeAgentEnableStatus = async (id:string) => {
 }
 
 onMounted(()=>{
-  Object.assign(searchParams,router.currentRoute.value.query??{page:1,limit:1})
-  pagination.current=searchParams.page
-  pagination.pageSize=searchParams.limit
   console.log('isHasPermission', isHasPermission)
+  if (getParamsFromUrl()) {
+    searchParams.value = Object.assign(searchParams.value, getParamsFromUrl())
+  }
   if (isHasPermission.value) {
     loadData()
   }
@@ -152,14 +156,19 @@ onMounted(()=>{
       <a-flex vertical :gap="15">
         <a-row :gutter="16">
 
-          <a-col class="gutter-row" :span="4">
-            <a-input v-model:value="searchParams.keyword" allow-clear  placeholder="代理ID/名称/简称" ></a-input>
+          <a-col class="gutter-row" :span="5">
+            <a-input v-model:value="searchParams.keyword" allow-clear  placeholder="按代理ID/名称/简称搜索" ></a-input>
           </a-col>
         </a-row>
 
-        <a-flex  :gap="0"  justify="flex-end">
+        <a-flex  :gap="0"  justify="flex-start">
           <a-button type="link" style="padding-left: 0" @click="resetSearch">重置筛选</a-button>
-          <a-button  size="small"   @click="filterSearch"  type="primary"  style="width: 80px;height:28px"  >筛选</a-button>
+          <a-button size="small"  @click="filterSearch"  type="primary"  style="width: 80px;height:28px"  >
+            <template #icon>
+              <FileSearchOutlined />
+            </template>
+            筛选
+          </a-button>
         </a-flex>
       </a-flex>
     </a-card>
@@ -179,16 +188,14 @@ onMounted(()=>{
           <template v-if="column.dataIndex==='name'">
 
             <a-flex vertical :gap="5" align="start">
-              <a-button style="padding-left: 0" type="link" @click="router.push({path:'/agent/info',query:{id:record.id}})">{{record.name}}</a-button>
-              <a-typography-text type="secondary">ID:{{record.id}}</a-typography-text>
+              <a-tooltip>
+                <template #title>查看代理商【{{record.name}}】详情</template>
+                <a-button style="padding-left: 0" type="link" @click="router.push({path:'/agent/info',query:{id:record.id}})">{{record.name}}</a-button>
+              </a-tooltip>
+              
+              <a-typography-text type="secondary">代理ID:{{record.id}}</a-typography-text>
             </a-flex>
           </template>
-<!--          <template v-if="column.dataIndex==='contactWay'">-->
-<!--             <a-space>-->
-<!--               <a-typography-text>{{getContactWayText((record["contactWay"]as ContactWay))}}</a-typography-text>-->
-<!--               <a-typography-text type="secondary" >{{record["contactNumber"]}}</a-typography-text>-->
-<!--             </a-space>-->
-<!--          </template>-->
           <template v-if="column.dataIndex==='contactWay'">
             <a-typography-text>{{getContactWayText((record.contactWay as ContactWay))}}</a-typography-text>
           </template>
@@ -214,10 +221,22 @@ onMounted(()=>{
             </a-felx>
           </template>
           <template v-if="column.dataIndex==='totalOrderCount'">
-            {{record.totalOrderAmount ?? '/' }}
+            <a-flex align="center" justify="start">
+              <a-typography-text> {{record.totalOrderCount ?? '/' }}</a-typography-text>
+              <a-tooltip>
+                <template #title>查看当前代理商订单信息</template>
+                <FundViewOutlined @click="router.push({path:'/agent/info',query:{id:record.id, tabKey: 'orderInfo'}})" style="color: #1677ff;padding-left: 3px" />
+              </a-tooltip>
+            </a-flex>
           </template>
           <template v-if="column.dataIndex==='totalOrderAmount'">
-            {{record.totalOrderAmount ?? '/' }}
+            <a-flex align="center" justify="start">
+              <a-typography-text>{{record.totalOrderAmount ?? '/' }}</a-typography-text>
+              <a-tooltip>
+                <template #title>查看当前代理商订单信息</template>
+                <FundViewOutlined @click="router.push({path:'/agent/info',query:{id:record.id, tabKey: 'orderInfo'}})" style="color: #1677ff;padding-left: 3px" />
+              </a-tooltip>
+            </a-flex>
           </template>
           <template v-if="column.dataIndex==='action'">
             <a-flex :gap="5">

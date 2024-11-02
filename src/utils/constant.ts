@@ -114,10 +114,10 @@ export const  PayChannelTypeSelectOption:SelectOption<PayChannelType>[]=[
     value:PayChannelType.ALI,
     title:getPayChannelTypeText(PayChannelType.ALI)
   },
-  {
-    value:PayChannelType.ALI_USER,
-    title:getPayChannelTypeText(PayChannelType.ALI_USER)
-  }
+  // {
+  //   value:PayChannelType.ALI_USER,
+  //   title:getPayChannelTypeText(PayChannelType.ALI_USER)
+  // }
 ]
 
 export enum PayModeType{

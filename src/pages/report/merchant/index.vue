@@ -3,21 +3,21 @@ import {ColumnsType} from "ant-design-vue/es/table"
 import {PaginationProps} from "ant-design-vue"
 import {FileSearchOutlined } from '@ant-design/icons-vue';
 import {
-  ChannelOrderReportSearch,
-  getChannelOrderReportData
+  MerchantOrderReportSearch,
+  getMerchantOrderReportData
 } from "~/api/order/report.ts"
 import { PayModeTypeSelectOption, DateRange} from "~/utils/constant.ts"
 import { getAllAgentList, AgentOptItem } from '@/api/agent'
 import { getAllMerchantList, MerchantOptItem } from '@/api/merchant'
 import { getALLChannelList,ChannelListResponse, ALLChannelListRequest, } from "~/api/channel/ChannelInterface.ts";
-import { calcFloat } from '~/utils/calcFloat'
 import { DateSearchTypeEnum} from '@/components/date-search-wrap/type'
+import { calcFloat } from '~/utils/calcFloat'
 
 const router=useRouter()
 const columns:ColumnsType =[
   {
-    title: '渠道',
-    dataIndex: 'channelName',
+    title: '商户',
+    dataIndex: 'mchName',
   },
   {
     title: '交易总额',
@@ -70,13 +70,13 @@ const pagination = reactive<PaginationProps>({
   },
 })
 const DateSearchWrapRef = ref()
-const inntSearchParams = ():ChannelOrderReportSearch => {
+const inntSearchParams = ():MerchantOrderReportSearch => {
   return {
     page:1,
     limit:10,
-  } as ChannelOrderReportSearch
+  } as MerchantOrderReportSearch
 }
-const searchParams = ref<ChannelOrderReportSearch>({
+const searchParams = ref<MerchantOrderReportSearch>({
   page:1,
   limit:10
 })
@@ -86,15 +86,11 @@ const resetSearch=async ()=>{
   DateSearchWrapRef.value.tranferReset()
   handleSearch()
 }
-const handleSearch = () => {
-  pagination.onChange(1, pagination.pageSize)
-}
-
 const loadData=async  ()=> {
   if (state.dataSourceLoading) return
   state.dataSourceLoading = true
   try {
-    const { data } = await getChannelOrderReportData({
+    const { data } = await getMerchantOrderReportData({
       ...searchParams.value,
       page: pagination.current,
       limit: pagination.pageSize,
@@ -111,6 +107,10 @@ const loadData=async  ()=> {
 const dateChange = (dateRange: DateRange) => {
   searchParams.value.dateRange = dateRange
   handleSearch()
+}
+
+const handleSearch = () => {
+  pagination.onChange(1, pagination.pageSize)
 }
 
 const filterChannelOption = (input: string, option: any) => {
@@ -156,7 +156,7 @@ onMounted(()=>{
   Promise.all([
     fetchALLChannelList(),
     fetchAllMerchantList(),
-    fetchAllAgentList()
+    // fetchAllAgentList(),
   ])
 })
 </script>
@@ -166,18 +166,12 @@ onMounted(()=>{
     <!--头部-->
     <a-card :body-style="{padding:'15px'}">
       <a-flex justify="space-between">
-        <a-typography-text>渠道订单数据报表</a-typography-text>
+        <a-typography-text>商户订单数据报表</a-typography-text>
       </a-flex>
     </a-card>
     <a-card style="border: none" :body-style="{padding:'15px'}">
       <a-flex vertical :gap="15">
         <a-row :gutter="16">
-
-          <!-- <a-col class="gutter-row" :span="6">
-            <a-select v-model:value="searchParams.agentIds" placeholder="按代理商查询" mode="multiple" :filter-option="filterAgentOption" :max-tag-count="1" show-search allow-clear style="width: 100%;">
-              <a-select-option v-for="(item) in agentOpts" :value="item.id" :label="item.name" >{{item.name}}</a-select-option>
-            </a-select>
-          </a-col> -->
 
           <a-col class="gutter-row" :span="6">
             <a-select v-model:value="searchParams.mchIds" placeholder="按商户查询" mode="multiple" :filter-option="filterMchOption" :max-tag-count="1" show-search  allow-clear style="width: 100%;">
@@ -217,21 +211,20 @@ onMounted(()=>{
           <a-empty></a-empty>
         </template>
         <template #bodyCell="{ column , record}">
-            <template v-if="column.dataIndex==='channelName'">
-              <a-flex vertical :gap="5" align="start">
-                <a-tooltip>
-                  <template #title>点击查看渠道【{{record.channelName}}】详情</template>
-                  <a-typography-link @click="router.push({path:'/channel/info',query:{id:record.channelId}})">{{record.channelName ?? '/'}}</a-typography-link>
-                </a-tooltip>
-              </a-flex>
-              
-            </template>
 
+            <template v-if="column.dataIndex==='mchName'">
+                <a-flex vertical :gap="5" align="start">
+                    <a-tooltip>
+                        <template #title>点击查看商户【{{record.mchName}}】详情</template>
+                        <a-typography-link @click="router.push({path:'/mch/info',query:{id:record.mchId}})">{{record.mchName}}</a-typography-link>
+                    </a-tooltip>
+                </a-flex>
+            </template>
             <template v-if="column.dataIndex==='successRate'">
             
-              <a-typography-text v-if="record.totalSuccessOrderCount > 0" type="success" strong>{{calcSuccessRate(record.totalSuccessOrderCount, record.totalOrderCount)}}%</a-typography-text>
-              <a-typography-text v-else type="danger" strong>{{calcSuccessRate(record.totalSuccessOrderCount, record.totalOrderCount)}}%</a-typography-text>
-            </template> 
+                <a-typography-text v-if="record.totalSuccessOrderCount > 0" type="success" strong>{{calcSuccessRate(record.totalSuccessOrderCount, record.totalOrderCount)}}%</a-typography-text>
+                <a-typography-text v-else type="danger" strong>{{calcSuccessRate(record.totalSuccessOrderCount, record.totalOrderCount)}}%</a-typography-text>
+            </template>
         </template>
       </a-table>
 

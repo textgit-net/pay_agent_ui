@@ -125,6 +125,16 @@ export default [
         }
       },
       {
+        path: '/channel/group-info',
+        name: 'ChannelGroupInfo',
+        component: () => import('~/pages/channel/group/info.vue'),
+        meta: {
+          title: '渠道组信息',
+          hideInMenu: true,
+          hideChildrenInMenu: true
+        }
+      },
+      {
         path: '/channel/list',
         name: 'ChannelList',
         component: () => import('~/pages/channel/index.vue'),
@@ -159,7 +169,7 @@ export default [
         name: 'ChannelTest',
         component: () => import('~/pages/channel/test.vue'),
         meta: {
-          title: '渠道测式',
+          title: '渠道测试',
         }
       }
     ]
@@ -295,6 +305,26 @@ export default [
         component: () => import('~/pages/report/channel/index.vue'),
         meta: {
           title: '渠道报表',
+          hideChildrenInMenu: true
+        }
+      },
+
+      {
+        path: '/report/agent',
+        name: 'AgentReport',
+        component: () => import('~/pages/report/agent/index.vue'),
+        meta: {
+          title: '代理商报表',
+          hideChildrenInMenu: true
+        }
+      },
+
+      {
+        path: '/report/merchant',
+        name: 'MerchantReport',
+        component: () => import('~/pages/report/merchant/index.vue'),
+        meta: {
+          title: '商户报表',
           hideChildrenInMenu: true
         }
       },

@@ -8,6 +8,7 @@ import { getChannelInfo, ChannelInfo, } from '~/api/channel/ChannelInterface'
 import OrderTablePanel from "~/pages/order/components/order-table-panel.vue";
 import {FileSearchOutlined } from "@ant-design/icons-vue"
 import { getALLChannelList,ChannelListResponse, ALLChannelListRequest, } from "~/api/channel/ChannelInterface.ts";
+import { init } from "~@/utils/page-bubble";
 const DateSearchWrapRef = ref()
 
 const router=useRouter()
@@ -19,14 +20,14 @@ const state=reactive({
   isConfirmLoading:false
 })
 const tableRef=ref()
-
 const inntSearchParams = ():OrderSearch => {
     return {
         page:1,
         limit:10,
-        channelId: id
+        agentId: `${id}`
     } as OrderSearch
 }
+
 const searchParams = ref<OrderSearch>(inntSearchParams())
 
 const info = ref<ChannelInfo>({})
@@ -37,13 +38,7 @@ const resetSearch=async ()=>{
   tableRef.value.resetSearch(searchParams.value)
 }
 
-const getInfo=async (id:string)=>{
-  state.dataSourceLoading=true
-  const {data} =await getChannelInfo(id)
-  info.value = data
-  
-  state.dataSourceLoading=false
-}
+
 
 const allChannelListRequest = ref<ALLChannelListRequest>({
   isIgnoreDisable: true
@@ -56,7 +51,6 @@ const fetchALLChannelList = async () => {
 }
 
 const filterOption = (input: string, option: any) => {
-  console.log('option', option)
   return option.label.toLowerCase().indexOf(input.toLowerCase()) >= 0;
 };
 
@@ -70,10 +64,8 @@ watch(() => searchParams.value.orderStatus, () => {
 })
 
 
-
 onMounted(()=>{
-    getInfo(`${id}`)
-    // fetchALLChannelList()
+    fetchALLChannelList()
 })
 </script>
 
@@ -137,12 +129,12 @@ onMounted(()=>{
             <a-select style="width: 100%" mode="multiple" allow-clear :max-tag-count="2" v-model:value="searchParams.channelTypes" placeholder="按渠道类型查询">
               <a-select-option v-for="(item) in PayChannelTypeSelectOption" :value="item.value">{{item.title}}</a-select-option>
             </a-select>
-          </a-col>
+          </a-col> -->
           <a-col class="gutter-row" :span="4">
             <a-select placeholder="按支付渠道筛选" :filter-option="filterOption"  show-search v-model:value="searchParams.channelId"  allow-clear style="width: 100%;">
               <a-select-option v-for="(item) in channelOpts" :value="item.id" :label="item.name" >{{item.name}}</a-select-option>
             </a-select>
-          </a-col> -->
+          </a-col>
           <a-col class="gutter-row" :span="4">
             <a-select style="width: 100%" mode="multiple" allow-clear :max-tag-count="1" v-model:value="searchParams.payModes" placeholder="按支付方式查询">
               <a-select-option v-for="(item) in PayModeTypeSelectOption" :value="item.value">{{item.title}}</a-select-option>
@@ -193,8 +185,6 @@ onMounted(()=>{
             <a-descriptions-item style="padding-bottom: 4px" :labelStyle="{'color':'#999'}" label="订单支付累计金额">
                 <a-typography-text type="danger" strong> {{ info.totalAmount }}</a-typography-text>
             </a-descriptions-item>
-            
-            
         </a-descriptions>
     </a-card>
 

@@ -2,10 +2,11 @@
 import {ColumnsType} from "ant-design-vue/es/table";
 import {PaginationProps} from "ant-design-vue";
 import {MerchantRequest, getMerchantList, MerchantInfo,delMerchant} from "~/api/merchant/index.ts";
-import {ContactWay, getContactWayText} from "../../utils/constant.ts";
+import {ContactWay, getContactWayText} from "@/utils/constant.ts";
 import { Modal, message } from 'ant-design-vue';
-import { ExclamationCircleOutlined } from '@ant-design/icons-vue';
+import { ExclamationCircleOutlined,FundViewOutlined,ReloadOutlined,FileSearchOutlined } from '@ant-design/icons-vue';
 import { ref, createVNode } from 'vue';
+import { updateParamsToUrl, getParamsFromUrl} from '@/utils/tools'
 
 const router=useRouter()
 
@@ -18,22 +19,18 @@ const columns:ColumnsType =[
     title: '商户名称',
     dataIndex: 'name',
   },
-  {
-    title: '联系人',
-    dataIndex: 'contactName',
-  },
-  {
-    title: '联系方式',
-    dataIndex: 'contactWay',
-  },
-  {
-    title:'联系号码',
-    dataIndex:'contactNumber'
-  },
-  {
-    title: '渠道数量',
-    dataIndex: 'channelCount',
-  },
+  // {
+  //   title: '联系人',
+  //   dataIndex: 'contactName',
+  // },
+  // {
+  //   title: '联系方式',
+  //   dataIndex: 'contactWay',
+  // },
+  // {
+  //   title:'联系号码',
+  //   dataIndex:'contactNumber'
+  // },
   {
     title: '订单数量',
     dataIndex: 'totalOrderCount',
@@ -41,6 +38,14 @@ const columns:ColumnsType =[
   {
     title: '订单金额',
     dataIndex: 'totalOrderAmount',
+  },
+  {
+    title: '冻结金额',
+    dataIndex: 'freezeAmount',
+  },
+  {
+    title: '可用金额',
+    dataIndex: 'amount',
   },
   {
     title: '签名方试',
@@ -69,10 +74,13 @@ const state=reactive<{
   isConfirmLoading:false,
   isShowDelDialog: false
 })
-const searchParams = reactive<MerchantRequest>({
-  page:1,
-  limit:10
-})
+const initSearchParams = ():MerchantRequest => {
+  return {
+    page:1,
+    limit:10
+  }
+}
+const searchParams = ref<MerchantRequest>(initSearchParams())
 const pagination = reactive<PaginationProps>({
   pageSize: 10,
   pageSizeOptions: ['10', '20', '30', '40'],
@@ -84,28 +92,18 @@ const pagination = reactive<PaginationProps>({
   onChange(current, pageSize) {
     pagination.pageSize = pageSize
     pagination.current = current
-    searchParams.page=pagination.current
-    searchParams.limit=pagination.pageSize
-    router.replace({query: searchParams})
+    router.replace({ query: {...searchParams.value, timestamp: new Date().getTime()}})
+    // loadData()
   },
 })
 const dataSource=shallowRef<MerchantInfo[]>([])
 const resetSearch=()=>{
-  Object.assign(searchParams,{
-    keywords:null,
-    page:1,
-    limit:10
-  })
-  router.replace({query: searchParams})
+  searchParams.value = initSearchParams()
+  filterSearch()
 }
 const filterSearch=()=>{
-  // Object.assign(searchParams,{
-  //   page:1,
-  //   limit:10
-  // })
-  // await loadData()
 
-  router.push({query: searchParams})
+  pagination.onChange(1, pagination.pageSize)
 }
 const loadData=async  ()=> {
   if (state.dataSourceLoading)
@@ -113,15 +111,43 @@ const loadData=async  ()=> {
   state.dataSourceLoading = true
   try {
     const { data } = await getMerchantList({
-      ...searchParams,
+      ...searchParams.value,
       page: pagination.current,
       limit: pagination.pageSize,
     })
     dataSource.value = data?.rows ?? []
+    dataSource.value = dataSource.value.map(i => {
+      return {
+        ...i,
+        isItemLoadSpinning: false
+      }
+    })
     pagination.total = data?.total ?? 0
   }
   finally {
     state.dataSourceLoading = false
+  }
+}
+
+
+const handleRefreshAmount = async (record: MerchantInfo) => {
+  let data  = JSON.parse(JSON.stringify(dataSource.value))
+  record.isItemLoadSpinning = true
+  let index = data.findIndex((item:MerchantInfo) => item.id == record.id)
+  data[index].isItemLoadSpinning = true
+  dataSource.value = data
+
+  try {
+    
+  } catch (error) {
+    
+  } finally {
+    setTimeout(() => {
+      data = JSON.parse(JSON.stringify(dataSource.value))
+      data[index].isItemLoadSpinning = false
+      dataSource.value = data
+    }, 1000)
+    
   }
 }
 
@@ -156,9 +182,9 @@ const handleDel = (item: MerchantInfo) => {
 }
 
 onMounted(()=>{
-  Object.assign(searchParams,router.currentRoute.value.query??{page:1,limit:1})
-  pagination.current=searchParams.page
-  pagination.pageSize=searchParams.limit
+  if (getParamsFromUrl()) {
+    searchParams.value = Object.assign(searchParams.value, getParamsFromUrl())
+  }
   loadData()
 })
 </script>
@@ -175,14 +201,19 @@ onMounted(()=>{
       <a-flex vertical :gap="15">
         <a-row :gutter="16">
 
-          <a-col class="gutter-row" :span="4">
-            <a-input v-model:value="searchParams.keywords" allow-clear  placeholder="商户名称/ID" ></a-input>
+          <a-col class="gutter-row" :span="5">
+            <a-input v-model:value="searchParams.keywords" allow-clear  placeholder="按商户名称/ID查询" ></a-input>
           </a-col>
         </a-row>
 
-        <a-flex  :gap="0"  justify="flex-end">
+        <a-flex  :gap="0"  justify="flex-start">
           <a-button type="link" style="padding-left: 0" @click="resetSearch">重置筛选</a-button>
-          <a-button  size="small"   @click="filterSearch"  type="primary"  style="width: 80px;height:28px"  >筛选</a-button>
+          <a-button  size="small"  @click="filterSearch"  type="primary"  style="width: 80px;height:28px" >
+            <template #icon>
+              <FileSearchOutlined />
+            </template>
+            筛选
+          </a-button>
         </a-flex>
       </a-flex>
     </a-card>
@@ -209,7 +240,10 @@ onMounted(()=>{
           </template>
           <template v-if="column.dataIndex==='name'">
             <a-flex vertical :gap="5" align="start">
-              <a-button style="padding-left: 0" type="link" @click="router.push({path:'/mch/info',query:{id:record.id}})">{{record["name"]}}</a-button>
+              <a-tooltip>
+                <template #title>查看商户【{{record.name}}】详情</template>
+                <a-button style="padding-left: 0" type="link" @click="router.push({path:'/mch/info',query:{id:record.id}})">{{record.name}}</a-button>
+              </a-tooltip>
               <a-typography-text type="secondary">商户ID:{{record["id"]}}</a-typography-text>
             </a-flex>
           </template>
@@ -225,14 +259,41 @@ onMounted(()=>{
           <template v-if="column.dataIndex==='isEnable'">
               <a-switch :checked-value="true" :un-checked-value="false" :checked="record['isEnable']"></a-switch>
           </template>
-          <template v-if="column.dataIndex==='channelCount'">
-             {{record.channelCount?? '/' }}
-          </template>
           <template v-if="column.dataIndex==='totalOrderCount'">
-            {{record.totalOrderAmount || '/' }}
+            {{record.totalOrderCount ?? '/' }}
+            <a-tooltip>
+              <template #title>查看当前商户订单信息</template>
+              <FundViewOutlined @click="router.push({path:'/mch/info',query:{id:record.id, tabKey: 'orderInfo'}})" style="color: #1677ff;padding-left: 3px" />
+            </a-tooltip>
           </template>
           <template v-if="column.dataIndex==='totalOrderAmount'">
-            {{record.totalOrderAmount|| '/' }}
+            {{record.totalOrderAmount ?? '/' }}
+            <a-tooltip>
+              <template #title>查看当前商户订单信息</template>
+              <FundViewOutlined @click="router.push({path:'/mch/info',query:{id:record.id, tabKey: 'orderInfo'}})" style="color: #1677ff;padding-left: 3px" />
+            </a-tooltip>
+          </template>
+          <template v-if="column.dataIndex==='freezeAmount'">
+              <a-flex>
+                <a-spin :spinning="(record as MerchantInfo).isItemLoadSpinning">
+                  <a-typography-text strong>￥{{ (record as MerchantInfo).freezeAmount }}</a-typography-text>
+                  <!-- <a-tooltip>
+                    <template #title>刷新冻结金额数据</template>
+                    <ReloadOutlined @click="handleRefreshAmount(record)" style="color: rgb(22, 119, 255); font-weight: bold; padding-left: 5px;" />
+                  </a-tooltip> -->
+                </a-spin>
+              </a-flex>
+          </template>
+          <template v-if="column.dataIndex==='amount'">
+            <a-flex>
+              <a-spin :spinning="record.isItemLoadSpinning">
+                <a-typography-text strong type="danger">￥{{ (record as MerchantInfo).amount }}</a-typography-text>
+                <!-- <a-tooltip>
+                  <template #title>刷新可用金额数据</template>
+                  <ReloadOutlined @click="handleRefreshAmount(record)" style="color: rgb(22, 119, 255); font-weight: bold; padding-left: 5px;" />
+                </a-tooltip> -->
+              </a-spin>
+            </a-flex>
           </template>
           <template v-if="column.dataIndex==='action'">
             <a-flex :gap="5">

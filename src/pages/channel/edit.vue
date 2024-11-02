@@ -17,7 +17,7 @@ import {
 } from "~/utils/constant.ts";
 import type { Rule } from 'ant-design-vue/es/form';
 
-import { fetchChannelGroups,ChannelGroupSimpleResponse } from '@/api/channel/group'
+import { getChannelGroups,ChannelGroupSimpleResponse } from '@/api/channel/group'
 
 const simpleImage = Empty.PRESENTED_IMAGE_SIMPLE;
 const alipayUserChannelStepsItems = [
@@ -204,7 +204,7 @@ const getChannelOauthCode = async () => {
   }
 }
 const loadGroups = async () => {
-  const { data } = await fetchChannelGroups()
+  const { data } = await getChannelGroups()
   groups.value = data ?? []
 }
 

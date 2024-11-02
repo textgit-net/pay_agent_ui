@@ -10,6 +10,7 @@ const { toClipboard } = useClipboard();
 
 export interface PropsType {
   copytext: string;
+  tipText: string;
   isShowText: boolean;
   text: string;
   iconStyle: Partial<StyleValue>;
@@ -19,6 +20,7 @@ export interface PropsType {
 
 const props = withDefaults(defineProps<Partial<PropsType>>(), {
   copytext: '',
+  tipText: '复制',
   text: "复制",
   isShowText: false,
   iconStyle: () => ({
@@ -39,7 +41,7 @@ const handleCopyText = async () => {
 <template>
     <a-space @click="handleCopyText">
         <a-tooltip>
-          <template #title>复制</template>
+          <template #title>{{  props.tipText }}</template>
           <CopyFilled :style="props.iconStyle" class="icon" />
           <a v-if="props.isShowText" :style="props.textStyle">{{ props.text }}</a>
         </a-tooltip>

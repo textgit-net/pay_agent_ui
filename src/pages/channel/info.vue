@@ -2,6 +2,7 @@
 import BasicInfo from "~/pages/channel/basicInfo.vue";
 import DebtAccountInfo from "~/pages/channel/debtAccountInfo.vue";
 import orderInfo from "~/pages/channel/orderInfo.vue";
+
 const router=useRouter()
 const route= useRoute()
 const state=reactive({
@@ -17,8 +18,7 @@ if (tabKey) {
 
 const onTabClick=(key: string)=>{
   route.query['tabKey']=key
-  console.log('route.query', route.query, route.path, router)
-  router.replace({ path: route.path,query: route.query,replace:true})
+  router.replace({ query: {...route.query, timestamp: new Date().getTime()},replace:true})
 }
 
 </script>
@@ -40,7 +40,7 @@ const onTabClick=(key: string)=>{
         </template>
         <a-flex justify="space-between" class="not_page_tabs">
           <a-tabs  v-model:activeKey="state.activeTabKey" @tabClick="onTabClick">
-            <a-tab-pane key="basicInfo"  tab="渠道信息"/>
+            <a-tab-pane key="basicInfo" tab="渠道信息"/>
             <a-tab-pane key="channelAccountInfo" tab="渠道分账信息"/>
             <a-tab-pane key="orderInfo" tab="渠道订单信息"/>
           </a-tabs>
@@ -50,10 +50,10 @@ const onTabClick=(key: string)=>{
     </a-card>
     <basic-info v-if="state.activeTabKey=='basicInfo'"/>
   
-    <debt-account-info v-show="state.activeTabKey=='channelAccountInfo'">
+    <debt-account-info v-if="state.activeTabKey=='channelAccountInfo'">
     </debt-account-info>
 
-    <order-info v-show="state.activeTabKey=='orderInfo'"></order-info>
+    <order-info v-if="state.activeTabKey=='orderInfo'"></order-info>
   </a-flex>
 
 </template>
