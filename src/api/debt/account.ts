@@ -34,7 +34,7 @@ export function modifyDebtAccount(data: DebtAccountInfo):Promise<ResponseBody<an
  * @returns {ResponseBody<PageWarp<DebtAccountInfo[]>>}
  */
 export function getDebtAccountList(params: DebtAccountRequset):Promise<ResponseBody<PageWarp<DebtAccountInfo>>>{
-    return useGet<PageWarp<DebtAccountInfo>>('/royalty/search', params)
+    return useGet<PageWarp<DebtAccountInfo>>('/royalty/account/search', params)
 }
 
 /**

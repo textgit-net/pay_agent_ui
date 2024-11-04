@@ -92,6 +92,8 @@ const pagination = reactive<PaginationProps>({
   onChange(current, pageSize) {
     pagination.pageSize = pageSize
     pagination.current = current
+    searchParams.value.page = current
+    searchParams.value.limit = pageSize
     router.replace({ query: {...searchParams.value, timestamp: new Date().getTime()}})
     // loadData()
   },
@@ -184,6 +186,10 @@ const handleDel = (item: MerchantInfo) => {
 onMounted(()=>{
   if (getParamsFromUrl()) {
     searchParams.value = Object.assign(searchParams.value, getParamsFromUrl())
+  }
+  if (searchParams.value.page) {
+    pagination.current = searchParams.value.page
+    pagination.pageSize = searchParams.value.limit
   }
   loadData()
 })

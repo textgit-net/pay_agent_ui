@@ -12,6 +12,7 @@ import { getAllMerchantList, MerchantOptItem } from '@/api/merchant'
 import { getALLChannelList,ChannelListResponse, ALLChannelListRequest, } from "~/api/channel/ChannelInterface.ts";
 import { calcFloat } from '~/utils/calcFloat'
 import { DateSearchTypeEnum} from '@/components/date-search-wrap/type'
+import { updateParamsToUrl, getParamsFromUrl} from '@/utils/tools'
 
 
 const router=useRouter()
@@ -67,6 +68,9 @@ const pagination = reactive<PaginationProps>({
   onChange(current, pageSize) {
     pagination.pageSize = pageSize
     pagination.current = current
+    searchParams.value.page = current
+    searchParams.value.limit = pageSize
+    // router.replace({ query: {...searchParams.value, timestamp: new Date().getTime()}})
     loadData()
   },
 })
@@ -75,12 +79,10 @@ const inntSearchParams = ():AllOrderReportSearch => {
   return {
     page:1,
     limit:10,
+    dateType: DateSearchTypeEnum.customRangeDate
   } as AllOrderReportSearch
 }
-const searchParams = ref<AllOrderReportSearch>({
-  page:1,
-  limit:10
-})
+const searchParams = ref<AllOrderReportSearch>(inntSearchParams())
 const dataSource=shallowRef<any>([])
 const resetSearch=async ()=>{
   searchParams.value = inntSearchParams()
@@ -111,10 +113,15 @@ const loadData=async  ()=> {
   }
 }
 
-const dateChange = (dateRange: DateRange) => {
-
-  console.log('searchParams.value ', searchParams.value )
-  searchParams.value.dateRange = dateRange
+const dateChange = (dateRange: DateRange, dateType: DateSearchTypeEnum) => {
+  searchParams.value.dateType = dateType
+  if (dateRange) {
+    searchParams.value.startDate = dateRange.startDate
+    searchParams.value.endDate = dateRange.endDate
+  } else {
+    searchParams.value.startDate = null
+    searchParams.value.endDate = null
+  }
   pagination.onChange(1, pagination.pageSize)
   // loadData()
 }
@@ -159,6 +166,13 @@ const calcSuccessRate = (successCount: number ,totalCount: number): number => {
 }
 
 onMounted(()=>{
+  if (getParamsFromUrl()) {
+    searchParams.value = Object.assign(searchParams.value, getParamsFromUrl())
+  }
+  if (searchParams.value.page) {
+    pagination.current = searchParams.value.page
+    pagination.pageSize = searchParams.value.limit
+  }
   Promise.all([
     fetchALLChannelList(),
     fetchAllMerchantList(),
@@ -205,7 +219,7 @@ onMounted(()=>{
             <date-search-wrap
               ref="DateSearchWrapRef" 
               :is-can-clear="false"
-              :default-date-type="DateSearchTypeEnum.customRangeDate"
+              :default-date-type="DateSearchTypeEnum.today"
               :immediatelyDateChange="true"
               :range-date-max-days="100"
               @date-change="dateChange" 

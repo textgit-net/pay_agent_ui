@@ -62,6 +62,7 @@ function responseHandler(response: any): ResponseBody<any> | AxiosResponse<any> 
 }
 
 function errorHandler(error: AxiosError): Promise<any> {
+  console.log('error',  error)
   const token = useAuthorization()
   const notification = useNotification()
   const { data, status, statusText } = error.response as AxiosResponse<ResponseBody>

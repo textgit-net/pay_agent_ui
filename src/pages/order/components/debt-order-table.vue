@@ -1,9 +1,11 @@
+
+
 <script setup lang="ts">
 import {ColumnsType} from "ant-design-vue/es/table";
 import {AccessEnum, getPayChannelTypeText, getPayModeTypeText, PayChannelType, PayModeType} from "~/utils/constant.ts";
 import CopyTextBtn from '~/components/copy-text-btn/index.vue'
 import { updateParamsToUrl, getParamsFromUrl, flatten, unflatten} from '@/utils/tools'
-import { DateSearchTypeEnum} from '@/components/date-search-wrap/type'
+import { getDebtModeEnumText, getDebtStrategyEnumText } from '@/api/channel/debt'
 import { toRaw} from 'vue'
 
 import {
@@ -15,7 +17,8 @@ import {
   LoadingOutlined,
   AlipaySquareFilled,
 } from '@ant-design/icons-vue';
-import {getOrderStatusText, OrderSearch, OrderStatus, OrderTableType, searchOrder, OrderNotifyStatusEnum, getOrderNotifyStatusEnumText} from "~/api/order/OrderInterface.ts";
+import {getOrderStatusText, OrderSearch, searchOrder, OrderNotifyStatusEnum, getOrderNotifyStatusEnumText} from "~/api/order/OrderInterface.ts";
+import { DebtOrderStatusEnum, getDebtOrderStatusEnumText,DebtOrderTableTypeEnum, BaseDebtAccountOrderSearch, DebtOrderInfo,getDebtAccountOrderList } from '@/api/debt/order'
 import {PaginationProps, Modal} from "ant-design-vue";
 
 const router = useRouter()
@@ -24,125 +27,117 @@ const router = useRouter()
 const columns =shallowRef<any[]>(
     [
       {
-        title: '订单编号',
+        title: '批次号',
         dataIndex: 'id',
         align:'left',
         fixed: 'left',
         width: '160px',
-        tableTypes:[OrderTableType.ALL]
+        tableTypes:[DebtOrderTableTypeEnum.ALL]
       },
       {
-        title: '商家订单号',
-        dataIndex: 'mchOrderNo',
+        title: '订单编号',
+        dataIndex: 'orderId',
         align:'left',
         fixed: 'left',
         width: '160px',
-        tableTypes:[OrderTableType.ALL]
+        tableTypes:[DebtOrderTableTypeEnum.ALL]
       },
-      {
-        title: '渠道订单号',
-        align:'center',
-        width: '160px',
-        dataIndex: 'channelOrderNo',
-        tableTypes:[OrderTableType.ALL,OrderTableType.PAY_ING,OrderTableType.SUCCESS,OrderTableType.FAIL],
-      },
-
+   
       {
         title: '渠道信息',
         dataIndex: 'channelInfo',
         width: '140px',
-        tableTypes:[OrderTableType.ALL],
+        tableTypes:[DebtOrderTableTypeEnum.ALL],
       },
-      {
-        title: '商户信息',
-        dataIndex: 'mchInfo',
-        width: '140px',
-        tableTypes:[OrderTableType.ALL],
-      },
-      {
-        title: '商户手续费',
-        width: '120px',
-        dataIndex: 'mchFeeAmount',
-        tableTypes:[OrderTableType.PAY_ING,OrderTableType.SUCCESS,OrderTableType.FAIL],
-      },
-
-      // {
-      //   title: '商品标题',
-      //   align:'center',
-      //   dataIndex: 'subject',
-      //   tableTypes:[OrderTableType.ALL]
-      // },
-
-     
+  
 
       {
         title: '订单金额',
-        width: '120px',
-        dataIndex: 'amount',
-        tableTypes:[OrderTableType.ALL]
+
+        dataIndex: 'orderAmount',
+        tableTypes:[DebtOrderTableTypeEnum.ALL]
       },
-      // {
-      //   title: '币种',
-      //   align:'center',
-      //   width: '60px',
-      //   dataIndex: 'currency',
-      //   tableTypes:[OrderTableType.ALL]
-      // },
+      {
+        title: '分账小计',
+
+        dataIndex: 'amount',
+        tableTypes:[DebtOrderTableTypeEnum.ALL]
+      },
+
+      {
+        title: '分账金额',
+
+        dataIndex: 'successAmount',
+        tableTypes:[DebtOrderTableTypeEnum.ALL]
+      },
+      {
+        title: '分账笔数',
+
+        dataIndex: 'splitCount',
+        tableTypes:[DebtOrderTableTypeEnum.ALL]
+      },
+      {
+        title: '分账比率',
+
+        dataIndex: 'royaltyRate',
+        tableTypes:[DebtOrderTableTypeEnum.ALL]
+      },
       
+      {
+        title: '分账模式',
+
+        dataIndex: 'royaltyMode',
+        tableTypes:[DebtOrderTableTypeEnum.ALL]
+      },
+      {
+        title: '分账策略',
+
+        dataIndex: 'royaltyStrategy',
+        tableTypes:[DebtOrderTableTypeEnum.ALL]
+      },
+     
+     
 
       {
         title: '订单状态',
-        width: '130px',
-        dataIndex: 'orderStatus',
-        tableTypes:[OrderTableType.ALL]
+        dataIndex: 'status',
+        tableTypes:[DebtOrderTableTypeEnum.ALL]
       },
       {
-        title: '支付方式',
-        width: '120px',
-        dataIndex: 'payMode',
-        tableTypes:[OrderTableType.ALL,OrderTableType.PAY_ING,OrderTableType.SUCCESS,OrderTableType.FAIL],
-      },
-      {
-        title: '回调状态',
-        width: '130px',
-        align:'left',
-        dataIndex: 'notifyStatus',
-        tableTypes:[OrderTableType.ALL]
+        title: '完成时间',
+        dataIndex: 'finishTime',
+        tableTypes:[DebtOrderTableTypeEnum.ALL],
       },
      
       {
         title: '创建时间',
-        dataIndex: 'createdTime',
-        tableTypes:[OrderTableType.ALL]
+        dataIndex: 'createTime',
+        tableTypes:[DebtOrderTableTypeEnum.ALL]
       },
-      {
-        title: '完成时间',
-        dataIndex: 'successTime',
-        tableTypes:[OrderTableType.ALL,OrderTableType.PAY_ING,OrderTableType.SUCCESS],
-      },
+      
       // {
       //   title: '操作',
       //   align:'center',
       //   dataIndex: 'action',
-      //   tableTypes:[OrderTableType.ALL]
+      //   tableTypes:[DebtOrderTableTypeEnum.ALL]
       // }
     ]
 )
-const initSearchParams = ():OrderSearch => {
+const initSearchParams = ():BaseDebtAccountOrderSearch => {
   return {
     page: 1,
     limit:10,
   }
 }
-const searchParams=ref<OrderSearch>(initSearchParams())
+const searchParams=ref<BaseDebtAccountOrderSearch>(initSearchParams())
 const props=defineProps<{
-  tableType: number   | OrderTableType,
-  searchParams?: null| OrderSearch,
+  tableType: number   | DebtOrderTableTypeEnum,
+  searchParams?: null| BaseDebtAccountOrderSearch,
 }>()
 const state=reactive({
   dataSourceLoading:false
 })
-const dataSource=shallowRef<any[]>([])
+const dataSource=shallowRef<DebtOrderInfo[]>([])
 const pagination = reactive<PaginationProps>({
   pageSize: 10,
   pageSizeOptions: ['10', '20', '30', '40'],
@@ -162,18 +157,18 @@ const pagination = reactive<PaginationProps>({
     // loadData()
   },
 })
-const getOrderStatus=():OrderStatus[]=>{
+const getOrderStatus=():DebtOrderStatusEnum=>{
   switch (props.tableType){
-    case OrderTableType.ALL:
-      return []
-    case OrderTableType.WAIT_PAY:
-      return [OrderStatus.WAIT_PAY]
-    case OrderTableType.PAY_ING:
-      return [OrderStatus.PAY_ING]
-    case OrderTableType.SUCCESS:
-      return [OrderStatus.SUCCESS]
-    case OrderTableType.FAIL:
-      return [OrderStatus.FAIL,OrderStatus.CANCEL,OrderStatus.CLOSE]
+    case DebtOrderTableTypeEnum.ALL:
+      return null
+    case DebtOrderTableTypeEnum.WAIT_ING:
+      return DebtOrderStatusEnum.WAIT_ING
+    case DebtOrderTableTypeEnum.PROCESS:
+      return DebtOrderStatusEnum.PROCESS
+    case DebtOrderTableTypeEnum.SUCCESS:
+      return DebtOrderStatusEnum.SUCCESS
+    case DebtOrderTableTypeEnum.FAIL:
+      return DebtOrderStatusEnum.FAIL
   }
 }
 const loadData=async  ()=> {
@@ -181,9 +176,9 @@ const loadData=async  ()=> {
   state.dataSourceLoading = true
   console.log('searchParams.value 2', searchParams.value )
   try {
-    const { data } = await searchOrder({
+    const { data } = await getDebtAccountOrderList({
       ...searchParams.value,
-      orderStatus:getOrderStatus(),
+      status:getOrderStatus(),
       page: pagination.current,
       limit: pagination.pageSize,
     })
@@ -206,12 +201,12 @@ const viewOrderStatusErrorInfo = (record: any) => {
   });
 }
 
-const resetSearch = (search:OrderSearch) => {
+const resetSearch = (search:BaseDebtAccountOrderSearch) => {
   searchParams.value = initSearchParams()
   refresh(search)
 }
 
-const refresh=async(search:OrderSearch)=>{
+const refresh=async(search:BaseDebtAccountOrderSearch)=>{
   Object.assign(searchParams.value, search)
   pagination.onChange(1, pagination.pageSize)
    
@@ -237,58 +232,56 @@ onMounted(()=>{
 
 <template>
   <div style="width: 100%;">
-    <a-table style="width: 100%" :scroll="{ x: 1300 }"  :data-source="dataSource" :pagination="pagination" :loading="state.dataSourceLoading"  :columns="columns.filter(v=>v.tableTypes.includes(OrderTableType.ALL)||v.tableTypes.includes(tableType))" size="middle" :bordered="false">
+    <a-table style="width: 100%" :scroll="{ x: 1300 }"  :data-source="dataSource" :pagination="pagination" :loading="state.dataSourceLoading"  :columns="columns.filter(v=>v.tableTypes.includes(DebtOrderTableTypeEnum.ALL)||v.tableTypes.includes(tableType))" size="middle" :bordered="false">
       <template #emptyText>
         <a-empty></a-empty>
       </template>
       <template #bodyCell="{ column , record}">
         <template v-if="column.dataIndex==='id'">
           <a-flex justify="space-start" align="center" :gap="5" >
-            <a-typography-text > {{ record.id }}</a-typography-text>
-            <copy-text-btn :copytext="record.id" tipText="复制订单编号"></copy-text-btn>
+            <a-tooltip>
+              <template #title>查看账单批号【{{record['id']}}】详情</template>
+              <a-typography-link  @click="router.push({path:'/order/royalty-detail',query:{id:record['id']}})"> {{ record.id }}</a-typography-link>
+            </a-tooltip>
+            <copy-text-btn :copytext="record.id" tipText="复制批次号"></copy-text-btn>
           </a-flex>
         </template>
-        <template v-if="column.dataIndex==='mchOrderNo'">
+        <template v-if="column.dataIndex==='orderId'">
           <a-flex justify="space-start" align="center" :gap="5" >
-            <a-typography-text > {{ record.mchOrderNo }}</a-typography-text>
-            <copy-text-btn :copytext="record.mchOrderNo" tipText="复制商家订单号"></copy-text-btn>
+
+            <a-tooltip>
+                <template #title>查看订单号【{{record['orderId']}}】详情</template>
+                <a-typography-link  @click="router.push({path:'',query:{id:record['orderId']}})"> {{ record.orderId }}</a-typography-link>
+            </a-tooltip>
+            <copy-text-btn :copytext="record.orderId" tipText="复制订单号"></copy-text-btn>
           </a-flex>
         </template>
 
-        <template v-if="column.dataIndex==='channelOrderNo'">
-            <a-typography-text v-if="!record.channelOrderNo">/</a-typography-text>
-
-            <a-flex v-else justify="space-start" align="center" :gap="5" >
-              <a-typography-text > {{ record.channelOrderNo }}</a-typography-text>
-              <copy-text-btn :copytext="record.channelOrderNo" tipText="复制渠道订单号"></copy-text-btn>
-            </a-flex>
-        </template>
-        <template v-if="column.dataIndex==='orderStatus'">
-            <a-tag v-if="record['orderStatus']===OrderStatus.WAIT_PAY" :bordered="false" color="processing" >
+       
+        <template v-if="column.dataIndex==='status'">
+            <a-tag v-if="record['status']===DebtOrderStatusEnum.WAIT_ING" :bordered="false" color="processing" >
               <template #icon>
                 <clock-circle-outlined />
               </template>
-              {{getOrderStatusText(record['orderStatus'] as OrderStatus)}}
+              {{getDebtOrderStatusEnumText(record['status'] as DebtOrderStatusEnum)}}
             </a-tag>
-            <a-tag v-if="record['orderStatus']===OrderStatus.PAY_ING" :bordered="false" color="warning" > 
+            <a-tag v-if="record['status']===DebtOrderStatusEnum.PROCESS" :bordered="false" color="warning" > 
               <template #icon>
                 <sync-outlined :spin="true" />
               </template>
-              {{getOrderStatusText(record['orderStatus'] as OrderStatus)}}
+              {{getDebtOrderStatusEnumText(record['status'] as DebtOrderStatusEnum)}}
             </a-tag>
-            <a-tag v-if="record['orderStatus']===OrderStatus.SUCCESS" :bordered="false" color="success" >
+            <a-tag v-if="record['status']===DebtOrderStatusEnum.SUCCESS" :bordered="false" color="success" >
               <template #icon>
                 <check-circle-outlined />
-              </template>{{getOrderStatusText(record['orderStatus'] as OrderStatus)}}
+              </template>{{getDebtOrderStatusEnumText(record['status'] as DebtOrderStatusEnum)}}
             </a-tag>
-            <a-tag v-if="record['orderStatus']===OrderStatus.FAIL" :bordered="false" color="error" >
+            <a-tag v-if="record['status']===DebtOrderStatusEnum.FAIL" :bordered="false" color="error" >
               <template #icon>
                 <close-circle-outlined />
-              </template>{{getOrderStatusText(record['orderStatus'] as OrderStatus)}}
+              </template>{{getDebtOrderStatusEnumText(record['status'] as DebtOrderStatusEnum)}}
             </a-tag>
-            <a-tag v-if="record['orderStatus']===OrderStatus.CANCEL":bordered="false" color="error" > {{getOrderStatusText(record['orderStatus'] as OrderStatus)}}</a-tag>
-            <a-tag v-if="record['orderStatus']===OrderStatus.CLOSE" :bordered="false" color="error" > {{getOrderStatusText(record['orderStatus'] as OrderStatus)}}</a-tag>
-            <a-tooltip v-if="record['orderStatus']== OrderStatus.FAIL">
+            <a-tooltip v-if="record['status']== DebtOrderStatusEnum.FAIL">
               
               <template #title>点击查看订单状态错误信息</template>
               <QuestionCircleFilled @click="viewOrderStatusErrorInfo(record)" style="color: #ff4d4f;" />
@@ -341,46 +334,65 @@ onMounted(()=>{
           
         </template>
 
+        <template v-if="column.dataIndex==='orderAmount'">
+          ￥{{(parseFloat(record['orderAmount']))}}
+        </template>
         <template v-if="column.dataIndex==='amount'">
           ￥{{(parseFloat(record['amount']))}}
         </template>
+        <template v-if="column.dataIndex==='successAmount'">
+            <a-flex :gap="5" align="center" justify="start">
+                <a-tooltip>
+                    <template #title>成功金额</template>
+                    <a-typography-text type="success" strong> ￥{{ record.successAmount }}</a-typography-text>
+                </a-tooltip> / 
+                <a-tooltip>
+                    <template #title>总分账金额</template>
+                    <a-typography-text type="danger" strong>  ￥{{ record.totalRoyaltyAmount }}</a-typography-text>
+                </a-tooltip>
+                
+                <!-- <a-tooltip>
+                    <template #title>查看当前渠道订单信息</template>
+                    <FundViewOutlined @click="router.push({path:'/channel/info',query:{id:record.id, tabKey: 'orderInfo'}})" style="color: #1677ff;padding-left: 3px" />
+                </a-tooltip> -->
+            </a-flex>
+        </template>
+
         <template v-if="column.dataIndex==='payMode'">
           <a-typography-text v-if="record['payMode']">{{getPayModeTypeText(record['payMode'])}}</a-typography-text>
           <a-typography-text v-else>/</a-typography-text>
         </template>
-        <template v-if="column.dataIndex==='successTime'">
-          {{record['successTime']?? '/' }}
+        <template v-if="column.dataIndex==='finishTime'">
+          {{record['finishTime']?? '/' }}
         </template>
-        <template v-if="column.dataIndex==='mchFeeAmount'">
-          {{record['mchFeeAmount']?? '/' }}
+        <template v-if="column.dataIndex==='royaltyRate'">
+          {{record['royaltyRate']}}%
         </template>
-
-        <template v-if="column.dataIndex==='mchInfo'">
-          <a-flex v-if="record['mchInfo']" vertical :gap="5" align="start">
-            <a-button style="padding-left: 0" type="link" @click="router.push({path:'/mch/info',query:{id:record['mchInfo'].id}})">{{record["mchInfo"].name}}</a-button>
-            <a-typography-text type="secondary">商户ID:{{record["mchInfo"].id}}</a-typography-text>
-          </a-flex>
-          <a-typography-text v-else>/</a-typography-text>
+        <template v-if="column.dataIndex==='royaltyMode'">
+            <a-typography-text>{{ getDebtModeEnumText(record.royaltyMode) }}</a-typography-text>
+        </template>
+        <template v-if="column.dataIndex==='royaltyStrategy'">
+            <a-typography-text>{{ getDebtStrategyEnumText(record.royaltyStrategy) }}</a-typography-text>
         </template>
        
         <template v-if="column.dataIndex==='channelInfo'">
 
 
-          <a-flex v-if="record['channelInfo']" vertical :gap="5" align="start">
+          <a-flex v-if="record['channelId']" vertical :gap="5" align="start">
               <a-flex justify="start" align="center" :gap="5" >
                 <a-tooltip>
                   
-                  <template #title>查看渠道【{{record['channelInfo'].name}}】详情</template>
+                  <template #title>查看渠道【{{record['chanelName']}}】详情</template>
                 
                   <a-space>
                     <a-flex justify="center" align="center">
-                      <AlipaySquareFilled  style="font-size: 18px;color: dodgerblue"/>
-                      <a-typography-link  @click="router.push({path:'/channel/info',query:{id:record['channelInfo'].id}})" style="padding-left: 3px;">{{record['channelInfo'].name}}</a-typography-link>
+                      <AlipaySquareFilled @click="router.push({path:'/channel/info',query:{id:record['channelId']}})" style="font-size: 18px;color: dodgerblue"/>
+                      <a-typography-link  @click="router.push({path:'/channel/info',query:{id:record['channelId']}})" style="padding-left: 3px;">{{record['chanelName']}}</a-typography-link>
                     </a-flex>
                   </a-space>
                 </a-tooltip>
               </a-flex>
-              <a-typography-text type="secondary">渠道ID:{{record['channelInfo'].id}}</a-typography-text>
+              <a-typography-text type="secondary">渠道ID:{{record['channelId']}}</a-typography-text>
             </a-flex>
           
           <a-typography-text v-else>/</a-typography-text>

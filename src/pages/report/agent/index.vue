@@ -108,7 +108,13 @@ const loadData=async  ()=> {
 }
 
 const dateChange = (dateRange: DateRange) => {
-  searchParams.value.dateRange = dateRange
+  if (dateRange) {
+    searchParams.value.startDate = dateRange.startDate
+    searchParams.value.endDate = dateRange.endDate
+  } else {
+    searchParams.value.startDate = null
+    searchParams.value.endDate = null
+  }
   handleSearch()
 }
 
@@ -189,7 +195,7 @@ onMounted(()=>{
             </a-select>
           </a-col>
           <a-col class="gutter-row" :span="24">
-            <date-search-wrap :is-can-clear="false" :default-date-type="DateSearchTypeEnum.last7days" :immediatelyDateChange="true" @date-change="dateChange" ref="DateSearchWrapRef" />
+            <date-search-wrap :is-can-clear="false" :default-date-type="DateSearchTypeEnum.today" :immediatelyDateChange="true" @date-change="dateChange" ref="DateSearchWrapRef" />
           </a-col>
         </a-row>
 

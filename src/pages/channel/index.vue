@@ -93,6 +93,8 @@ const pagination = reactive<PaginationProps>({
   onChange(current, pageSize) {
     pagination.pageSize = pageSize
     pagination.current = current
+    searchParams.value.page = current
+    searchParams.value.limit = pageSize
     router.replace({ query: {...JSON.parse(JSON.stringify(searchParams.value)), timestamp: new Date().getTime()}})
     // loadData()
   },
@@ -206,6 +208,10 @@ onMounted(()=>{
   if (getParamsFromUrl()) {
     searchParams.value = Object.assign(searchParams.value, getParamsFromUrl())
   }
+  if (searchParams.value.page) {
+    pagination.current = searchParams.value.page
+    pagination.pageSize = searchParams.value.limit
+  }
   loadData()
 
   fetchChanelGroups()
@@ -308,11 +314,11 @@ onMounted(()=>{
               <a-flex :gap="5" align="center" justify="start">
                 <a-tooltip>
                   <template #title>成功金额</template>
-                  <a-typography-text type="success" strong>  {{ record.successAmount }}</a-typography-text>
+                  <a-typography-text type="success" strong>   ￥{{ record.successAmount }}</a-typography-text>
                 </a-tooltip> / 
                 <a-tooltip>
                   <template #title>总金额</template>
-                  <a-typography-text type="danger" strong> {{ record.totalAmount }}</a-typography-text>
+                  <a-typography-text type="danger" strong>  ￥{{ record.totalAmount }}</a-typography-text>
                 </a-tooltip>
                 
                 <a-tooltip>
@@ -380,7 +386,7 @@ onMounted(()=>{
             <template v-if="column.dataIndex==='channelFreezeAmount'">
               <a-flex>
                 <a-spin :spinning="(record as ChannelListResponse).isItemLoadSpinning">
-                  <a-typography-text>{{ (record as ChannelListResponse).channelFreezeAmount }}</a-typography-text>
+                  <a-typography-text> ￥{{ (record as ChannelListResponse).channelFreezeAmount }}</a-typography-text>
                   <a-tooltip>
                     <template #title>刷新冻结金额数据</template>
                     <ReloadOutlined @click="handleRefreshAmount(record)" style="color: rgb(22, 119, 255); font-weight: bold; padding-left: 5px;" />
@@ -391,7 +397,7 @@ onMounted(()=>{
             <template v-if="column.dataIndex==='channelAmount'">
               <a-flex>
                 <a-spin :spinning="record.isItemLoadSpinning">
-                  <a-typography-text>{{ (record as ChannelListResponse).channelAmount }}</a-typography-text>
+                  <a-typography-text> ￥{{ (record as ChannelListResponse).channelAmount }}</a-typography-text>
                   <a-tooltip>
                     <template #title>刷新可用金额数据</template>
                     <ReloadOutlined @click="handleRefreshAmount(record)" style="color: rgb(22, 119, 255); font-weight: bold; padding-left: 5px;" />

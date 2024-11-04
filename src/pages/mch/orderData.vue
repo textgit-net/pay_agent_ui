@@ -8,7 +8,8 @@ import { getChannelInfo, ChannelInfo, } from '~/api/channel/ChannelInterface'
 import OrderTablePanel from "~/pages/order/components/order-table-panel.vue";
 import {FileSearchOutlined } from "@ant-design/icons-vue"
 import { getALLChannelList,ChannelListResponse, ALLChannelListRequest, } from "~/api/channel/ChannelInterface.ts";
-import { init } from "~@/utils/page-bubble";
+import { DateSearchTypeEnum} from '@/components/date-search-wrap/type'
+import { getParamsFromUrl} from '@/utils/tools'
 const DateSearchWrapRef = ref()
 
 const router=useRouter()
@@ -24,7 +25,8 @@ const inntSearchParams = ():OrderSearch => {
     return {
         page:1,
         limit:10,
-        mchId: `${id}`
+        mchId: `${id}`,
+        dateType:null
     } as OrderSearch
 }
 
@@ -54,8 +56,15 @@ const filterOption = (input: string, option: any) => {
   return option.label.toLowerCase().indexOf(input.toLowerCase()) >= 0;
 };
 
-const dateChange = (dateRange: DateRange) => {
-  searchParams.value.dateRange = dateRange
+const dateChange = (dateRange: DateRange, dateType: DateSearchTypeEnum) => {
+  searchParams.value.dateType = dateType
+  if (dateRange) {
+    searchParams.value.startDate = dateRange.startDate
+    searchParams.value.endDate = dateRange.endDate
+  } else {
+    searchParams.value.startDate = null
+    searchParams.value.endDate = null
+  }
   tableRef.value.refresh(searchParams.value)
 }
 
@@ -65,8 +74,20 @@ watch(() => searchParams.value.orderStatus, () => {
   tableRef.value.refresh(searchParams.value)
 })
 
-onMounted(()=>{
-    fetchALLChannelList()
+let defaultDateRange = ref<DateRange>(null)
+
+onBeforeMount(()=>{
+  if (getParamsFromUrl()) {
+    searchParams.value = Object.assign(searchParams.value, getParamsFromUrl())
+  }
+
+  if (searchParams.value.startDate) {
+    defaultDateRange.value = {
+      startDate: searchParams.value.startDate,
+      endDate: searchParams.value.endDate
+    } 
+  }
+  fetchALLChannelList()
 })
 </script>
 
@@ -101,7 +122,7 @@ onMounted(()=>{
           </a-col>
 
           <a-col class="gutter-row" :span="24">
-            <date-search-wrap @date-change="dateChange" ref="DateSearchWrapRef" />
+            <date-search-wrap @date-change="dateChange" :default-range-date="defaultDateRange" :default-date-type="searchParams.dateType" ref="DateSearchWrapRef" />
           </a-col>
           
         </a-row>

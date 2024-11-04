@@ -7,10 +7,12 @@ import {
     SelectOption,
     SignType
 } from "~/utils/constant.ts";
+import { DateSearchTypeEnum } from '@/components/date-search-wrap/type'
 export interface BaseOrderReportSearch extends BasePageRequest{
     startDate?:string
     endDate?:string
-
+    // 为了回显
+    dateType?: DateSearchTypeEnum
 }
 
 export interface OrderReportSearch extends BaseOrderReportSearch{
@@ -143,7 +145,7 @@ export const  OrderStatusSelectOptions:SelectOption<OrderStatus>[]=[
 ]
 
 
-export interface OrderSearch extends BasePageRequest{
+export interface OrderSearch extends BaseOrderReportSearch{
     // 渠道ID
     channelId?: string;
     // 商户订单号
@@ -156,7 +158,6 @@ export interface OrderSearch extends BasePageRequest{
     agentId?: string;
     orderStatus?:OrderStatus[]
     orderNo?:string
-    dateRange?:DateRange
     //支付方式
     payModes?:PayModeType[]
     channelTypes?:PayChannelType[]
@@ -166,7 +167,7 @@ export interface OrderSearch extends BasePageRequest{
 
 
 export function searchOrder(search:OrderSearch)   {
-    return usePost<PageWarp<any>>("/order/page",search)
+    return useGet<PageWarp<any>>("/order/page",search)
 }
 
 /**

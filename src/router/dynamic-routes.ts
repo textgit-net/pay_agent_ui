@@ -218,9 +218,19 @@ export default [
       {
         path: '/order/royalty',
         name: 'OrderRoyalty',
-        component: () => import('~/pages/order/index.vue'),
+        component: () => import('~/pages/order/debt/order.vue'),
         meta: {
           title: '分账单',
+          hideChildrenInMenu: true
+        }
+      },
+      {
+        path: '/order/royalty-detail',
+        name: 'OrderRoyaltyDetail',
+        component: () => import('~/pages/order/debt/info.vue'),
+        meta: {
+          title: '分账单详细',
+          hideInMenu: true,
           hideChildrenInMenu: true
         }
       }

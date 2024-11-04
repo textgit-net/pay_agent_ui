@@ -1,14 +1,12 @@
 <script setup lang="ts">
-import {ColumnsType} from "ant-design-vue/es/table";
-import {PaginationProps} from "ant-design-vue";
-import { DateRange, PayChannelTypeSelectOption, PayModeTypeSelectOption, } from '@/utils/constant'
+import { DateRange,PayChannelTypeSelectOption} from '@/utils/constant'
 import { DateSearchTypeEnum} from '@/components/date-search-wrap/type'
-import {OrderSearch, searchOrder,OrderTableType} from "~/api/order/OrderInterface.ts";
-import OrderTablePanel from "~/pages/order/components/order-table-panel.vue";
+import DebtOrderTable from "~/pages/order/components/debt-order-table.vue";
 import DateSearchWrap from '@/components/date-search-wrap/index.vue'
 import { getALLChannelList,ChannelListResponse, ALLChannelListRequest, } from "~/api/channel/ChannelInterface.ts";
 import {FileSearchOutlined } from '@ant-design/icons-vue';
-import { updateParamsToUrl, getParamsFromUrl, flatten, unflatten} from '@/utils/tools'
+import { getParamsFromUrl,} from '@/utils/tools'
+import { DebtOrderStatusEnum, getDebtOrderStatusEnumText,DebtOrderTableTypeEnum, BaseDebtAccountOrderSearch, getDebtOrderTableTypeEnumText } from '@/api/debt/order'
 
 const DateSearchWrapRef = ref()
 const router=useRouter()
@@ -18,14 +16,14 @@ const state=reactive({
 })
 const tableRef=ref()
 
-const inntSearchParams = ():OrderSearch => {
+const inntSearchParams = ():BaseDebtAccountOrderSearch => {
     return {
         page:1,
         limit:10,
         dateType:null
-    } as OrderSearch
+    } as BaseDebtAccountOrderSearch
 }
-const searchParams = ref<OrderSearch>(inntSearchParams())
+const searchParams = ref<BaseDebtAccountOrderSearch>(inntSearchParams())
 
 const resetSearch=async ()=>{
   searchParams.value = inntSearchParams()
@@ -48,7 +46,6 @@ const fetchALLChannelList = async () => {
 }
 
 const filterOption = (input: string, option: any) => {
-  console.log('option', option)
   return option.label.toLowerCase().indexOf(input.toLowerCase()) >= 0;
 };
 
@@ -66,7 +63,7 @@ const dateChange = (dateRange: DateRange, dateType: DateSearchTypeEnum) => {
 }
 
 
-watch(() => searchParams.value.orderStatus, () => {
+watch(() => searchParams.value.status, () => {
   tableRef.value.refresh(searchParams.value)
 })
 let defaultDateRange = ref<DateRange>(null)
@@ -83,7 +80,6 @@ onBeforeMount(()=>{
     } 
   }
   
-  console.log('searchParams.value', searchParams.value)
   fetchALLChannelList()
 })
 </script>
@@ -93,34 +89,24 @@ onBeforeMount(()=>{
     <!--头部-->
     <a-card :body-style="{padding:'15px'}">
       <a-flex justify="space-between">
-        <a-typography-text>订单列表</a-typography-text>
+        <a-typography-text>分账单列表</a-typography-text>
       </a-flex>
     </a-card>
     <a-card style="border: none" :body-style="{padding:'15px'}">
       <a-flex vertical :gap="15">
         <a-row :gutter="16">
-          <a-col class="gutter-row" :span="4">
-            <a-input  v-model:value="searchParams.orderNo"  allow-clear placeholder="按订单编号查询"> </a-input>
+          <a-col class="gutter-row" :span="5">
+            <a-input  v-model:value="searchParams.orderId"  allow-clear placeholder="按订单编号查询"> </a-input>
           </a-col>
-          <a-col class="gutter-row" :span="4">
-            <a-input  v-model:value="searchParams.mchOrderNo"  allow-clear placeholder="按商家订单号查询"> </a-input>
-          </a-col>
-          <a-col class="gutter-row" :span="4">
-            <a-input  v-model:value="searchParams.channelOrderNo"  allow-clear placeholder="按渠道订单号查询"> </a-input>
-          </a-col>
-          <!-- <a-col class="gutter-row" :span="4">
-            <a-select style="width: 100%" mode="multiple" allow-clear :max-tag-count="2" v-model:value="searchParams.channelTypes" placeholder="按渠道类型查询">
-              <a-select-option v-for="(item) in PayChannelTypeSelectOption" :value="item.value">{{item.title}}</a-select-option>
-            </a-select>
-          </a-col> -->
-          <a-col class="gutter-row" :span="4">
+          
+          <a-col class="gutter-row" :span="5">
             <a-select placeholder="按支付渠道筛选" :filter-option="filterOption"  show-search v-model:value="searchParams.channelId"  allow-clear style="width: 100%;">
               <a-select-option v-for="(item) in channelOpts" :value="item.id" :label="item.name" >{{item.name}}</a-select-option>
             </a-select>
           </a-col>
-          <a-col class="gutter-row" :span="4">
-            <a-select style="width: 100%" mode="multiple" allow-clear :max-tag-count="1" v-model:value="searchParams.payModes" placeholder="按支付方式查询">
-              <a-select-option v-for="(item) in PayModeTypeSelectOption" :value="item.value">{{item.title}}</a-select-option>
+          <a-col class="gutter-row" :span="5">
+            <a-select style="width: 100%" mode="multiple" allow-clear :max-tag-count="2" v-model:value="searchParams.channelTypes" placeholder="按渠道类型查询">
+              <a-select-option v-for="(item) in PayChannelTypeSelectOption" :value="item.value">{{item.title}}</a-select-option>
             </a-select>
           </a-col>
 
@@ -143,24 +129,22 @@ onBeforeMount(()=>{
     </a-card>
     <a-card >
       <a-tabs destroy-inactive-tab-pane >
-        <a-tab-pane key="all" tab="全部">
-          <OrderTablePanel ref="tableRef" :table-type="OrderTableType.ALL" :search-params="searchParams"/>
+        <a-tab-pane :key="DebtOrderTableTypeEnum.ALL" :tab="getDebtOrderTableTypeEnumText(DebtOrderTableTypeEnum.ALL)">
+          <debt-order-table ref="tableRef" :table-type="DebtOrderTableTypeEnum.ALL" :search-params="searchParams"/>
         </a-tab-pane>
-        <a-tab-pane key="waitPay" tab="待支付">
-          <OrderTablePanel ref="tableRef" :table-type="OrderTableType.WAIT_PAY" :search-params="searchParams"/>
+        <a-tab-pane :key="DebtOrderTableTypeEnum.WAIT_ING" :tab="getDebtOrderTableTypeEnumText(DebtOrderTableTypeEnum.WAIT_ING)">
+          <debt-order-table ref="tableRef" :table-type="DebtOrderTableTypeEnum.WAIT_ING" :search-params="searchParams"/>
         </a-tab-pane>
-        <a-tab-pane key="payIng" tab="支付中">
-          <OrderTablePanel ref="tableRef" :table-type="OrderTableType.PAY_ING" :search-params="searchParams"/>
+        <a-tab-pane :key="DebtOrderTableTypeEnum.PROCESS" :tab="getDebtOrderTableTypeEnumText(DebtOrderTableTypeEnum.PROCESS)">
+          <debt-order-table ref="tableRef" :table-type="DebtOrderTableTypeEnum.PROCESS" :search-params="searchParams"/>
         </a-tab-pane>
-        <a-tab-pane key="paySuccess" tab="支付成功">
-          <OrderTablePanel ref="tableRef" :table-type="OrderTableType.SUCCESS" :search-params="searchParams"/>
+        <a-tab-pane :key="DebtOrderTableTypeEnum.SUCCESS" :tab="getDebtOrderTableTypeEnumText(DebtOrderTableTypeEnum.SUCCESS)">
+          <debt-order-table ref="tableRef" :table-type="DebtOrderTableTypeEnum.SUCCESS" :search-params="searchParams"/>
         </a-tab-pane>
-        <a-tab-pane key="payFail" tab="支付失败">
-          <OrderTablePanel ref="tableRef" :table-type="OrderTableType.FAIL" :search-params="searchParams"/>
+        <a-tab-pane :key="DebtOrderTableTypeEnum.FAIL" :tab="getDebtOrderTableTypeEnumText(DebtOrderTableTypeEnum.FAIL)">
+          <debt-order-table ref="tableRef" :table-type="DebtOrderTableTypeEnum.FAIL" :search-params="searchParams"/>
         </a-tab-pane>
       </a-tabs>
-
-
     </a-card>
   </a-flex>
 </template>

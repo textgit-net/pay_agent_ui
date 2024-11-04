@@ -5,9 +5,13 @@ import {
     PageWarp,
     PayModeType,
 } from "~/utils/constant.ts";
+import { DateSearchTypeEnum } from '@/components/date-search-wrap/type'
 
 export interface BaseOrderReportSearch extends BasePageRequest{
-    dateRange?: DateRange
+    startDate?: string
+    endDate?: string
+    // 为了回响
+    dateType?: DateSearchTypeEnum
     agentIds?: number []
     channelIds?: number []
     mchIds?: number []
@@ -35,7 +39,7 @@ export interface AgentOrderReportSearch extends BaseOrderReportSearch{
  * @param search 查询参数
  */
 export function getAllOrderReportData(search:AllOrderReportSearch):Promise<ResponseBody<PageWarp<any>>>{
-    return usePost<PageWarp<any>>("/order/all/report", search)
+    return useGet<PageWarp<any>>("/order/all/report", search)
 }
 
 /**
@@ -43,7 +47,7 @@ export function getAllOrderReportData(search:AllOrderReportSearch):Promise<Respo
  * @param search
  */
 export function getChannelOrderReportData(search:ChannelOrderReportSearch):Promise<ResponseBody<PageWarp<any>>>{
-    return usePost<PageWarp<any>>("/order/channel/report",search)
+    return useGet<PageWarp<any>>("/order/channel/report",search)
 }
 
 /**
@@ -51,7 +55,7 @@ export function getChannelOrderReportData(search:ChannelOrderReportSearch):Promi
  * @param search
  */
 export function getMerchantOrderReportData(search:MerchantOrderReportSearch):Promise<ResponseBody<PageWarp<any>>>{
-    return usePost<PageWarp<any>>("/order/mch/report",search)
+    return useGet<PageWarp<any>>("/order/mch/report",search)
 }
 
 /**
@@ -59,5 +63,5 @@ export function getMerchantOrderReportData(search:MerchantOrderReportSearch):Pro
  * @param search
  */
 export function getAgentOrderReportData(search:AgentOrderReportSearch):Promise<ResponseBody<PageWarp<any>>>{
-    return usePost<PageWarp<any>>("/order/agent/report",search)
+    return useGet<PageWarp<any>>("/order/agent/report",search)
 }

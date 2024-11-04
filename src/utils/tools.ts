@@ -30,7 +30,7 @@ export function updateParamsToUrl (query: any = {}) {
 
 // 获取Url参数
 // 强制转类型的字段
-let castKeys = ['isIgnoreDisable', 'limit', 'page']
+let castKeys = ['isIgnoreDisable', 'limit', 'page', 'channelId']
 export function getParamsFromUrl () {
   let search = window.location.search;
   let json = queryString.parse(search)
@@ -43,3 +43,62 @@ export function getParamsFromUrl () {
   }
   return json ?? null
 }
+
+//json扁平化
+export function flatten (data: any): any{
+  const result = {};
+  console.log('Object.keys(x).length', )
+  const isEmpty = (x) => Object.keys(x).length === 0;
+  const recurse = (cur, prop) => {
+      if (Object(cur) !== cur) {
+          result[prop] = cur;
+      } else if (Array.isArray(cur)) {
+          const length = cur.length;
+          for (let i = 0; i < length; i++) {
+              recurse(cur[i], `${prop}[${i}]`);
+          }
+          if (length === 0) {
+              result[prop] = [];
+          }
+      } else {
+          if ( cur && !isEmpty(cur)) {
+              Object.keys(cur).forEach((key) =>
+                  recurse(cur[key], prop ? `${prop}.${key}` : key)
+              );
+          } else {
+              result[prop] = {};
+          }
+      }
+  };
+  recurse(data, "");
+  return result;
+};
+
+//json非扁平化
+export function unflatten(data:any ):any {
+  if (Object(data) !== data || Array.isArray(data)) {
+      return data;
+  }
+  const regex = /\.?([^.\[\]]+)$|\[(\d+)\]$/;
+  const props = Object.keys(data);
+  let result, p;
+  while ((p = props.shift())) {
+      const match = regex.exec(p);
+      let target;
+      if (match.index) {
+          const rest = p.slice(0, match.index);
+          if (!(rest in data)) {
+              data[rest] = match[2] ? [] : {};
+              props.push(rest);
+          }
+          target = data[rest];
+      } else {
+          if (!result) {
+              result = match[2] ? [] : {};
+          }
+          target = result;
+      }
+      target[match[2] || match[1]] = data[p];
+  }
+  return result;
+};

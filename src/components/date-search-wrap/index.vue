@@ -16,7 +16,7 @@ const { toClipboard } = useClipboard();
 
 
 const emit = defineEmits<{
-  (e: "date-change", val: DateRange): void;
+  (e: "date-change", val: DateRange, dateType: DateSearchTypeEnum): void;
 //   (e: "update:checked", item: any): void;
 }>();
 
@@ -27,6 +27,7 @@ let firstDefaultDateTypeIsCustom = false
 export interface PropsType {
     isCanClear?: boolean;
     defaultDateType: DateSearchTypeEnum;
+    defaultRangeDate?: DateRange;
     // 马上触发change
     immediatelyDateChange: boolean;
     // 自定义的时间最大天数
@@ -40,6 +41,7 @@ const props = withDefaults(defineProps<Partial<PropsType>>(), {
     isCanClear: true,
     immediatelyDateChange: false,
     rangeDateMaxDays: 180,
+    defaultRangeDate: null,
     resetFormimmediatelyDateChange: true
 });
 
@@ -106,14 +108,14 @@ function getDateRange(type: DateSearchTypeEnum, isFromDatePicker: boolean = fals
     console.log('form.value', form.value)
     //选自定义时间不刷新表单
     if (type != DateSearchTypeEnum.customRangeDate) {
-        emit("date-change", form.value.dateRange);
+        emit("date-change", form.value.dateRange, state.active);
     }
-    if (type == DateSearchTypeEnum.customRangeDate && isFromDatePicker) {
-        emit("date-change", form.value.dateRange);
+    if (type == DateSearchTypeEnum.customRangeDate && isFromDatePicker && form.value.dateRange) {
+        emit("date-change", form.value.dateRange, state.active);
     }
     // 第一选择的类型为自定义要加载数据
     if (type == DateSearchTypeEnum.customRangeDate && !isFromDatePicker && firstDefaultDateTypeIsCustom) {
-        emit("date-change", form.value.dateRange);
+        emit("date-change", form.value.dateRange, state.active);
     }
     // 选自定义时间刷新表单
     // emit("date-change", form.value.dateRange);
@@ -168,11 +170,15 @@ const init =  () => {
         // state.active = DateSearchTypeEnum.today
     }
     if (props.defaultDateType) {
-        
+        console.log('props.defaultDateType', props.defaultDateType)
         state.active = props.defaultDateType
-        if (state.active == DateSearchTypeEnum.customRangeDate) {
+        if (state.active == DateSearchTypeEnum.customRangeDate && !props.defaultRangeDate) {
             firstDefaultDateTypeIsCustom = true
             isTypeCustomAutoSelect()
+        }
+        if (state.active == DateSearchTypeEnum.customRangeDate && props.defaultRangeDate) {
+            firstDefaultDateTypeIsCustom = true
+            rangePickerValue.value = [dayjs(props.defaultRangeDate.startDate), dayjs(props.defaultRangeDate.endDate)]
         }
     }
 
@@ -193,7 +199,7 @@ const tranferReset = () => {
     }
 }
 
-onBeforeMount(() => {
+onMounted(() => {
     init()
 })
  
@@ -201,7 +207,8 @@ defineExpose({
     handleReset,
     handleFormReset,
     tranferReset,
-    dateRange: form.value.dateRange
+    dateRange: form.value.dateRange,
+    dateType: state.active
 });
 </script>
 
