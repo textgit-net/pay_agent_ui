@@ -2,7 +2,7 @@ import { ResponseBody, PayModeType} from "~/utils/constant.ts";
 
 export interface PayModeRatesRequest {
     mchId?: string
-    payMode?:PayModeType
+    productCode?: string
     rates?: string
 }
 
@@ -11,8 +11,8 @@ export interface PayModeRatesRequest {
  * @param { PayModeRatesRequest } data 
  * @returns {Promise<ResponseBody<any>>}
  */
-export function updatePayModeRates(data: PayModeRatesRequest):Promise<ResponseBody<any>>{
-    return usePost<any>('/mch/updatePayModeRates', data)
+export function updateProductRates(data: PayModeRatesRequest):Promise<ResponseBody<any>>{
+    return usePost<any>('/mch/updateProductRates', data)
 }
 
 /**
@@ -20,6 +20,6 @@ export function updatePayModeRates(data: PayModeRatesRequest):Promise<ResponseBo
  * @param { PayModeRatesRequest } data 
  * @returns {Promise<ResponseBody<any>>}
  */
-export function switchPayMode(data: PayModeRatesRequest):Promise<ResponseBody<any>>{
-    return usePut<any>(`/mch/switchPayMode`, data)
+export function switchProduct(data: PayModeRatesRequest):Promise<ResponseBody<any>>{
+    return usePut<any>(`/mch/switchProduct`, data)
 }

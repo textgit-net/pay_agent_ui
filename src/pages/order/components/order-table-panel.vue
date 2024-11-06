@@ -290,7 +290,7 @@ onMounted(()=>{
             <a-tag v-if="record['orderStatus']===OrderStatus.CLOSE" :bordered="false" color="error" > {{getOrderStatusText(record['orderStatus'] as OrderStatus)}}</a-tag>
             <a-tooltip v-if="record['orderStatus']== OrderStatus.FAIL">
               
-              <template #title>点击查看订单状态错误信息</template>
+              <template #title>{{ record.errMsg }}</template>
               <QuestionCircleFilled @click="viewOrderStatusErrorInfo(record)" style="color: #ff4d4f;" />
             </a-tooltip>
         </template>

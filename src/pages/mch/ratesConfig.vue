@@ -7,8 +7,8 @@ import {PaginationProps,Modal,message} from "ant-design-vue";
 import CopyTextBtn from '~/components/copy-text-btn/index.vue'
 
 import {ColumnsType} from "ant-design-vue/es/table";
-import {getMerchantInfo, MerchantInfo, PayModeRateItem} from '~/api/merchant'
-import { switchPayMode, PayModeRatesRequest, updatePayModeRates } from '~@/api/merchant/rates'
+import {getMerchantInfo, MerchantInfo, ProductRateItem} from '~/api/merchant'
+import { switchProduct, PayModeRatesRequest, updateProductRates } from '~@/api/merchant/rates'
 const route = useRoute()
 const router = useRouter()
 const {id}= route.query
@@ -26,13 +26,13 @@ const state = reactive<{
 })
 
 const info=ref<MerchantInfo>({
-  payModeRates: []
+  products: []
 })
 
-const isOPenPayModeRates = ref<PayModeRateItem[]>([])
-const isClosePayModeRates = ref<PayModeRateItem[]>([])
+const isOPenPayModeRates = ref<ProductRateItem[]>([])
+const isClosePayModeRates = ref<ProductRateItem[]>([])
 
-const selectPayModeRateItem = ref<PayModeRateItem>({})
+const selectPayModeRateItem = ref<ProductRateItem>({})
 
 const initFormData = ():PayModeRatesRequest => {
   return {
@@ -46,14 +46,14 @@ const formData = ref<PayModeRatesRequest>(initFormData())
 const getInfo=async ()=>{
   state.isLoading=true
   const {data} =await getMerchantInfo(id as string)
-  isOPenPayModeRates.value = data.payModeRates.filter((item) => !item.isDisable)
-  isClosePayModeRates.value = data.payModeRates.filter((item) => item.isDisable)
+  isOPenPayModeRates.value = data.products
+
   info.value = data
   
   state.isLoading=false
 }
 
-const handleFixRates = async (item:PayModeRateItem)=>{
+const handleFixRates = async (item:ProductRateItem)=>{
   selectPayModeRateItem.value = item;
   formData.value = Object.assign(formData.value, item)
   state.showRateDialog = true
@@ -69,7 +69,7 @@ const validateRate =  async (_rule: Rule, value: string) => {
   }
 };
 
-const changeEnable=async (item:PayModeRateItem)=>{
+const changeEnable=async (item:ProductRateItem)=>{
   formData.value = Object.assign(formData.value, item)
   let content = item.isEnable ? '确认关闭当前支付产品吗？' : '确认开启当前支付产品吗？'
   Modal.confirm({
@@ -81,7 +81,7 @@ const changeEnable=async (item:PayModeRateItem)=>{
     cancelText: '取消',
     async onOk() {
       try {
-        let res = await switchPayMode(formData.value)
+        let res = await switchProduct(formData.value)
         message.success('操作成功')
         await getInfo()
       } catch {
@@ -96,7 +96,7 @@ const handleBaseInfoOk = async () => {
   state.dialogBtnLoading = true
   
   try {
-    let res = await updatePayModeRates(formData.value)
+    let res = await updateProductRates(formData.value)
     message.success('操作成功')
     state.showRateDialog = false
     await getInfo()
@@ -113,12 +113,12 @@ getInfo()
 const columns:ColumnsType =[
   {
     title: '产品名称',
-    dataIndex: 'payModeName',
+    dataIndex: 'productName',
     width: '25%'
   },
   {
     title: '产品代码',
-    dataIndex: 'payMode',
+    dataIndex: 'productCode',
     width: '25%'
   },
   {
@@ -152,7 +152,7 @@ const columns:ColumnsType =[
         <a-form-item
           label="当前支付产品"
         >
-          {{ selectPayModeRateItem.payModeName }} | {{ selectPayModeRateItem.payMode }}
+          {{ selectPayModeRateItem.productName }} | {{ selectPayModeRateItem.productCode }}
         </a-form-item>
         <a-form-item
           label="产品费率"

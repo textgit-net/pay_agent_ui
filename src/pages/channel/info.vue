@@ -2,6 +2,7 @@
 import BasicInfo from "~/pages/channel/basicInfo.vue";
 import DebtAccountInfo from "~/pages/channel/debtAccountInfo.vue";
 import orderInfo from "~/pages/channel/orderInfo.vue";
+import withdrawInfo from "~/pages/channel/withdrawInfo.vue";
 
 const router=useRouter()
 const route= useRoute()
@@ -43,6 +44,7 @@ const onTabClick=(key: string)=>{
             <a-tab-pane key="basicInfo" tab="渠道信息"/>
             <a-tab-pane key="channelAccountInfo" tab="渠道分账信息"/>
             <a-tab-pane key="orderInfo" tab="渠道订单信息"/>
+            <a-tab-pane key="withdrawInfo" tab="渠道提现信息"/>
           </a-tabs>
         </a-flex>
       </a-page-header>
@@ -54,6 +56,7 @@ const onTabClick=(key: string)=>{
     </debt-account-info>
 
     <order-info v-if="state.activeTabKey=='orderInfo'"></order-info>
+    <withdraw-info v-if="state.activeTabKey=='withdrawInfo'"></withdraw-info>
   </a-flex>
 
 </template>

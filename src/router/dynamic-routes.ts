@@ -171,6 +171,14 @@ export default [
         meta: {
           title: '渠道测试',
         }
+      },
+      {
+        path: '/channel/withdraw-list',
+        name: 'ChannelWithdrawList',
+        component: () => import('~/pages/channel/withdraw/list.vue'),
+        meta: {
+          title: '提现记录',
+        }
       }
     ]
   },

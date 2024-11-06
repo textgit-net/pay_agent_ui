@@ -1,11 +1,11 @@
 import {PageWarp, ResponseBody, BasePageRequest, ContactWay, PayModeType} from "~/utils/constant.ts";
 import {AgentInfo} from "~/api/agent";
 
-export interface PayModeRateItem {
+export interface ProductRateItem {
     isEnable?: boolean
-    isDisable?: boolean
-    payMode?: PayModeType
-    payModeName?:string
+    // isDisable?: boolean
+    productCode?: string
+    productName?:string
     rates?:number
 }
 
@@ -30,7 +30,7 @@ export interface MerchantInfo {
     password?: string
     isResetPassword?: boolean
     agentInfo?: AgentInfo,
-    payModeRates?: PayModeRateItem[],
+    products?: ProductRateItem[],
     totalOrderAmount?: number
     totalOrderCount?: number
     //可用金额

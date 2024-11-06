@@ -216,17 +216,18 @@ defineExpose({
     <a-flex gap="center" justify="start" style="flex: 1;padding-top: 20px;">
         <a-space>
             <a-tooltip>
-                <template #title>筛选昨日数据</template>
-                <a-button @click="handleTypeClick(DateSearchTypeEnum.yestoday)" :type="state.active == DateSearchTypeEnum.yestoday ? 'primary' : 'dashed'">
-                    {{ getDateSearchTypeEnumText(DateSearchTypeEnum.yestoday) }}
-                </a-button>
-            </a-tooltip>
-            <a-tooltip>
                 <template #title>筛选今日数据</template>
                 <a-button @click="handleTypeClick(DateSearchTypeEnum.today)" :type="state.active == DateSearchTypeEnum.today ? 'primary' : 'dashed'">
                     {{ getDateSearchTypeEnumText(DateSearchTypeEnum.today) }}
                 </a-button>
             </a-tooltip>
+            <a-tooltip>
+                <template #title>筛选昨日数据</template>
+                <a-button @click="handleTypeClick(DateSearchTypeEnum.yestoday)" :type="state.active == DateSearchTypeEnum.yestoday ? 'primary' : 'dashed'">
+                    {{ getDateSearchTypeEnumText(DateSearchTypeEnum.yestoday) }}
+                </a-button>
+            </a-tooltip>
+            
             <a-tooltip>
                 <template #title>筛选最近一周（7天）数据</template>
                 <a-button @click="handleTypeClick(DateSearchTypeEnum.last7days)" :type="state.active == DateSearchTypeEnum.last7days ? 'primary' : 'dashed'">

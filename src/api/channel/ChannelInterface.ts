@@ -61,6 +61,8 @@ export interface ChannelListResponse extends ChannelSimpleResponse{
     channelFreezeAmount?: number
     // 用于加载动画
     isItemLoadSpinning?: boolean
+    //提现金额
+    totalWithdrawAmount?: number
 }
 
 

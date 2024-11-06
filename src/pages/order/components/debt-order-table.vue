@@ -240,20 +240,33 @@ onMounted(()=>{
         <template v-if="column.dataIndex==='id'">
           <a-flex justify="space-start" align="center" :gap="5" >
             <a-tooltip>
-              <template #title>查看账单批号【{{record['id']}}】详情</template>
+              <template #title>点击查看账单批号【{{record['id']}}】详情</template>
               <a-typography-link  @click="router.push({path:'/order/royalty-detail',query:{id:record['id']}})"> {{ record.id }}</a-typography-link>
             </a-tooltip>
             <copy-text-btn :copytext="record.id" tipText="复制批次号"></copy-text-btn>
           </a-flex>
         </template>
+
+       
+        
         <template v-if="column.dataIndex==='orderId'">
           <a-flex justify="space-start" align="center" :gap="5" >
 
             <a-tooltip>
-                <template #title>查看订单号【{{record['orderId']}}】详情</template>
-                <a-typography-link  @click="router.push({path:'',query:{id:record['orderId']}})"> {{ record.orderId }}</a-typography-link>
+                <template #title>点击查看订单号【{{record['orderId']}}】详情</template>
+                {{ record.orderId }}
+                <!-- <a-typography-link  @click="router.push({path:'',query:{id:record['orderId']}})"> {{ record.orderId }}</a-typography-link> -->
             </a-tooltip>
             <copy-text-btn :copytext="record.orderId" tipText="复制订单号"></copy-text-btn>
+          </a-flex>
+        </template>
+
+        <template v-if="column.dataIndex==='splitCount'">
+          <a-flex justify="space-start" align="center" :gap="5" >
+            <a-tooltip>
+              <template #title>点击查看分账单订单详情</template>
+              <a-typography-link  @click="router.push({path:'/order/royalty-detail',query:{id:record['id'],tabKey: 'orderInfo'}})"> {{ record.splitCount }}</a-typography-link>
+            </a-tooltip>
           </a-flex>
         </template>
 

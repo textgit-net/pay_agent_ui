@@ -9,6 +9,7 @@ import {ChannelListResponse, ChannelSearch, searchChannel, getChannelWalletInfo}
 import {getPayChannelTypeText, PayChannelType, PayModeType, getPayModeTypeText, PayChannelTypeSelectOption} from "~/utils/constant.ts";
 import { calcFloat } from '~/utils/calcFloat'
 import { updateParamsToUrl, getParamsFromUrl} from '@/utils/tools'
+import ChannelWithdrawDialog from '@/pages/channel/components/channel-withdraw-dialog.vue';
 
 const router=useRouter()
 const columns:ColumnsType =[
@@ -53,6 +54,10 @@ const columns:ColumnsType =[
     dataIndex: 'channelAmount',
   },
   {
+    title: '提现金额',
+    dataIndex: 'totalWithdrawAmount',
+  },
+  {
     title: '启用状态',
     dataIndex: 'isEnable',
   },
@@ -70,7 +75,8 @@ const state=reactive({
   isShowEditModal:false,
   dataSourceLoading:false,
   isPageLoading:false,
-
+  showWithdrawDialog: false,
+  channelInfo: {}
 })
 const initSearchParams = ():ChannelSearch => {
   return {
@@ -184,6 +190,22 @@ const handleRefreshAmount = async (record: ChannelListResponse) => {
   }
 }
 
+const handleWithdraw = async (record: ChannelListResponse) => {
+  
+  state.channelInfo =record
+  state.showWithdrawDialog = true
+}
+
+const onWithdrawSuccess = async () => {
+  
+  await loadData()
+  let timer = setTimeout(() => {
+    clearTimeout(timer);
+    timer = null;
+    handleRefreshAmount(state.channelInfo)
+  }, 600)
+}
+
 watch(()=> searchParams.value.isIgnoreDisable, () => {
   filterSearch()
 })
@@ -221,6 +243,7 @@ onMounted(()=>{
 
 <template>
   <a-spin :spinning="state.isPageLoading">
+    <channel-withdraw-dialog v-model:visible="state.showWithdrawDialog" :chnnel-info="state.channelInfo" @on-success="onWithdrawSuccess" />
     <a-flex vertical :gap="10" style="width: 100%;height: 100%">
       <!--头部-->
       <a-card :body-style="{padding:'15px'}">
@@ -405,6 +428,17 @@ onMounted(()=>{
                 </a-spin>
               </a-flex>
             </template>
+
+            <template v-if="column.dataIndex==='totalWithdrawAmount'">
+              <a-flex>
+                <a-tooltip>
+                  <template #title>点击查看渠道提现记录</template>
+                  <a-typography-link type="danger" strong @click="router.push({path:'/channel/info',query:{id:record.id, tabKey: 'withdrawInfo'}})">￥{{ record.totalWithdrawAmount }}</a-typography-link>
+                </a-tooltip>
+              </a-flex>
+            </template>
+
+            
             <template v-if="column.dataIndex==='amount'">
               {{record['totalAmount']||'/'}}
             </template>
@@ -465,7 +499,11 @@ onMounted(()=>{
                         <a-button type="link" @click="router.push({path:'/channel/edit',query:{id:record['id']}})" style="padding-left: 0">编辑渠道</a-button>
                       </a-menu-item>
                       <a-menu-divider v-if="record.isEnable" />
-                      <a-menu-item v-if="record.isEnable" key="2">
+                      <a-menu-item key="2" v-if="record.isEnable">
+                        <a-button @click="handleWithdraw(record)" type="link" style="padding-left: 0">渠道提现</a-button>
+                      </a-menu-item>
+                      <a-menu-divider v-if="record.isEnable" />
+                      <a-menu-item v-if="record.isEnable" key="3">
                         <a-button type="primary" size="small" :disabled="!record.isEnable" @click="router.push({path:'/channel/test',query:{id:record.id}})" style="padding: 0 10px" >渠道测试</a-button>
                       </a-menu-item>
                     </a-menu>

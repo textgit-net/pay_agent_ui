@@ -136,11 +136,12 @@ onMounted(async ()=>{
         <a-descriptions-item style="padding-bottom: 4px" :labelStyle="{'color':'#999'}"  label="订单金额">
           <a-typography-text strong type="danger"  style="font-size: 12px">￥{{info.orderAmount}}</a-typography-text >
         </a-descriptions-item>
-        <a-descriptions-item style="padding-bottom: 4px" :labelStyle="{'color':'#999'}"  label="分账笔数">
-          <a-typography-text  style="font-size: 12px">{{info.splitCount}}</a-typography-text >
-        </a-descriptions-item>
+        
         <a-descriptions-item style="padding-bottom: 4px" :labelStyle="{'color':'#999'}"  label="分账小计">
           <a-typography-text strong type="danger"  style="font-size: 12px">￥{{info.amount}}</a-typography-text >
+        </a-descriptions-item>
+        <a-descriptions-item style="padding-bottom: 4px" :labelStyle="{'color':'#999'}"  label="分账笔数">
+          <a-typography-text  style="font-size: 12px">{{info.splitCount}}</a-typography-text >
         </a-descriptions-item>
       
         <a-descriptions-item style="padding-bottom: 4px" :labelStyle="{'color':'#999'}"  label="分账状态">
