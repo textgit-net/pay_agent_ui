@@ -245,61 +245,6 @@ export default [
     ]
   },
   {
-    path: '/account/center',
-    name: 'AccountInfo',
-    component: () => import('~/pages/account/center/index.vue'),
-    meta: {
-      hideInMenu:true,
-      title: '账号中心',
-    }
-  },
-  {
-    name: 'AccountManage',
-    path: '/account',
-    meta: {
-      title: '账户信息',
-      icon: 'UserOutlined'
-    },
-    children: [
-      {
-        path: '/account/role',
-        name: 'AccountRoleManage',
-        meta: {
-          title: '账户权限'
-        },
-        children: [
-          {
-            path: '/system/role/staff',
-            name: 'AccountStaffManage',
-            component: () => import('~/pages/system/staff/index.vue'),
-            meta: {
-              title: '人员管理',
-            }
-          },
-          {
-            path: '/system/role/list',
-            name: 'RolePermission',
-            component: () => import('~/pages/system/role/index.vue'),
-            meta: {
-              title: '角色权限',
-            }
-          },
-          {
-            path: '/system/role/edit',
-            name: 'AccountRoleEdit',
-            component: () => import('~/pages/system/role/edit.vue'),
-            meta: {
-              hideInMenu:true,
-              title: '编辑角色',
-            }
-          }
-        ]
-      },
-     
-
-    ]
-  },
-  {
     name: 'Report',
     path: '/report',
     meta: {
@@ -356,6 +301,61 @@ export default [
       //     hideChildrenInMenu: true
       //   }
       // }
+    ]
+  },
+  {
+    path: '/account/center',
+    name: 'AccountInfo',
+    component: () => import('~/pages/account/center/index.vue'),
+    meta: {
+      hideInMenu:true,
+      title: '账号中心',
+    }
+  },
+  {
+    name: 'AccountManage',
+    path: '/account',
+    meta: {
+      title: '账户信息',
+      icon: 'UserOutlined'
+    },
+    children: [
+      {
+        path: '/account/role',
+        name: 'AccountRoleManage',
+        meta: {
+          title: '账户权限'
+        },
+        children: [
+          {
+            path: '/system/role/staff',
+            name: 'AccountStaffManage',
+            component: () => import('~/pages/system/staff/index.vue'),
+            meta: {
+              title: '人员管理',
+            }
+          },
+          {
+            path: '/system/role/list',
+            name: 'RolePermission',
+            component: () => import('~/pages/system/role/index.vue'),
+            meta: {
+              title: '角色权限',
+            }
+          },
+          {
+            path: '/system/role/edit',
+            name: 'AccountRoleEdit',
+            component: () => import('~/pages/system/role/edit.vue'),
+            meta: {
+              hideInMenu:true,
+              title: '编辑角色',
+            }
+          }
+        ]
+      },
+     
+
     ]
   },
   {

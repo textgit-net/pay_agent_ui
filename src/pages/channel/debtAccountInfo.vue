@@ -249,7 +249,7 @@ const columns = [
 
 
 const setTableRateText = (text: string) => {
-  return info.value.royaltyMode == DebtModeEnum.FIXED_RATIO ? `${text}%`: '--'
+  return info.value.royaltyMode == DebtModeEnum.FIXED_RATIO ? `${text}%`: '/'
 }
 
 const filterOption = (input: string, option: any) => {
@@ -463,7 +463,17 @@ const filterOption = (input: string, option: any) => {
           <template v-if="column.dataIndex == 'accountId'">
             <a-flex vertical :gap="5" align="start">
               <a-typography-text >渠道类型: {{ getPayChannelTypeText((record.accountInfo as DebtAccountInfo).channelType) }}</a-typography-text>
-              <a-typography-text > {{ (record.accountInfo as DebtAccountInfo).realName   }} / {{ (record.accountInfo as DebtAccountInfo).accountNo   }}</a-typography-text>
+              <a-flex>
+                <a-tooltip>
+                  <template #title>账户名称</template>
+                  <a-typography-text > {{ (record.accountInfo as DebtAccountInfo).realName   }}</a-typography-text>
+                </a-tooltip>
+                /
+                <a-tooltip>
+                  <template #title>分账账户</template>
+                  <a-typography-text >{{ (record.accountInfo as DebtAccountInfo).accountNo   }}</a-typography-text>
+                </a-tooltip>
+              </a-flex>
               
             </a-flex>
           </template>

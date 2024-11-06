@@ -165,7 +165,7 @@ const columns:ColumnsType =[
     </a-modal>
 
     <a-flex vertical>
-      <a-typography-text style="color: darkblue"><AlipayOutlined/> 支付宝</a-typography-text>
+      <a-typography-text strong>支付产品</a-typography-text>
       <a-table :loading="state.isLoading" bordered size="small" :columns="columns" :data-source="isOPenPayModeRates" class="mt-4" :pagination="false">
         <!-- <template #emptyText>
           <a-empty></a-empty>

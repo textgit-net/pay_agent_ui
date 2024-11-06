@@ -12,6 +12,7 @@ import { getAllMerchantList, MerchantOptItem } from '@/api/merchant'
 import { getALLChannelList,ChannelListResponse, ALLChannelListRequest, } from "~/api/channel/ChannelInterface.ts";
 import { DateSearchTypeEnum} from '@/components/date-search-wrap/type'
 import { calcFloat } from '~/utils/calcFloat'
+const userStore = useUserStore()
 
 const router=useRouter()
 const columns:ColumnsType =[
@@ -115,7 +116,10 @@ const dateChange = (dateRange: DateRange) => {
     searchParams.value.startDate = null
     searchParams.value.endDate = null
   }
-  handleSearch()
+  if (isHasPermission.value) {
+    handleSearch()
+  }
+  
 }
 
 const filterChannelOption = (input: string, option: any) => {
@@ -157,17 +161,35 @@ const calcSuccessRate = (successCount: number ,totalCount: number): number => {
   return 0
 }
 
+const isHasPermission = computed(()=> {
+  return userStore.userInfo.isAllowInviteUser
+})
+
 onMounted(()=>{
-  Promise.all([
-    fetchALLChannelList(),
-    // fetchAllMerchantList(),
-    fetchAllAgentList(),
-  ])
+
+  if (isHasPermission.value) {
+      Promise.all([
+      fetchALLChannelList(),
+      // fetchAllMerchantList(),
+      fetchAllAgentList(),
+    ])
+  }
+  
 })
 </script>
 
 <template>
-  <a-flex vertical :gap="10" style="width: 100%;height: 100%">
+  <a-card style="height: 100%;" v-if="!isHasPermission" :body-style="{padding:'15px', height: '100%'}">
+    <div style="height: 100%; width: 100%; display: flex;align-items: center;justify-content: center;">
+
+      <a-result status="403" title="温馨提示" sub-title="您无权限查看！" >
+        <template #extra>
+          
+        </template>
+      </a-result>
+    </div>
+  </a-card>
+  <a-flex v-else vertical :gap="10" style="width: 100%;height: 100%">
     <!--头部-->
     <a-card :body-style="{padding:'15px'}">
       <a-flex justify="space-between">
