@@ -266,7 +266,7 @@ onMounted(async ()=>{
       </a-form>
     </a-modal>
 
-    <a-card :body-style="{padding: '15px'}">
+    <a-card :body-style="{padding: '15px'}" :loading="state.isLoading">
       <a-descriptions :column="3" layout="vertical">
         <template #title>
           <a-flex  align="center">
@@ -309,7 +309,7 @@ onMounted(async ()=>{
       </a-descriptions>
     </a-card>
 
-    <a-card :body-style="{padding: '15px',}">
+    <a-card :body-style="{padding: '15px',}" :loading="state.isLoading">
       <a-descriptions :column="3" layout="vertical">
         <template #title>
           <a-flex  align="center">

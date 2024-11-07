@@ -9,12 +9,17 @@ import DateSearchWrap from '@/components/date-search-wrap/index.vue'
 import { getALLChannelList,ChannelListResponse, ALLChannelListRequest, } from "~/api/channel/ChannelInterface.ts";
 import {FileSearchOutlined } from '@ant-design/icons-vue';
 import { updateParamsToUrl, getParamsFromUrl, flatten, unflatten} from '@/utils/tools'
+import { calcFloat } from '@/utils/calcFloat'
+import {OrderStatisticsEnum,OrderStatisticsRequest, OrderStatisticsResponse,getOrderStatistics } from '@/api/dashboard'
+
 
 const DateSearchWrapRef = ref()
 const router=useRouter()
 const state=reactive({
   dataSourceLoading:false,
-  isConfirmLoading:false
+  isConfirmLoading:false,
+  isShowData: localStorage.getItem('OrderListIsShowData')? eval(localStorage.getItem('OrderListIsShowData')): false,
+  isShowDataLoading: false
 })
 const tableRef=ref()
 
@@ -65,6 +70,48 @@ const dateChange = (dateRange: DateRange, dateType: DateSearchTypeEnum) => {
   tableRef.value.refresh(searchParams.value)
 }
 
+const initDataValue = (): OrderStatisticsResponse => {
+    if (localStorage.getItem('OrderListStatisticsData')) {
+      return JSON.parse(localStorage.getItem('OrderListStatisticsData'))
+    }
+    return {
+        totalAmount: 0,
+        todayAmount: 0,
+        yesterdayAmount: 0,
+        totalCount: 0,
+        todayCount: 0,
+        yesterdayCount: 0,
+        totalSuccessCount: 0,
+        todaySuccessCount: 0,
+        yesterdaySuccessCount: 0,
+        totalFailCount: 0,
+        todayFailCount: 0,
+        yesterdayFailCount: 0,
+    }
+}
+const statisticsData = ref<OrderStatisticsResponse>(initDataValue())
+watch(() => state.isShowData, (val) => {
+  localStorage.setItem('OrderListIsShowData', val)
+  if (val) {
+    getStatisticsData()
+    console.log(val)
+  }
+})
+const getStatisticsData = async () => {
+    state.isShowDataLoading = true;
+    statisticsData.value = JSON.parse(JSON.stringify(statisticsData.value))
+    try {
+      let res = await getOrderStatistics({
+        type: OrderStatisticsEnum.total
+      })
+      localStorage.setItem('OrderListStatisticsData', JSON.stringify(res.data))
+      statisticsData.value = res.data
+    } catch (error) {
+        
+    } finally {
+        state.isShowDataLoading = false;
+    }
+}
 
 watch(() => searchParams.value.orderStatus, () => {
   tableRef.value.refresh(searchParams.value)
@@ -85,6 +132,7 @@ onBeforeMount(()=>{
   
   console.log('searchParams.value', searchParams.value)
   fetchALLChannelList()
+
 })
 </script>
 
@@ -138,9 +186,197 @@ onBeforeMount(()=>{
             </template>
             筛选
           </a-button>
+
+        
+          <a-space>
+            <a-typography-text type="secondary">是否展示统计数据</a-typography-text>
+            <a-tooltip>
+                <template #title>勾选展示订单统计数据</template>
+              <a-checkbox v-model:checked="state.isShowData"></a-checkbox>
+            </a-tooltip>
+          </a-space>
+         
         </a-flex>
       </a-flex>
     </a-card>
+    <a-spin :spinning="state.isShowDataLoading" tip="更新数据中...">
+      <a-card v-show="state.isShowData" :body-style="{padding: '15px'}">
+          <a-descriptions :column="5" layout="vertical">
+            <template #title>
+                <a-flex  align="center">
+                  <a-typography-text>订单数据统计信息</a-typography-text>
+                </a-flex>
+            </template>
+          
+            
+              
+            <a-descriptions-item style="padding-bottom: 4px; padding-top: 0;" :labelStyle="{'color':'#999'}" label="交易额">
+              <a-flex vertical style="padding-top: 4px;">
+                <a-flex >
+                  <a-typography-text type="secondary">总计：</a-typography-text>
+                  <a-tooltip>
+                    <template #title>全部订单累计金额</template>
+                    <a-typography-text strong style="color: rgb(22, 119, 255);"> ￥{{  statisticsData.totalAmount }}</a-typography-text>
+                  </a-tooltip>
+                </a-flex>
+                
+                <a-flex justify="space-between" style="padding-top: 4px;">
+
+      
+                  <a-flex>
+                    <a-typography-text type="secondary">今日：</a-typography-text>
+                    <a-tooltip>
+                      <template #title>今日订单累计金额</template>
+                      <a-typography-text strong style="color: rgb(22, 119, 255);">￥{{ statisticsData.todayAmount }}</a-typography-text>
+                    </a-tooltip>
+                    
+                  </a-flex>
+                
+                  <a-flex style="padding-left: 40px;">
+                    <a-typography-text type="secondary">昨日：</a-typography-text>
+                    <a-tooltip>
+                      <template #title>昨日订单累计金额</template>
+                      <a-typography-text strong style="color: rgb(22, 119, 255);">￥{{ statisticsData.yesterdayAmount }}</a-typography-text>
+                    </a-tooltip>
+                  </a-flex>
+                
+                </a-flex>
+              </a-flex>
+            </a-descriptions-item>
+            <a-descriptions-item style="padding-bottom: 4px; padding-top: 0;" :labelStyle="{'color':'#999'}" label="交易笔数">
+              <a-flex vertical style="padding-top: 4px;">
+                <a-flex>
+                  <a-typography-text type="secondary">总计：</a-typography-text>
+                  <a-tooltip>
+                    <template #title>全部订单累计交易笔数</template>
+                    <a-typography-text strong style="color: purple;">{{ statisticsData.totalCount }}</a-typography-text>
+                  </a-tooltip>
+                  
+                </a-flex>
+                <a-flex justify="space-between" style="padding-top: 4px;">
+                  <a-flex>
+                    <a-typography-text type="secondary">今日：</a-typography-text>
+                    <a-tooltip>
+                      <template #title>今日订单累计交易笔数</template>
+                      <a-typography-text strong style="color: purple;">{{ statisticsData.todayCount }}</a-typography-text>
+                    </a-tooltip>
+                  </a-flex>
+                  <a-flex style="padding-left: 40px;">
+                    <a-typography-text type="secondary">昨日：</a-typography-text>
+                    <a-tooltip>
+                      <template #title>昨日订单累计交易笔数</template>
+                      <a-typography-text strong style="color: purple;">{{ statisticsData.yesterdayCount }}</a-typography-text>
+                    </a-tooltip>
+                  </a-flex>
+                </a-flex>
+              </a-flex>
+            </a-descriptions-item>
+          
+            <a-descriptions-item style="padding-bottom: 4px;padding-top: 0;" :labelStyle="{'color':'#999'}" label="成交笔数">
+              <a-flex vertical style="padding-top: 4px;">
+                <a-flex >
+                  <a-typography-text type="secondary">总计：</a-typography-text>
+                  <a-tooltip>
+                    <template #title>全部订单累计成功笔数</template>
+                    <a-typography-text type="success" strong>{{ statisticsData.totalSuccessCount }}</a-typography-text>
+                  </a-tooltip>
+                </a-flex>
+                <a-flex justify="space-between" style="padding-top: 4px;">
+                  <a-flex>
+                    <a-typography-text type="secondary">今日：</a-typography-text>
+                    <a-tooltip>
+                      <template #title>今日订单累计成功笔数</template>
+                      <a-typography-text type="success" strong>{{ statisticsData.todaySuccessCount }}</a-typography-text>
+                    </a-tooltip>
+                  </a-flex>
+                  <a-flex style="padding-left: 40px;">
+                    <a-typography-text type="secondary">昨日：</a-typography-text>
+                    <a-tooltip>
+                      <template #title>昨日订单累计成功笔数</template>
+                      <a-typography-text type="success" strong>{{ statisticsData.yesterdaySuccessCount }}</a-typography-text>
+                    </a-tooltip>
+                  </a-flex>
+                </a-flex>
+              </a-flex>
+            </a-descriptions-item>
+            <a-descriptions-item style="padding-bottom: 4px;" :labelStyle="{'color':'#999'}" label="失败笔数">
+              <a-flex vertical style="padding-top: 4px;">
+                <a-flex>
+                  <a-typography-text type="secondary">总计：</a-typography-text>
+                  
+                  <a-tooltip>
+                    <template #title>全部订单累计失败笔数</template>
+                    <a-typography-text type="danger" strong>{{ statisticsData.totalFailCount }}</a-typography-text>
+                  </a-tooltip>
+                </a-flex>
+                <a-flex justify="space-between" style="padding-top: 4px;">
+                  <a-flex>
+                    <a-typography-text type="secondary">今日：</a-typography-text>
+                    <a-tooltip>
+                      <template #title>今日订单累计失败笔数</template>
+                      <a-typography-text type="danger" strong>{{ statisticsData.todayFailCount }}</a-typography-text>
+                    </a-tooltip>
+                  </a-flex>
+                  <a-flex style="padding-left: 40px;">
+                    <a-typography-text type="secondary">昨日：</a-typography-text>
+                    <a-tooltip>
+                      <template #title>昨日订单累计失败笔数</template>
+                      <a-typography-text type="danger" strong>{{ statisticsData.yesterdayFailCount }}</a-typography-text>
+                    </a-tooltip>
+                  </a-flex>
+                </a-flex>
+              </a-flex>
+            </a-descriptions-item>
+            
+            <a-descriptions-item style="padding-bottom: 4px;" :labelStyle="{'color':'#999'}" label="成功率">
+              <a-flex vertical style="padding-top: 4px;">
+                <a-flex>
+                  <a-typography-text type="secondary">总计：</a-typography-text>
+                  
+                  <a-tooltip>
+                    <template #title>全部订单成功率</template>
+                    <a-typography-text v-if="statisticsData.totalSuccessCount > 0" type="success" strong>
+                      {{ calcFloat.multi(calcFloat.div(statisticsData.totalSuccessCount,  statisticsData.totalCount),100).toFixed(2) }}%
+                    </a-typography-text>
+                    <a-typography-text v-else type="danger" strong>
+                      0%
+                    </a-typography-text>
+                  </a-tooltip>
+                </a-flex>
+                <a-flex justify="space-between" style="padding-top: 4px;">
+                  <a-flex>
+                    <a-typography-text type="secondary">今日：</a-typography-text>
+                    <a-tooltip>
+                      <template #title>今日订单成功率</template>
+                      <a-typography-text v-if="statisticsData.todaySuccessCount > 0" type="success" strong>
+                
+                        {{ calcFloat.multi(calcFloat.div(statisticsData.todaySuccessCount,  statisticsData.todayCount),100).toFixed(2) }}%
+                      </a-typography-text>
+                      <a-typography-text v-else type="danger" strong>
+                        0%
+                      </a-typography-text>
+                    </a-tooltip>
+                  </a-flex>
+                  <a-flex style="padding-left: 40px;">
+                    <a-typography-text type="secondary">昨日：</a-typography-text>
+                    <a-tooltip>
+                      <template #title>昨日订单成功率</template>
+                      <a-typography-text v-if="statisticsData.yesterdaySuccessCount > 0" type="success" strong>
+                        {{ calcFloat.multi( calcFloat.div(statisticsData.yesterdaySuccessCount,  statisticsData.yesterdayCount),100).toFixed(2) }}%
+                      </a-typography-text>
+                      <a-typography-text v-else type="danger" strong>
+                        0%
+                      </a-typography-text>
+                    </a-tooltip>
+                  </a-flex>
+                </a-flex>
+              </a-flex>
+            </a-descriptions-item>
+          </a-descriptions>
+      </a-card>
+    </a-spin>
+   
+
     <a-card >
       <a-tabs destroy-inactive-tab-pane >
         <a-tab-pane key="all" tab="全部">

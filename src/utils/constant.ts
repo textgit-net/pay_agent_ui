@@ -125,22 +125,22 @@ export enum PayModeType{
   ALI_PAY_FACE_TO_FACE="ALI_PAY_FACE_TO_FACE",
   ALI_PAY_FACE_TO_FACE_TO_H5="ALI_PAY_FACE_TO_FACE_TO_H5",
   ALI_PAY_TO_OPEN="ALI_PAY_TO_OPEN",
-  ALI_PAY_TO_USER="ALI_PAY_TO_USER"
+  //ALI_PAY_TO_USER="ALI_PAY_TO_USER"
 }
 
 
 export const getPayModeTypeText=(type:PayModeType)=>{
   switch (type) {
     case PayModeType.ALI_PAY_QR_CODE:
-      return "扫码支付"
+      return "当面付扫码"
     case PayModeType.ALI_PAY_FACE_TO_FACE:
-      return "门店支付授权JS收银台"
+      return "当面付转授权"
     case PayModeType.ALI_PAY_FACE_TO_FACE_TO_H5:
-      return "门店支付授权H5跳转"
+      return "当面付转淘宝"
     case PayModeType.ALI_PAY_TO_OPEN:
       return "支付宝转账"
-    case PayModeType.ALI_PAY_TO_USER:
-      return "支付宝转账到个人"
+    // case PayModeType.ALI_PAY_TO_USER:
+    //   return "支付宝转账到个人"
   }
 }
 export const PayModeTypeSelectOption:SelectOption<PayModeType>[]=[
@@ -160,10 +160,10 @@ export const PayModeTypeSelectOption:SelectOption<PayModeType>[]=[
     value:PayModeType.ALI_PAY_TO_OPEN,
     title:getPayModeTypeText(PayModeType.ALI_PAY_TO_OPEN)
   },
-  {
-    value:PayModeType.ALI_PAY_TO_USER,
-    title:getPayModeTypeText(PayModeType.ALI_PAY_TO_USER)
-  }
+  // {
+  //   value:PayModeType.ALI_PAY_TO_USER,
+  //   title:getPayModeTypeText(PayModeType.ALI_PAY_TO_USER)
+  // }
 ]
 
 

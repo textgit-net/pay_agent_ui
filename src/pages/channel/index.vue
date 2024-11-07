@@ -206,9 +206,12 @@ const onWithdrawSuccess = async () => {
   }, 600)
 }
 
-watch(()=> searchParams.value.isIgnoreDisable, () => {
+// watch(()=> searchParams.value.isIgnoreDisable, () => {
+//   filterSearch()
+// })
+const changeIsIgnoreDisable= () => {
   filterSearch()
-})
+}
 
 
 const fetchChanelGroups = async () => {
@@ -293,13 +296,16 @@ onMounted(()=>{
               </template>
               筛选
             </a-button>
-            <a-tooltip>
-              <template #title>默认为不开启忽略禁用，若只查看开启的请进行勾选筛选</template>
-              <a-space style="padding-left: 20px;">
-                <a-typography-text type="secondary">是否忽略禁用的渠道</a-typography-text>
-                <a-checkbox v-model:checked="searchParams.isIgnoreDisable"></a-checkbox>
-              </a-space>
-            </a-tooltip>
+            
+             
+            <a-space style="padding-left: 20px;">
+              <a-typography-text type="secondary">是否忽略禁用的渠道</a-typography-text>
+              <a-tooltip>
+                <template #title>默认为不开启忽略禁用，若只查看开启的请进行勾选筛选</template>
+                <a-checkbox v-model:checked="searchParams.isIgnoreDisable" @change="changeIsIgnoreDisable"></a-checkbox>
+              </a-tooltip>
+            </a-space>
+            
           </a-flex>
         </a-flex>
       </a-card>
@@ -495,10 +501,10 @@ onMounted(()=>{
                         <a-button style="padding-left: 0" type="link" @click="router.push({path:'/channel/info',query:{id:record.id}})">查看详情</a-button>
                       </a-menu-item>
                       <a-menu-divider />
-                      <a-menu-item key="1">
+                      <!-- <a-menu-item key="1">
                         <a-button type="link" @click="router.push({path:'/channel/edit',query:{id:record['id']}})" style="padding-left: 0">编辑渠道</a-button>
                       </a-menu-item>
-                      <a-menu-divider v-if="record.isEnable" />
+                      <a-menu-divider v-if="record.isEnable" /> -->
                       <a-menu-item key="2" v-if="record.isEnable">
                         <a-button @click="handleWithdraw(record)" type="link" style="padding-left: 0">渠道提现</a-button>
                       </a-menu-item>

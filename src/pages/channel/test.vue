@@ -3,9 +3,11 @@ import {CloseCircleOutlined, DoubleRightOutlined} from '@ant-design/icons-vue'
 import {getPayChannelTypeText, PayChannelType, PayModeType, getPayModeTypeText, PayModeTypeSelectOption, SelectOption} from "~/utils/constant.ts";
 import {channelTest, ChannelTestRequest, getALLChannelList,ChannelListResponse, ALLChannelListRequest, } from "~/api/channel/ChannelInterface.ts";
 import {AlipaySquareFilled,ArrowLeftOutlined } from "@ant-design/icons-vue"
+import QrcodeVue from 'qrcode.vue'
+import type { Level, RenderAs, ImageSettings } from 'qrcode.vue'
 
-
-
+const qrLevel = ref<Level>('H')
+const renderAs = ref<RenderAs>('svg')
 
 const items = ref([
   {
@@ -36,7 +38,7 @@ const state=reactive({
   current:0,
 })
 const fromData=reactive<ChannelTestRequest>({
-   isWebCashier:false,
+   isWebCashier:true,
    amount:0.1,
    payMode: null
 })
@@ -182,7 +184,7 @@ onMounted(()=>{
           </a-form-item>
           <a-form-item label="跳转方式" name="isWebCashier">
             <a-radio-group :disabled="fromData.channelId==null" v-model:value="fromData.isWebCashier">
-              <a-radio :value="false">直连</a-radio>
+              <a-radio :value="false" disabled>直连</a-radio>
               <a-radio :value="true">Web收银台</a-radio>
             </a-radio-group>
           </a-form-item>
@@ -197,14 +199,22 @@ onMounted(()=>{
               <a-input  placeholder="请输入商品标题" v-model:value="fromData.subject" style="width: 100%;"></a-input>
             </a-form-item>
             <a-form-item label="商品描述">
-              .
-
               <a-input  placeholder="请输入商品描述"  v-model:value="fromData.body" style="width: 100%;"></a-input>
             </a-form-item>
           </a-flex>
         </a-form>
         <a-flex  v-if="state.current==1" vertical justify="center" align="center" style="padding: 60px" :gap="10">
-          <vue-qrcode :color="{}" :quality="1" :value="orderInfo['data']" :width="200" :margin="0"></vue-qrcode>
+          <!-- <vue-qrcode :color="{}" :quality="1" :value="orderInfo['data']" :width="200" :margin="0"></vue-qrcode> -->
+
+          <qrcode-vue
+            :value="orderInfo['redirectUrl']"
+            :level="qrLevel"
+            :margin="0"
+            :size="200"
+            :render-as="renderAs"
+            background="#000000"
+            foreground='#fff'
+          />
           <a-typography-text type="secondary">打开手机浏览器扫一扫</a-typography-text>
         </a-flex>
 

@@ -389,7 +389,7 @@ const filterOption = (input: string, option: any) => {
      
     </a-modal>
 
-    <a-card :body-style="{padding: '15px',}">
+    <a-card :body-style="{padding: '15px',}" :loading="state.isLoading">
       <a-descriptions layout="vertical" :column="4">
         <template #title>
           <a-flex  align="center">
@@ -401,7 +401,7 @@ const filterOption = (input: string, option: any) => {
         </a-descriptions-item>
       </a-descriptions>
     </a-card>
-    <a-card v-show="info.isEnableRoyalty" :body-style="{padding: '15px'}">
+    <a-card v-show="info.isEnableRoyalty" :body-style="{padding: '15px'}" :loading="state.isLoading">
 
 
       <a-descriptions :column="4" layout="vertical">
@@ -417,12 +417,13 @@ const filterOption = (input: string, option: any) => {
         </a-descriptions-item>
         <a-descriptions-item style="padding-bottom: 4px" :labelStyle="{'color':'#999'}"label="分账方式(影响分账账户比率配置)">
           
-          <a-tooltip>
+          <a-tooltip v-if="info.royaltyMode">
             <template #title>{{
                 info.royaltyMode == DebtModeEnum.FIXED_RATIO ? '需手动配置分账账户的分账比率' : '无需配置分账账户的分账比率'
               }}</template>
             {{ getDebtModeEnumText(info.royaltyMode) }}<QuestionCircleFilled />
           </a-tooltip>
+          <a-typography-text v-else>{{ getDebtModeEnumText(info.royaltyMode) }}</a-typography-text>
         </a-descriptions-item>
         <a-descriptions-item style="padding-bottom: 4px" :labelStyle="{'color':'#999'}" label="分账策略">
           {{ getDebtStrategyEnumText(info.royaltyStrategy) }}
@@ -430,7 +431,7 @@ const filterOption = (input: string, option: any) => {
 
       </a-descriptions>
     </a-card>
-    <a-card v-show="info.isEnableRoyalty" :body-style="{padding: '15px'}">
+    <a-card v-show="info.isEnableRoyalty" :body-style="{padding: '15px'}" :loading="state.isLoading">
 
 
       <a-descriptions :column="4" >
@@ -448,7 +449,7 @@ const filterOption = (input: string, option: any) => {
       <a-table :columns="columns" :data-source="info.accounts" style="width: 1200px;" bordered :pagination="false">
         <template #emptyText>
           <a-empty></a-empty>
-          <a-button @click="handleShowAccountRateInfo(null)" type="link">添加分账账户</a-button>
+          <a-button @click="handleShowAccountRateInfo(null)" type="link">分账账户配置</a-button>
         </template>
         <template #bodyCell="{ column, text, record }">
           <template v-if="column.dataIndex == 'rate'">

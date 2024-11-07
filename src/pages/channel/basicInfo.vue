@@ -181,7 +181,7 @@ onMounted(async ()=>{
        
         <a-descriptions-item style="padding-bottom: 4px" :labelStyle="{'color':'#999'}" label="渠道组名称">
           
-          <a-typography-link v-if="info.group"  @click="router.push({path:'/channel/group-info',query:{groupCode:info.group.groupCode}})">{{info.group.name}}</a-typography-link>
+          <a-typography-link v-if="info.group" @click="router.push({path:'/channel/group-info',query:{groupCode:info.group.groupCode}})">{{info.group.name}}</a-typography-link>
           <a-typography-text v-else type="secondary">/</a-typography-text>
         </a-descriptions-item>
         <a-descriptions-item style="padding-bottom: 4px" :labelStyle="{'color':'#999'}" label="渠道组编码">{{  info.group ? info.group.groupCode : '/'  }}</a-descriptions-item>
