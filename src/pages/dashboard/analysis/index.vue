@@ -16,6 +16,11 @@ defineOptions({
   name: 'Analysis',
 })
 
+const userStore = useUserStore()
+const isHasPermission = computed(()=> {
+  return userStore.userInfo.isAllowInviteUser
+})
+
 const loading = ref(false)
 
 const visitData = ref([])
@@ -28,7 +33,7 @@ const visitData = ref([])
       
     </Suspense> -->
     <TransactionDataCard style="margin-bottom: 20px" />
-    <TransactionDataAgentCard style="margin-bottom: 20px" />
+    <TransactionDataAgentCard v-if="isHasPermission" style="margin-bottom: 20px" />
     <TransactionDataMchCard style="margin-bottom: 20px" />
     <!-- <TransactionData style="margin-bottom: 20px" />
    

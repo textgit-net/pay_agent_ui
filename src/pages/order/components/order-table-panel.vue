@@ -20,7 +20,15 @@ import {PaginationProps, Modal} from "ant-design-vue";
 
 const router = useRouter()
 
-
+const props=defineProps<{
+  tableType: number   | OrderTableType,
+  hideChannelinfoColumn?: boolean,
+  hideChannelorderColumn?: boolean,
+  hidemchinfoColumn?: boolean,
+  isDiabledChnnnelInfo?: boolean,
+  isDiabledMchInfo?: boolean,
+  searchParams?: null| OrderSearch,
+}>()
 const columns =shallowRef<any[]>(
     [
       {
@@ -45,6 +53,7 @@ const columns =shallowRef<any[]>(
         width: '160px',
         dataIndex: 'channelOrderNo',
         tableTypes:[OrderTableType.ALL,OrderTableType.PAY_ING,OrderTableType.SUCCESS,OrderTableType.FAIL],
+        isHide: props.hideChannelorderColumn
       },
 
       {
@@ -52,19 +61,16 @@ const columns =shallowRef<any[]>(
         dataIndex: 'channelInfo',
         width: '140px',
         tableTypes:[OrderTableType.ALL],
+        isHide: props.hideChannelinfoColumn
       },
       {
         title: '商户信息',
         dataIndex: 'mchInfo',
         width: '140px',
         tableTypes:[OrderTableType.ALL],
+        isHide: props.hidemchinfoColumn
       },
-      {
-        title: '商户手续费',
-        width: '120px',
-        dataIndex: 'mchFeeAmount',
-        tableTypes:[OrderTableType.PAY_ING,OrderTableType.SUCCESS,OrderTableType.FAIL],
-      },
+     
 
       // {
       //   title: '商品标题',
@@ -80,6 +86,12 @@ const columns =shallowRef<any[]>(
         width: '120px',
         dataIndex: 'amount',
         tableTypes:[OrderTableType.ALL]
+      },
+      {
+        title: '商户手续费',
+        width: '120px',
+        dataIndex: 'mchFeeAmount',
+        tableTypes:[OrderTableType.PAY_ING,OrderTableType.SUCCESS,OrderTableType.FAIL],
       },
       // {
       //   title: '币种',
@@ -135,10 +147,7 @@ const initSearchParams = ():OrderSearch => {
   }
 }
 const searchParams=ref<OrderSearch>(initSearchParams())
-const props=defineProps<{
-  tableType: number   | OrderTableType,
-  searchParams?: null| OrderSearch,
-}>()
+
 const state=reactive({
   dataSourceLoading:false
 })
@@ -216,6 +225,11 @@ const refresh=async(search:OrderSearch)=>{
   pagination.onChange(1, pagination.pageSize)
    
 }
+const filterColumns = () => {
+  return columns.value.filter(v=>(v.tableTypes.includes(OrderTableType.ALL)||v.tableTypes.includes(props.tableType)) && !v.isHide)
+}
+  
+
 defineExpose({refresh, loadData, resetSearch})
 onMounted(()=>{
   if (props.searchParams) {
@@ -237,7 +251,7 @@ onMounted(()=>{
 
 <template>
   <div style="width: 100%;">
-    <a-table style="width: 100%" :scroll="{ x: 1300 }"  :data-source="dataSource" :pagination="pagination" :loading="state.dataSourceLoading"  :columns="columns.filter(v=>v.tableTypes.includes(OrderTableType.ALL)||v.tableTypes.includes(tableType))" size="middle" :bordered="false">
+    <a-table style="width: 100%" :scroll="{ x: 1300 }"  :data-source="dataSource" :pagination="pagination" :loading="state.dataSourceLoading"  :columns="filterColumns()" size="middle" :bordered="false">
       <template #emptyText>
         <a-empty></a-empty>
       </template>
@@ -357,7 +371,8 @@ onMounted(()=>{
 
         <template v-if="column.dataIndex==='mchInfo'">
           <a-flex v-if="record['mchInfo']" vertical :gap="5" align="start">
-            <a-button style="padding-left: 0" type="link" @click="router.push({path:'/mch/info',query:{id:record['mchInfo'].id}})">{{record["mchInfo"].name}}</a-button>
+            <a-button v-if="!props.isDiabledMchInfo" style="padding-left: 0" type="link" @click="router.push({path:'/mch/info',query:{id:record['mchInfo'].id}})">{{record["mchInfo"].name}}</a-button>
+            <a-typography-text v-else>{{record["mchInfo"].name}}</a-typography-text>
             <a-typography-text type="secondary">商户ID:{{record["mchInfo"].id}}</a-typography-text>
           </a-flex>
           <a-typography-text v-else>/</a-typography-text>
@@ -367,7 +382,7 @@ onMounted(()=>{
 
 
           <a-flex v-if="record['channelInfo']" vertical :gap="5" align="start">
-              <a-flex justify="start" align="center" :gap="5" >
+              <a-flex v-if="!props.isDiabledChnnnelInfo"  justify="start" align="center" :gap="5" >
                 <a-tooltip>
                   
                   <template #title>查看渠道【{{record['channelInfo'].name}}】详情</template>
@@ -380,6 +395,12 @@ onMounted(()=>{
                   </a-space>
                 </a-tooltip>
               </a-flex>
+              <a-space v-else>
+                <a-flex justify="center" align="center">
+                  <AlipaySquareFilled  style="font-size: 18px;color: dodgerblue"/>
+                  <a-typography-text style="padding-left: 3px;">{{record['channelInfo'].name}}</a-typography-text>
+                </a-flex>
+              </a-space>
               <a-typography-text type="secondary">渠道ID:{{record['channelInfo'].id}}</a-typography-text>
             </a-flex>
           

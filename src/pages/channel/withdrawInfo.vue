@@ -124,25 +124,25 @@ onBeforeMount(()=>{
     <a-card >
       <a-tabs destroy-inactive-tab-pane >
         <a-tab-pane :key="ChannelWithdrawTableTypeEnum.ALL" :tab="getChannelWithdrawTableTypeEnumText(ChannelWithdrawTableTypeEnum.ALL)">
-          <withdraw-record-table ref="tableRef" :table-type="ChannelWithdrawTableTypeEnum.ALL" :search-params="searchParams"/>
+          <withdraw-record-table ref="tableRef" :table-type="ChannelWithdrawTableTypeEnum.ALL" :search-params="searchParams" :is-diabled-chnnnel-info="true" />
         </a-tab-pane>
         <a-tab-pane :key="ChannelWithdrawTableTypeEnum.AUDIT" :tab="getChannelWithdrawTableTypeEnumText(ChannelWithdrawTableTypeEnum.AUDIT)">
-          <withdraw-record-table ref="tableRef" :table-type="ChannelWithdrawTableTypeEnum.AUDIT" :search-params="searchParams"/>
+          <withdraw-record-table ref="tableRef" :table-type="ChannelWithdrawTableTypeEnum.AUDIT" :search-params="searchParams" :is-diabled-chnnnel-info="true"/>
         </a-tab-pane>
         <a-tab-pane :key="ChannelWithdrawTableTypeEnum.PROCESS" :tab="getChannelWithdrawTableTypeEnumText(ChannelWithdrawTableTypeEnum.PROCESS)">
-          <withdraw-record-table ref="tableRef" :table-type="ChannelWithdrawTableTypeEnum.PROCESS" :search-params="searchParams"/>
+          <withdraw-record-table ref="tableRef" :table-type="ChannelWithdrawTableTypeEnum.PROCESS" :search-params="searchParams" :is-diabled-chnnnel-info="true"/>
         </a-tab-pane>
         <a-tab-pane :key="ChannelWithdrawTableTypeEnum.TRANSFER" :tab="getChannelWithdrawTableTypeEnumText(ChannelWithdrawTableTypeEnum.TRANSFER)">
-          <withdraw-record-table ref="tableRef" :table-type="ChannelWithdrawTableTypeEnum.TRANSFER" :search-params="searchParams"/>
+          <withdraw-record-table ref="tableRef" :table-type="ChannelWithdrawTableTypeEnum.TRANSFER" :search-params="searchParams" :is-diabled-chnnnel-info="true"/>
         </a-tab-pane>
         <a-tab-pane :key="ChannelWithdrawTableTypeEnum.SUCCESS" :tab="getChannelWithdrawTableTypeEnumText(ChannelWithdrawTableTypeEnum.SUCCESS)">
-          <withdraw-record-table ref="tableRef" :table-type="ChannelWithdrawTableTypeEnum.SUCCESS" :search-params="searchParams"/>
+          <withdraw-record-table ref="tableRef" :table-type="ChannelWithdrawTableTypeEnum.SUCCESS" :search-params="searchParams" :is-diabled-chnnnel-info="true"/>
         </a-tab-pane>
         <a-tab-pane :key="ChannelWithdrawTableTypeEnum.TRANSFER_FAIL" :tab="getChannelWithdrawTableTypeEnumText(ChannelWithdrawTableTypeEnum.TRANSFER_FAIL)">
-          <withdraw-record-table ref="tableRef" :table-type="ChannelWithdrawTableTypeEnum.TRANSFER_FAIL" :search-params="searchParams"/>
+          <withdraw-record-table ref="tableRef" :table-type="ChannelWithdrawTableTypeEnum.TRANSFER_FAIL" :search-params="searchParams" :is-diabled-chnnnel-info="true"/>
         </a-tab-pane>
         <a-tab-pane :key="ChannelWithdrawTableTypeEnum.AUDIT_REJECT" :tab="getChannelWithdrawTableTypeEnumText(ChannelWithdrawTableTypeEnum.AUDIT_REJECT)">
-          <withdraw-record-table ref="tableRef" :table-type="ChannelWithdrawTableTypeEnum.AUDIT_REJECT" :search-params="searchParams"/>
+          <withdraw-record-table ref="tableRef" :table-type="ChannelWithdrawTableTypeEnum.AUDIT_REJECT" :search-params="searchParams" :is-diabled-chnnnel-info="true"/>
         </a-tab-pane>
         
       </a-tabs>

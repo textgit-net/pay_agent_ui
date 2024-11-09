@@ -52,10 +52,10 @@ const columns:ColumnsType =[
     title: '合作日期',
     dataIndex: 'createdTime',
   },
-  {
-    title:'操作',
-    dataIndex: 'action',
-  },
+  // {
+  //   title:'操作',
+  //   dataIndex: 'action',
+  // },
 ]
 const state=reactive({
   dataSourceLoading:false,
@@ -147,7 +147,8 @@ onMounted(()=>{
         <template #bodyCell="{ column , record}">
           <template v-if="column.dataIndex==='name'">
             <a-flex vertical :gap="5" align="start">
-              <a-button style="padding-left: 0" type="link" @click="router.push({path:'/mch/info',query:{id:record.id}})">{{record["name"]}}</a-button>
+              <!-- <a-button style="padding-left: 0" type="link" @click="router.push({path:'/mch/info',query:{id:record.id}})">{{record["name"]}}</a-button> -->
+              <a-typography-text>ID:{{record["name"]}}</a-typography-text>
               <a-typography-text type="secondary">ID:{{record["id"]}}</a-typography-text>
             </a-flex>
           </template>
@@ -170,13 +171,13 @@ onMounted(()=>{
               <a-switch :checked-value="true" :un-checked-value="false" :checked="record['isEnable']"></a-switch>
           </template>
           <template v-if="column.dataIndex==='channelCount'">
-             {{record['channelCount']|| '--' }}
+             {{record['channelCount']?? '/' }}
           </template>
           <template v-if="column.dataIndex==='totalOrderCount'">
-            {{record['totalOrderAmount']|| '--' }}
+            {{record['totalOrderAmount']?? '/' }}
           </template>
           <template v-if="column.dataIndex==='totalOrderAmount'">
-            {{record['totalOrderAmount']|| '--' }}
+            {{record['totalOrderAmount']?? '/' }}
           </template>
           <template v-if="column.dataIndex==='action'">
             <a-flex :gap="5">

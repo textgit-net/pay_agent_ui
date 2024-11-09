@@ -220,16 +220,13 @@ onMounted(()=>{
           <a-flex  :gap="0" justify="start">
             <a-button type="link" style="padding-left: 0" @click="resetSearch">重置筛选</a-button>
             <a-button  size="small"  @click="filterSearch"  type="primary"  style="width: 80px;height:28px"  >筛选</a-button>
-           
-              <a-tooltip>
-                <template #title>默认为不开启忽略禁用，若只查看开启的请进行勾选筛选</template>
                 <a-space style="padding-left: 20px;">
                   <a-typography-text type="secondary">是否忽略禁用的渠道</a-typography-text>
-                  <a-checkbox v-model:checked="searchParams.isIgnoreDisable"></a-checkbox>
+                  <a-tooltip>
+                    <template #title>默认为不开启忽略禁用，若只查看开启的请进行勾选筛选</template>
+                    <a-checkbox v-model:checked="searchParams.isIgnoreDisable"></a-checkbox>
+                  </a-tooltip>
                 </a-space>
-              </a-tooltip>
-             
-           
           </a-flex>
         </a-flex>
       </a-card>

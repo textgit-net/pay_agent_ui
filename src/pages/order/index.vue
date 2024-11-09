@@ -132,6 +132,9 @@ onBeforeMount(()=>{
   
   console.log('searchParams.value', searchParams.value)
   fetchALLChannelList()
+  if (state.isShowData && searchParams.value.page == 1) {
+    getStatisticsData()
+  }
 
 })
 </script>

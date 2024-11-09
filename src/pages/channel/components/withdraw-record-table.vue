@@ -110,6 +110,7 @@ const searchParams=ref<ChannelWithdrawSearch>(initSearchParams())
 const props=defineProps<{
   tableType: number   | ChannelWithdrawTableTypeEnum,
   searchParams?: null| ChannelWithdrawSearch,
+  isDiabledChnnnelInfo?: boolean,
 }>()
 const state=reactive({
   dataSourceLoading:false
@@ -327,7 +328,7 @@ onMounted(()=>{
 
 
           <a-flex v-if="record['channelId']" vertical :gap="5" align="start">
-              <a-flex justify="start" align="center" :gap="5" >
+              <a-flex v-if="!props.isDiabledChnnnelInfo" justify="start" align="center" :gap="5" >
                 <a-tooltip>
                   
                   <template #title>查看渠道【{{record['channelName']}}】详情</template>
@@ -340,6 +341,7 @@ onMounted(()=>{
                   </a-space>
                 </a-tooltip>
               </a-flex>
+              <a-typography-text v-else>{{record['channelName']}}</a-typography-text>
               <a-typography-text type="secondary">渠道ID:{{record['channelId']}}</a-typography-text>
             </a-flex>
           
