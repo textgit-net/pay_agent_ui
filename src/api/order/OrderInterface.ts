@@ -70,26 +70,18 @@ export enum OrderStatus {
 }
 
 export enum OrderNotifyStatusEnum {
-    //未开始
-    NO_NEED=0,
-    //待处理
-    WAIT_HANDLE=1,
     //处理中
-    HANDLE_ING=2,
+    HANDLE_ING=1,
     //回调成功 
-    SUCCESS=3,
+    SUCCESS=2,
     //失败重试
-    FAIL_RETRY=4,
+    FAIL_RETRY=3,
     //回调失败
-    FAIL=5
+    FAIL=4
 }
 
 export function getOrderNotifyStatusEnumText(status:OrderNotifyStatusEnum): string {
     switch (status){
-        case OrderNotifyStatusEnum.NO_NEED:
-            return "未开始"
-        case OrderNotifyStatusEnum.WAIT_HANDLE:
-            return "待处理"
         case OrderNotifyStatusEnum.HANDLE_ING:
             return "处理中"
         case OrderNotifyStatusEnum.SUCCESS:

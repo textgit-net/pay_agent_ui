@@ -199,7 +199,7 @@ const tranferReset = () => {
     }
 }
 
-onMounted(() => {
+onBeforeMount(() => {
     init()
 })
  

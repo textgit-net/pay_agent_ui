@@ -311,19 +311,6 @@ onMounted(()=>{
 
         <template v-if="column.dataIndex==='notifyStatus'">
             <a-flex align="center" justify="start">
-             
-              <a-tag v-if="record['notifyStatus']==OrderNotifyStatusEnum.NO_NEED" color="processing" >
-                <template #icon>
-                  <clock-circle-outlined />
-                </template>
-                {{getOrderNotifyStatusEnumText(OrderNotifyStatusEnum.NO_NEED)}}
-              </a-tag>
-              <a-tag v-if="record['notifyStatus']==OrderNotifyStatusEnum.WAIT_HANDLE" color="processing" > 
-                <template #icon>
-                  <clock-circle-outlined />
-                </template>
-                {{getOrderNotifyStatusEnumText(OrderNotifyStatusEnum.WAIT_HANDLE)}}
-              </a-tag>
               <a-tag v-if="record['notifyStatus']==OrderNotifyStatusEnum.HANDLE_ING" color="processing" > 
                 <template #icon>
                   <sync-outlined :spin="true" />
