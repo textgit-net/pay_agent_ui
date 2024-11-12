@@ -501,10 +501,10 @@ onMounted(()=>{
                         <a-button style="padding-left: 0" type="link" @click="router.push({path:'/channel/info',query:{id:record.id}})">查看详情</a-button>
                       </a-menu-item>
                       <a-menu-divider />
-                      <!-- <a-menu-item key="1">
+                      <a-menu-item v-if="!record.isEnable" key="1">
                         <a-button type="link" @click="router.push({path:'/channel/edit',query:{id:record['id']}})" style="padding-left: 0">编辑渠道</a-button>
                       </a-menu-item>
-                      <a-menu-divider v-if="record.isEnable" /> -->
+                      <a-menu-divider v-if="!record.isEnable" />
                       <a-menu-item key="2" v-if="record.isEnable">
                         <a-button @click="handleWithdraw(record)" type="link" style="padding-left: 0">渠道提现</a-button>
                       </a-menu-item>

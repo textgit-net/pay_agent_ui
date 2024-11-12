@@ -17,6 +17,7 @@ const instance: AxiosInstance = axios.create({
   headers: { 'Content-Type': ContentTypeEnum.JSON },
 })
 const axiosLoading = new AxiosLoading()
+const deleteKeys = ['tabKey', 'timestamp']
 async function requestHandler(config: InternalAxiosRequestConfig & RequestConfigExtra): Promise<InternalAxiosRequestConfig> {
   // 处理请求前的url
   if (
@@ -30,8 +31,20 @@ async function requestHandler(config: InternalAxiosRequestConfig & RequestConfig
   }
   const token = useAuthorization()
 
-  if (token.value && config.token !== false)
+  if (token.value && config.token !== false) {
     config.headers.set(STORAGE_AUTHORIZE_KEY, token.value)
+  }
+   
+  const params = Object.assign({}, config.params);
+  for (const key in params) {
+    if (!params[key]) {
+      delete params[key];
+    }
+    if (deleteKeys.includes(key)) {
+      delete params[key];
+    }
+  }
+  config.params = params
 
   // 增加多语言的配置
   const { locale } = useI18nLocale()

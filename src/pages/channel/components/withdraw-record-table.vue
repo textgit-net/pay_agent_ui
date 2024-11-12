@@ -280,14 +280,22 @@ onMounted(()=>{
 
         <template v-if="column.dataIndex==='accountNo'">
           <a-flex vertical justify="flex-start">
-            <a-tooltip>
-              <template #title>收款账号姓名</template>
-              <a-typography-text>{{ record.accountRealName }}</a-typography-text>
-            </a-tooltip>
-            <a-tooltip>
+            <a-space>
+              <a-tooltip>
+                <template #title>收款账号姓名</template>
+                <a-typography-text>{{ record.accountRealName }}</a-typography-text>
+              </a-tooltip>
+            </a-space>
+            <!-- <a-tooltip>
               <template #title>收款账号</template>
               <a-typography-text>{{ record.accountNo }}</a-typography-text>
-            </a-tooltip>
+              <copy-text-btn :copytext="record.accountNo" tipText="复制收款账号"></copy-text-btn>
+            </a-tooltip> -->
+            <a-space>
+              <a-typography-text>{{ record.accountNo }}</a-typography-text>
+              <copy-text-btn :copytext="record.accountNo" tipText="复制收款账号"></copy-text-btn>
+            </a-space>
+            
           </a-flex>
         </template>
         <template v-if="column.dataIndex==='amount'">
