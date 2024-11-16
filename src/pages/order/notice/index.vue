@@ -2,7 +2,7 @@
 import {ColumnsType} from "ant-design-vue/es/table";
 import {PaginationProps} from "ant-design-vue";
 import EditContentModal from "~/pages/mch/edit-content-modal.vue";
-import {MerchantSearch, searchMerchants} from "~/api/merchant/MerchantInterface.ts";
+// import {MerchantSearch, searchMerchants} from "~/api/merchant/MerchantInterface.ts";
 import {PayChannelTypeSelectOption} from "~/utils/constant.ts";
 
 const router=useRouter()
@@ -49,7 +49,7 @@ const state=reactive({
   dataSourceLoading:false,
   isConfirmLoading:false
 })
-const searchParams = reactive<MerchantSearch>({
+const searchParams = reactive<any>({
   page:1,
   limit:10
 })
@@ -90,7 +90,7 @@ const loadData=async  ()=> {
 }
 
 onMounted(()=>{
-  loadData()
+  // loadData()
 })
 </script>
 
