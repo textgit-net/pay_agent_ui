@@ -141,6 +141,18 @@ export interface ChannelFormData{
     mchId?: number;
 }
 
+export interface CloneChannelFormData {
+    /**
+     * 渠道ID
+    */
+    id?: number
+    /**
+     * 渠道名称
+     */
+    name?: string
+    groupCode?:string
+}
+
 export interface ChannelWallat {
     amount?: number;
     freezeAmount?: number;
@@ -238,6 +250,16 @@ export function saveChannel(data:ChannelFormData) {
         return usePut<String>('/channel', data,)
     }
     return usePost<String>("/channel", data,)
+}
+
+
+
+/**
+ * 复制渠道
+ * @param data
+ */
+export function cloneChannel(data:CloneChannelFormData) {
+    return usePost<String>("/channel/copy", data)
 }
 
 /**

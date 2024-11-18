@@ -159,29 +159,29 @@ onMounted(()=>{
 <template>
   <a-flex vertical :gap="10" style="width: 100%;height: 100%">
     <a-modal
-      v-model:open="state.isShowEditModal"
-      :mask-closable="false" centered :width="420" :title="formData.id?'编辑分账账户':'创建分账账户'"
-    >
-    <template #footer>
-      <a-button key="submit" type="primary" :loading="state.isSaveLoading" :disabled="isDisAbledChannelGroupForm" @click="onSubmit" style="width: 100%;">提 交</a-button>
-    </template>
-    <a-form ref="formRef" :model="formData" layout="vertical"  style="padding: 20px 0;">
-      <a-form-item name="realName" :rules="{required:true,message:'请输入真实姓名'}"  label="真实姓名" >
-        <a-input placeholder="请输入真实姓名" v-model:value="formData.realName" allow-clear></a-input>
-      </a-form-item>
-      <a-form-item name="accountNo" :rules="{required:true,message:'请输入分账账户'}" label="分账账户">
-        <a-input placeholder="请输入分账账户" v-model:value="formData.accountNo" allow-clear></a-input>
-      </a-form-item>
-      <a-form-item name="channelType" :rules="{required:true,message:'请选择渠道类型'}" label="渠道类型">
-        <a-radio-group :disabled="!formData.channelType" v-model:value="formData.channelType">
-          <a-radio :value="PayChannelType.ALI">{{ getPayChannelTypeText(PayChannelType.ALI) }}</a-radio>
-          <!-- <a-radio :value="PayChannelType.ALI_USER">{{ getPayChannelTypeText(PayChannelType.ALI_USER) }}</a-radio> -->
-        </a-radio-group>
-      </a-form-item>
-     
+        v-model:open="state.isShowEditModal"
+        :mask-closable="false" centered :width="420" :title="formData.id?'编辑分账账户':'创建分账账户'"
+      >
+      <template #footer>
+        <a-button key="submit" type="primary" :loading="state.isSaveLoading" :disabled="isDisAbledChannelGroupForm" @click="onSubmit" style="width: 100%;">提 交</a-button>
+      </template>
+      <a-form ref="formRef" :model="formData" layout="vertical"  style="padding: 20px 0;">
+        <a-form-item name="realName" :rules="{required:true,message:'请输入真实姓名'}"  label="真实姓名" >
+          <a-input placeholder="请输入真实姓名" v-model:value="formData.realName" allow-clear></a-input>
+        </a-form-item>
+        <a-form-item name="accountNo" :rules="{required:true,message:'请输入分账账户'}" label="分账账户">
+          <a-input placeholder="请输入分账账户" v-model:value="formData.accountNo" allow-clear></a-input>
+        </a-form-item>
+        <a-form-item name="channelType" :rules="{required:true,message:'请选择渠道类型'}" label="渠道类型">
+          <a-radio-group :disabled="!formData.channelType" v-model:value="formData.channelType">
+            <a-radio :value="PayChannelType.ALI">{{ getPayChannelTypeText(PayChannelType.ALI) }}</a-radio>
+            <!-- <a-radio :value="PayChannelType.ALI_USER">{{ getPayChannelTypeText(PayChannelType.ALI_USER) }}</a-radio> -->
+          </a-radio-group>
+        </a-form-item>
       
-    </a-form>
-   </a-modal>
+        
+      </a-form>
+    </a-modal>
 
 
     <!--头部-->

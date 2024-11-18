@@ -125,6 +125,7 @@ export enum PayModeType{
   ALI_PAY_FACE_TO_FACE="ALI_PAY_FACE_TO_FACE",
   ALI_PAY_FACE_TO_FACE_TO_H5="ALI_PAY_FACE_TO_FACE_TO_H5",
   ALI_PAY_TO_OPEN="ALI_PAY_TO_OPEN",
+  ALI_PAY_H5_TO_JS="ALI_PAY_H5_TO_JS"
   //ALI_PAY_TO_USER="ALI_PAY_TO_USER"
 }
 
@@ -139,6 +140,8 @@ export const getPayModeTypeText=(type:PayModeType)=>{
       return "当面付转淘宝"
     case PayModeType.ALI_PAY_TO_OPEN:
       return "支付宝转账"
+    case PayModeType.ALI_PAY_H5_TO_JS:
+      return "支付宝H5转JS"
     // case PayModeType.ALI_PAY_TO_USER:
     //   return "支付宝转账到个人"
   }
@@ -159,6 +162,10 @@ export const PayModeTypeSelectOption:SelectOption<PayModeType>[]=[
   {
     value:PayModeType.ALI_PAY_TO_OPEN,
     title:getPayModeTypeText(PayModeType.ALI_PAY_TO_OPEN)
+  },
+  {
+    value:PayModeType.ALI_PAY_H5_TO_JS,
+    title:getPayModeTypeText(PayModeType.ALI_PAY_H5_TO_JS)
   },
   // {
   //   value:PayModeType.ALI_PAY_TO_USER,

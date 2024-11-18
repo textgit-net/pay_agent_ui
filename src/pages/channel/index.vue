@@ -5,7 +5,7 @@ import {AlipaySquareFilled, ExclamationCircleOutlined, FormOutlined, FundViewOut
 import {PaginationProps,Modal,message} from "ant-design-vue";
 import { ChannelGroupSimpleResponse, getChannelGroups} from '@/api/channel/group'
 
-import {ChannelListResponse, ChannelSearch, searchChannel, getChannelWalletInfo} from "~/api/channel/ChannelInterface.ts";
+import {ChannelListResponse, ChannelSearch, searchChannel, getChannelWalletInfo, cloneChannel, CloneChannelFormData} from "~/api/channel/ChannelInterface.ts";
 import {getPayChannelTypeText, PayChannelType, PayModeType, getPayModeTypeText, PayChannelTypeSelectOption} from "~/utils/constant.ts";
 import { calcFloat } from '~/utils/calcFloat'
 import { updateParamsToUrl, getParamsFromUrl} from '@/utils/tools'
@@ -72,7 +72,8 @@ const columns:ColumnsType =[
   },
 ]
 const state=reactive({
-  isShowEditModal:false,
+  isShowCloneModal:false,
+  isSaveLoading: false,
   dataSourceLoading:false,
   isPageLoading:false,
   showWithdrawDialog: false,
@@ -229,6 +230,39 @@ const filterSearch=()=>{
   pagination.onChange(1, pagination.pageSize)
 }
 
+const cloneFormRef = ref()
+const cloneFormData = ref<CloneChannelFormData>({
+
+})
+
+const handleShowClone = (record: ChannelListResponse) => {
+  const uniqueId = Math.random().toString(36).substr(2, 6);
+ 
+  console.log('cloneFormData', cloneFormData.value)
+  state.isShowCloneModal = true
+  nextTick().then(_=> {
+    cloneFormRef.value.resetFields()
+    cloneFormData.value.id = record.id
+    cloneFormData.value.groupCode = record.group?.groupCode
+    cloneFormData.value.name = `${record.name}-${uniqueId}`
+  })
+}
+const onCloneSubmit = () => {
+  cloneFormRef.value.validate().then(async()=> {
+    state.isSaveLoading=true
+    try {
+     await cloneChannel(cloneFormData.value)
+     filterSearch()
+     state.isShowCloneModal=false
+    }finally {
+      state.isSaveLoading=false
+    }
+  })
+}
+const isDisAbledCloneChannelForm = computed(() => {
+  return !cloneFormData.value.name || state.isSaveLoading
+})
+
 onMounted(()=>{
   if (getParamsFromUrl()) {
     searchParams.value = Object.assign(searchParams.value, getParamsFromUrl())
@@ -246,6 +280,31 @@ onMounted(()=>{
 
 <template>
   <a-spin :spinning="state.isPageLoading">
+    <a-modal
+        v-model:open="state.isShowCloneModal"
+        :mask-closable="false" centered :width="420" title="克隆渠道"
+      >
+      <template #footer>
+        <a-button key="submit" type="primary" :loading="state.isSaveLoading" :disabled="isDisAbledCloneChannelForm" @click="onCloneSubmit" style="width: 100%;">提 交</a-button>
+      </template>
+      <a-form ref="cloneFormRef" :model="cloneFormData" layout="vertical"  style="padding: 20px 0;">
+        <a-form-item name="name" :rules="{required:true,message:'请输入渠道名称'}"  label="渠道名称" >
+          <a-input placeholder="请输入渠道名称" v-model:value="cloneFormData.name" allow-clear></a-input>
+        </a-form-item>
+        <a-form-item name="groupCode" :rules="{required:false,message:'请选择渠道组'}" label="所属渠道组">
+          <a-select
+            v-model:value="cloneFormData.groupCode"
+            style="width: 100%"
+            placeholder="请选择渠道组"
+            allow-clea
+          >
+            <a-select-option v-for="item in channelGroups" :value="item.groupCode">{{ item.name }}</a-select-option>
+          </a-select>
+        </a-form-item>
+      </a-form>
+    </a-modal>
+
+
     <channel-withdraw-dialog v-model:visible="state.showWithdrawDialog" :chnnel-info="state.channelInfo" @on-success="onWithdrawSuccess" />
     <a-flex vertical :gap="10" style="width: 100%;height: 100%">
       <!--头部-->
@@ -499,6 +558,10 @@ onMounted(()=>{
                     <a-menu>
                       <a-menu-item key="0">
                         <a-button style="padding-left: 0" type="link" @click="router.push({path:'/channel/info',query:{id:record.id}})">查看详情</a-button>
+                      </a-menu-item>
+                      <a-menu-divider />
+                      <a-menu-item key="clone">
+                        <a-button style="padding-left: 0" type="link" @click="handleShowClone(record)">克隆渠道</a-button>
                       </a-menu-item>
                       <a-menu-divider />
                       <a-menu-item v-if="!record.isEnable" key="1">
