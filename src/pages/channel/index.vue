@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { h, createVNode  } from 'vue';
 import {ColumnsType} from "ant-design-vue/es/table";
-import {AlipaySquareFilled, ExclamationCircleOutlined, FormOutlined, FundViewOutlined, ReloadOutlined,FileSearchOutlined } from "@ant-design/icons-vue"
+import {AlipaySquareFilled, ExclamationCircleOutlined, FormOutlined, FundViewOutlined, ReloadOutlined,FileSearchOutlined,QuestionCircleOutlined } from "@ant-design/icons-vue"
 import {PaginationProps,Modal,message} from "ant-design-vue";
 import { ChannelGroupSimpleResponse, getChannelGroups} from '@/api/channel/group'
 
@@ -10,7 +10,8 @@ import {getPayChannelTypeText, PayChannelType, PayModeType, getPayModeTypeText, 
 import { calcFloat } from '~/utils/calcFloat'
 import { updateParamsToUrl, getParamsFromUrl} from '@/utils/tools'
 import ChannelWithdrawDialog from '@/pages/channel/components/channel-withdraw-dialog.vue';
-
+import ChannelAreaBlackDialog from '@/pages/channel/components/channel-area-black-dialog.vue';
+const optsStore = useOptsStore()
 const router=useRouter()
 const columns:ColumnsType =[
   {
@@ -77,6 +78,7 @@ const state=reactive({
   dataSourceLoading:false,
   isPageLoading:false,
   showWithdrawDialog: false,
+  showAreaBlackDialog: false,
   channelInfo: {}
 })
 const initSearchParams = ():ChannelSearch => {
@@ -109,17 +111,18 @@ const pagination = reactive<PaginationProps>({
 const dataSource=shallowRef<ChannelListResponse[]>([])
 const channelGroups = ref<ChannelGroupSimpleResponse[]>([])
 
-const changeEnable=async (id:number)=>{
+const changeEnable=async (record:ChannelListResponse)=>{
+  let tip = record.isEnable ? `确认关闭当前渠道【${record.name}】吗？` : `确认开启当前渠道【${record.name}】吗? ${record.isErrorAutoClose? '上次是因为【'+ record.closeReason +'】关闭。':''}`
   Modal.confirm({
     title: '温馨提示',
     icon: createVNode(ExclamationCircleOutlined),
-    content: `确认关闭当前渠道吗？关闭后需联系管理员开启。`,
+    content: tip,
     okText: '确认',
     cancelText: '取消',
     async onOk() {
       try {
         state.isPageLoading=true
-        let res = await usePut(`/channel/change/${id}`)
+        let res = await usePut(`/channel/change/${record.id}`)
         message.success('操作成功')
         await loadData()
         state.isPageLoading=false
@@ -157,7 +160,7 @@ const showPayModelDialog = (record: ChannelListResponse) => {
   let domArr = []
   if (record.payModes.length) {
     record.payModes.map((item: PayModeType, index: number) => {
-      domArr.push(h('p', `${index + 1}、${getPayModeTypeText(item)}`))
+      domArr.push(h('p', `${index + 1}、${ optsStore.getPayModesText(item)}`))
     })
   
   }
@@ -247,6 +250,7 @@ const handleShowClone = (record: ChannelListResponse) => {
     cloneFormData.value.name = `${record.name}-${uniqueId}`
   })
 }
+
 const onCloneSubmit = () => {
   cloneFormRef.value.validate().then(async()=> {
     state.isSaveLoading=true
@@ -262,6 +266,11 @@ const onCloneSubmit = () => {
 const isDisAbledCloneChannelForm = computed(() => {
   return !cloneFormData.value.name || state.isSaveLoading
 })
+
+const handleAddAreaBlackList = (record: ChannelListResponse) => {
+  state.channelInfo =record
+  state.showAreaBlackDialog = true
+}
 
 onMounted(()=>{
   if (getParamsFromUrl()) {
@@ -306,6 +315,7 @@ onMounted(()=>{
 
 
     <channel-withdraw-dialog v-model:visible="state.showWithdrawDialog" :chnnel-info="state.channelInfo" @on-success="onWithdrawSuccess" />
+    <ChannelAreaBlackDialog v-model:visible="state.showAreaBlackDialog" :chnnel-info="state.channelInfo" />
     <a-flex vertical :gap="10" style="width: 100%;height: 100%">
       <!--头部-->
       <a-card :body-style="{padding:'15px'}">
@@ -514,22 +524,30 @@ onMounted(()=>{
                   <a-tag :bordered="false" color="success">已开启</a-tag>
                   <a-tooltip>
                     <template #title>关闭渠道</template>
-                    <FormOutlined @click="changeEnable(record.id as number)" style="color: #1677ff;" />
+                    <FormOutlined @click="changeEnable(record)" style="color: #1677ff;" />
                   </a-tooltip>
                   
                 </a-flex>
                 
+                <a-flex v-else align="center"  justify="center">
+                  <a-tooltip >
+                    <template #title>{{(record as ChannelListResponse).closeReason?? '渠道已关闭' }}</template>
+                    <a-tag :bordered="false" color="error">
+                      <span>已关闭<QuestionCircleOutlined /></span>
+                      
+                      <!-- <template #icon>
+                        <QuestionCircleOutlined />
+                      </template> -->
+                    </a-tag>
+                  </a-tooltip>
+                  <a-tooltip >
+                    <template #title>开启渠道</template>
+                    <FormOutlined @click="changeEnable(record)" style="color: #1677ff;" />
+                   
+                  </a-tooltip>
+                </a-flex>
                 
-                <a-tooltip v-else>
-                  <template #title>请联系管理员进行开启</template>
-                  <a-tag :bordered="false" color="error">
-                    已关闭
-                  </a-tag>
-                </a-tooltip>
               </a-flex>
-              
-             
-             
             </template>
             <template v-if="column.dataIndex==='groupInfo'">
               <a-flex :gap="10"  justify="space-between" align="center" >
@@ -571,10 +589,15 @@ onMounted(()=>{
                       <a-menu-item key="2" v-if="record.isEnable">
                         <a-button @click="handleWithdraw(record)" type="link" style="padding-left: 0">渠道提现</a-button>
                       </a-menu-item>
+                      <a-menu-item key="0">
+                        <a-button style="padding-left: 0" type="link" @click="handleAddAreaBlackList(record)">渠道地区权限</a-button>
+                      </a-menu-item>
+                      <a-menu-divider />
                       <a-menu-divider v-if="record.isEnable" />
                       <a-menu-item v-if="record.isEnable" key="3">
                         <a-button type="primary" size="small" :disabled="!record.isEnable" @click="router.push({path:'/channel/test',query:{id:record.id}})" style="padding: 0 10px" >渠道测试</a-button>
                       </a-menu-item>
+                      
                     </a-menu>
                   </template>
                 </a-dropdown>

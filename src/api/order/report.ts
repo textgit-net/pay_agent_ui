@@ -15,7 +15,7 @@ export interface BaseOrderReportSearch extends BasePageRequest{
     agentIds?: number []
     channelIds?: number []
     mchIds?: number []
-    payModes?: PayModeType[]
+    payModes?: string[]
 }
 
 export interface AllOrderReportSearch extends BaseOrderReportSearch{

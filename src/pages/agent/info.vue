@@ -14,8 +14,20 @@ if (tabKey) {
   state.activeTabKey = tabKey as string;
 }
 
+const initSearchParams = () => {
+  delete route.query.page
+  delete route.query.limit
+  delete route.query.dateType
+  delete route.query.startDate
+  delete route.query.endDate
+}
+
 const onTabClick=(key: string)=>{
+  
   route.query['tabKey']=key
+  if (key != state.activeTabKey) {
+    initSearchParams()
+  }
   console.log('route.query', route.query, route.path, router)
   router.replace({ query: {...route.query, timestamp: new Date().getTime()},replace:true})
 }

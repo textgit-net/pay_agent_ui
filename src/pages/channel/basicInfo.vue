@@ -99,10 +99,10 @@ const getInfo=async (id:string)=>{
 }
 
 const payModelNames = ref<string[]>([])
-const getPayModelName = (payModes: PayModeType[]) => {
+const getPayModelName = (payModes: string[]) => {
   if (payModes.length) {
     payModes.map((item: PayModeType, index: number) => {
-      payModelNames.value.push(`${index + 1}、${getPayModeTypeText(item)}`)
+      payModelNames.value.push(`${index + 1}、${ useOptsStore().getPayModesText(item)}`)
     })
   }
 }

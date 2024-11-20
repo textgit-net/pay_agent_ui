@@ -12,7 +12,7 @@ import { getAllMerchantList, MerchantOptItem } from '@/api/merchant'
 import { getALLChannelList,ChannelListResponse, ALLChannelListRequest, } from "~/api/channel/ChannelInterface.ts";
 import { DateSearchTypeEnum} from '@/components/date-search-wrap/type'
 import { calcFloat } from '~/utils/calcFloat'
-
+const PayModeOptions = useOptsStore().payModesOpts
 const router=useRouter()
 const columns:ColumnsType =[
   {
@@ -192,7 +192,8 @@ onMounted(()=>{
           </a-col>
           <a-col class="gutter-row" :span="5">
             <a-select style="width: 100%" mode="multiple" allow-clear :max-tag-count="1" v-model:value="searchParams.payModes" placeholder="按支付方式查询">
-              <a-select-option v-for="(item) in PayModeTypeSelectOption" :value="item.value">{{item.title}}</a-select-option>
+              <a-select-option v-for="(item) in PayModeOptions" :value="item.payMode">{{item.payModeName}}</a-select-option>
+              
             </a-select>
           </a-col>
           <a-col class="gutter-row" :span="24">

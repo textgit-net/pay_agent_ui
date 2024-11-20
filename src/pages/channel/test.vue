@@ -2,6 +2,7 @@
 import {CloseCircleOutlined, DoubleRightOutlined} from '@ant-design/icons-vue'
 import {getPayChannelTypeText, PayChannelType, PayModeType, getPayModeTypeText, PayModeTypeSelectOption, SelectOption} from "~/utils/constant.ts";
 import {channelTest, ChannelTestRequest, getALLChannelList,ChannelListResponse, ALLChannelListRequest, } from "~/api/channel/ChannelInterface.ts";
+import type { PayModesItem, ChannelTypeAndPayModeOptItem } from '~@/api/common/opts'
 import {AlipaySquareFilled,ArrowLeftOutlined } from "@ant-design/icons-vue"
 import QrcodeVue from 'qrcode.vue'
 import type { Level, RenderAs, ImageSettings } from 'qrcode.vue'
@@ -26,8 +27,10 @@ const router=useRouter()
 const route = useRoute()
 const formRef=ref()
 var channels = [];
-let originPayModes:SelectOption<PayModeType>[] = PayModeTypeSelectOption
-const payModes=ref<SelectOption<PayModeType>[]>([])
+const PayModeOptions = useOptsStore().payModesOpts
+
+let originPayModes:PayModesItem[] = PayModeOptions
+const payModes=ref<PayModesItem[]>([])
 
 const channelOpts = ref<ChannelListResponse[]>([])
 const state=reactive({
@@ -53,13 +56,13 @@ const onChannelChange=()=>{
   payModes.value = []
   if(fromData.channelId){
     let payModesArr = channelOpts.value.find(v=>v.id==fromData.channelId).payModes
-    originPayModes.map((item:SelectOption<PayModeType>) => {
-      if (payModesArr.includes(item.value)) {
+    originPayModes.map((item:PayModesItem) => {
+      if (payModesArr.includes(item.payMode)) {
         payModes.value.push(item)
       }
     })
    
-    fromData.payMode = payModes.value[0].value
+    fromData.payMode = payModes.value[0].payMode
   }else {
     payModes.value=[]
   }
@@ -174,7 +177,7 @@ onMounted(()=>{
         
           <a-form-item label="支付方式" name="payMode" :rules="{required:true,message:'请选择支付方式',trigger: 'change'}">
             <a-radio-group :disabled="fromData.channelId==null" v-model:value="fromData.payMode">
-              <a-radio v-for="(item) in payModes" :value="item.value">{{item.title}}</a-radio>
+              <a-radio v-for="(item) in payModes" :value="item.payMode">{{item.payModeName}}</a-radio>
             </a-radio-group>
             <a-typography-text v-if="payModes.length == 0 && fromData.channelId==null" type="secondary">待选择支付渠道后显示</a-typography-text>
 

@@ -2,7 +2,7 @@
 import {ColumnsType} from "ant-design-vue/es/table";
 import {PaginationProps} from "ant-design-vue";
 import { PayChannelType, getPayChannelTypeText} from "~/utils/constant.ts";
-
+import { DebtAccountTypeEnum, getDebtAccountTypeEnumText } from '@/api/channel/debt'
 import { FileSearchOutlined} from "@ant-design/icons-vue"
 import {DebtAccountInfo, DebtAccountRequset, modifyDebtAccount, getDebtAccountList } from '~/api/debt/account'
 import { changeChannel } from "~@/api/channel/ChannelInterface";
@@ -15,17 +15,21 @@ const route = useRoute()
 const columns:ColumnsType =[
 
   {
-    title: 'ID',
+    title: '#ID',
     dataIndex: 'id',
-    align: 'center'
+  },
+  {
+    title: '账户类型',
+    dataIndex: 'accountType',
+  },
+  
+  {
+    title: '分账账户',
+    dataIndex: 'accountNo',
   },
   {
     title: '真实姓名',
     dataIndex: 'realName',
-  },
-  {
-    title: '分账账户',
-    dataIndex: 'accountNo',
   },
   {
     title: '渠道类型',
@@ -54,12 +58,17 @@ const initFormData = ():DebtAccountInfo => {
   return {
     realName: '',
     accountNo:'',
-    channelType: PayChannelType.ALI
+    channelType: PayChannelType.ALI,
+    accountType: DebtAccountTypeEnum.LOGIN_NAME
   }
 }
 const formData=ref<DebtAccountInfo>(initFormData())
 const isDisAbledChannelGroupForm = computed(() => {
-  return !formData.value.realName || !formData.value.accountNo || !formData.value.channelType || state.isSaveLoading
+  if (formData.value.accountType == DebtAccountTypeEnum.LOGIN_NAME) {
+    return !formData.value.realName || !formData.value.accountNo || !formData.value.channelType || state.isSaveLoading
+  } else if (formData.value.accountType == DebtAccountTypeEnum.UID) {
+    return !formData.value.accountNo || !formData.value.channelType || state.isSaveLoading
+  }
 })
 
 const initSearchParams = ():DebtAccountRequset => {
@@ -100,7 +109,7 @@ const loadData=async  ()=> {
   state.dataSourceLoading = true
   try {
     const { data } = await getDebtAccountList({
-      ...searchParams,
+      ...searchParams.value,
       page: pagination.current,
       limit: pagination.pageSize,
     })
@@ -166,11 +175,31 @@ onMounted(()=>{
         <a-button key="submit" type="primary" :loading="state.isSaveLoading" :disabled="isDisAbledChannelGroupForm" @click="onSubmit" style="width: 100%;">提 交</a-button>
       </template>
       <a-form ref="formRef" :model="formData" layout="vertical"  style="padding: 20px 0;">
-        <a-form-item name="realName" :rules="{required:true,message:'请输入真实姓名'}"  label="真实姓名" >
+        <a-form-item
+          label="账户类型"
+          name="accountType"
+          :rules="[
+            { required: true, message: '请选择账户类型!' }, 
+          ]"
+        >
+          <a-radio-group v-model:value="formData.accountType">
+            <a-radio :value="DebtAccountTypeEnum.UID">
+              {{ getDebtAccountTypeEnumText(DebtAccountTypeEnum.UID) }}
+            </a-radio>
+            <a-radio :value="DebtAccountTypeEnum.LOGIN_NAME">
+              {{ getDebtAccountTypeEnumText(DebtAccountTypeEnum.LOGIN_NAME) }}
+            </a-radio>
+          </a-radio-group>
+        </a-form-item>
+
+        <a-form-item v-if="DebtAccountTypeEnum.LOGIN_NAME == formData.accountType" name="realName" :rules="{required:true,message:'请输入真实姓名'}"  label="真实姓名" >
           <a-input placeholder="请输入真实姓名" v-model:value="formData.realName" allow-clear></a-input>
         </a-form-item>
-        <a-form-item name="accountNo" :rules="{required:true,message:'请输入分账账户'}" label="分账账户">
+        <a-form-item v-if="DebtAccountTypeEnum.LOGIN_NAME == formData.accountType" name="accountNo" :rules="{required:true,message:'请输入分账账户'}" label="分账账户">
           <a-input placeholder="请输入分账账户" v-model:value="formData.accountNo" allow-clear></a-input>
+        </a-form-item>
+        <a-form-item v-if="DebtAccountTypeEnum.UID == formData.accountType" name="accountNo" :rules="{required:true,message:'请输入分账账户UID'}" label="分账账户UID">
+          <a-input placeholder="请输入分账账户UID" v-model:value="formData.accountNo" allow-clear></a-input>
         </a-form-item>
         <a-form-item name="channelType" :rules="{required:true,message:'请选择渠道类型'}" label="渠道类型">
           <a-radio-group :disabled="!formData.channelType" v-model:value="formData.channelType">
@@ -231,16 +260,18 @@ onMounted(()=>{
           <a-button v-if="searchParams.page==1" type="primary" @click="handleAddAccount(null)" >添加账户</a-button>
         </template>
         <template #bodyCell="{ column , record}">
-          <template v-if="column.dataIndex==='name'">
-
-            <a-flex vertical :gap="5" align="start">
-              <a-button style="padding-left: 0" type="link" @click="router.push({path:'/agent/info',query:{id:record.id}})">{{record.name}}</a-button>
-              <a-typography-text type="secondary">ID:{{record.id}}</a-typography-text>
-            </a-flex>
+          <template v-if="column.dataIndex==='realName'">
+            <a-typography-text>{{ record.realName ?  record.realName: '/' }}</a-typography-text>
+            
           </template>
           <template v-if="column.dataIndex==='channelType'">
             <a-flex :gap="5">
               {{ getPayChannelTypeText(record.channelType) }}
+            </a-flex>
+          </template>
+          <template v-if="column.dataIndex==='accountType'">
+            <a-flex :gap="5">
+              {{ getDebtAccountTypeEnumText(record.accountType) }}
             </a-flex>
           </template>
           <template v-if="column.dataIndex==='action'">

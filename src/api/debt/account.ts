@@ -1,17 +1,21 @@
 import {PageWarp, ResponseBody, BasePageRequest} from "~/utils/constant.ts";
 import { PayChannelType} from "~/utils/constant.ts";
-
+import type { DebtAccountTypeEnum } from '@/api/channel/debt'
 export interface DebtAccountInfo {
     id?: string
     realName?: string
     accountNo?:string
     channelType?:PayChannelType
+    //	账户类型
+    accountType?: DebtAccountTypeEnum,
 }
 
 export interface  DebtAccountRequset extends BasePageRequest {
     realName?: string
     accountNo?:string
     channelType?: PayChannelType
+    //	账户类型
+    accountType?: DebtAccountTypeEnum,
 }
 
 

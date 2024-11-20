@@ -12,7 +12,7 @@ import { getALLChannelList,ChannelListResponse, ALLChannelListRequest, } from "~
 import { DateSearchTypeEnum} from '@/components/date-search-wrap/type'
 import { getParamsFromUrl} from '@/utils/tools'
 import orderStatistics from "~@/components/analysis/order-statistics.vue";
-
+const PayModeOptions = useOptsStore().payModesOpts
 
 const DateSearchWrapRef = ref()
 
@@ -165,7 +165,7 @@ onBeforeMount(()=>{
           </a-col>
           <a-col class="gutter-row" :span="4">
             <a-select style="width: 100%" mode="multiple" allow-clear :max-tag-count="1" v-model:value="searchParams.payModes" placeholder="按支付方式查询">
-              <a-select-option v-for="(item) in PayModeTypeSelectOption" :value="item.value">{{item.title}}</a-select-option>
+              <a-select-option v-for="(item) in PayModeOptions" :value="item.payMode">{{item.payModeName}}</a-select-option>
             </a-select>
           </a-col>
 

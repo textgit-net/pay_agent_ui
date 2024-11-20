@@ -5,9 +5,9 @@ import QrcodeVue from 'qrcode.vue'
 import type { Level, RenderAs, ImageSettings } from 'qrcode.vue'
 import type { Rule } from 'ant-design-vue/es/form';
 import { message } from 'ant-design-vue';
-import {QuestionCircleFilled } from "@ant-design/icons-vue"
+import {QuestionCircleFilled,FormOutlined } from "@ant-design/icons-vue"
 import { AgentInfo, modifyAgent,AgentResetPwdRequset } from '~/api/agent/index'
-import { getGoogleSecretKey,bigdGoogleSecretCode,changeGoogleVerifyStatus,GoogleSecretKeyRespone,GoogleSecretCodeRequest,resetPassword } from '~/api/account/auth'
+import { getGoogleSecretKey,bigdGoogleSecretCode,changeGoogleVerifyStatus,GoogleSecretKeyRespone,GoogleSecretCodeRequest,changePassword } from '~/api/account/auth'
 import  logoGoogleAuth from '~/assets/images/logo-google-auth.png'
 
 const userStore = useUserStore()
@@ -19,6 +19,7 @@ const state = reactive<{
   dialogBtnLoading: boolean;
   ShowSettingPwdDialog: boolean;
   showGooglVerifyDialog: boolean;
+  showChangeGoogleVerifyDialog: boolean;
   isLoading:boolean;
   isOnEditPay:boolean;
   isOnEditChildAgent: boolean;
@@ -32,13 +33,16 @@ const state = reactive<{
   isOnEditPay: false,
   isOnEditChildAgent: false,
   showGooglVerifyDialog: false,
+  showChangeGoogleVerifyDialog: false,
   btnStatusLoading: false
 
 })
 const formRef = ref();
 const GoogleVerifyRef = ref();
 const ResetPwdFormRef = ref();
-const resetPwdForm = ref<AgentResetPwdRequset>({});
+const resetPwdForm = ref<AgentResetPwdRequset>({
+  securityCode: ''
+});
 
 const googleVerifyInfo = ref<GoogleSecretKeyRespone>({
   qeCode: ''
@@ -127,23 +131,36 @@ const handleGoogleVerifyOk = async () => {
   }
 }
 
-const changeGoogleVerify = async () => {
-  state.btnStatusLoading = true
+const handleShowChangeGoogleVerifyDialog = () => {
+  state.showChangeGoogleVerifyDialog = true
+  nextTick(() => {
+    changeGoogleVerifyFormRef.value.resetFields()
+  })
+}
+
+const changeGoogleVerifyFormRef = ref()
+const changeGoogleVerifyForm = ref<{
+  secretCode?: string
+}>({secretCode: ''})
+
+const changeGoogleVerifyOk = async () => {
+  state.dialogBtnLoading = true
   try {
-    let res = await changeGoogleVerifyStatus()
+    await changeGoogleVerifyStatus(changeGoogleVerifyForm.value.secretCode)
     message.success('操作成功')
 
     userInfo.value.isEnableGoogleVerify = !userInfo.value.isEnableGoogleVerify;
+    state.showChangeGoogleVerifyDialog = false
     userStore.setUserInfo(userInfo.value)
   } catch (error) {
-      message.error(`${error}`)
+    message.error(`${error.msg}`)
   } finally {
-    state.btnStatusLoading = false
+    state.dialogBtnLoading = false
   }
 }
 
 const isDisAbledPwdBtn = computed(()=> {
-  return !(resetPwdForm.value.password && resetPwdForm.value.confirmPassword) || (resetPwdForm.value.password.trim().length < 6 ||  resetPwdForm.value.confirmPassword.trim().length < 6);
+  return !(resetPwdForm.value.password && resetPwdForm.value.confirmPassword) || (resetPwdForm.value.password.trim().length != 6 ||  resetPwdForm.value.confirmPassword.trim().length < 6) || (resetPwdForm.value.securityCode.length < 6 && userInfo.value.isEnableGoogleVerify);
 })
 
 const validatePwd =  async (_rule: Rule, value: string) => {
@@ -171,7 +188,7 @@ const handleResetPwdOk = async () => {
   }
   state.dialogBtnLoading = true
     try {
-      let res = await resetPassword(resetPwdForm.value.password)
+      let res = await changePassword(resetPwdForm.value.password, resetPwdForm.value.securityCode)
       message.success('操作成功')
       state.ShowSettingPwdDialog = false
       // initPayChannelConfig()
@@ -229,7 +246,7 @@ onMounted(async ()=>{
       </a-form>
     </a-modal>
 
-    <a-modal v-model:open="state.ShowSettingPwdDialog" :mask-closable="false" style="width: 480px;" title="重置密码">
+    <a-modal v-model:open="state.ShowSettingPwdDialog" :mask-closable="false" style="width: 480px;" title="修改登录密码">
       <template #footer>
         <a-flex align="center">
           <a-button key="submit" style="width: 100%;" :disabled="isDisAbledPwdBtn" type="primary" :loading="state.dialogBtnLoading" @click="handleResetPwdOk">保 存</a-button>
@@ -270,6 +287,18 @@ onMounted(async ()=>{
         >
           <a-input-password v-model:value="resetPwdForm.confirmPassword" placeholder="请输入确认新密码" allow-clear />
         </a-form-item>
+
+        <a-form-item
+            label="Google动态安全码"
+            v-if="userInfo.isEnableGoogleVerify"
+            name="securityCode"
+            :rules="[
+              { required: true, validator: validateGoogleCode }
+            ]"
+          >
+            <a-input v-model:value="resetPwdForm.securityCode" placeholder="请输入6位数Google安全码" :maxlength="6" allow-clear />
+           
+          </a-form-item>
       </a-form>
     </a-modal>
     <a-modal v-model:open="state.showGooglVerifyDialog" :footer="null" :mask-closable="false" style="width: 680px;" title="绑定Google安全验证器">
@@ -328,7 +357,34 @@ onMounted(async ()=>{
     </a-modal>
 
 
+    <a-modal v-model:open="state.showChangeGoogleVerifyDialog" :footer="null" :mask-closable="false" style="width: 440px;" title="设置Google安全验证器">
+        <a-form
+          style="padding: 30px;width: 360px; padding-right: 0px;"
+          :model="changeGoogleVerifyForm"
+          name="basic"
+          ref="changeGoogleVerifyFormRef"
+          layout="vertical"
+          autocomplete="off"
+        >
+          <a-form-item>
+            <a-alert v-if="userInfo.isEnableGoogleVerify" message="正在关闭【登录 | 提现 | 重置密码】google安全验证器操作" type="info" show-icon />
+            <a-alert v-else message="正在开启【登录 | 提现 | 重置密码】google安全验证器操作" type="info" show-icon />
+            
+          </a-form-item>
+          <a-form-item
+            label="Google动态安全码"
+            name="secretCode"
+            :rules="[
+              { required: true, validator: validateGoogleCode }
+            ]"
+          >
+            <a-input v-model:value="changeGoogleVerifyForm.secretCode" placeholder="请输入6位数Google安全码" :maxlength="6" allow-clear />
+           
+          </a-form-item>
+          <a-button key="submit" type="primary" :disabled="!changeGoogleVerifyForm.secretCode || changeGoogleVerifyForm.secretCode.length != 6" :loading="state.dialogBtnLoading" @click="changeGoogleVerifyOk" style="width: 100%;">提交验证</a-button>
+        </a-form>
     
+    </a-modal>
 
     <a-card :body-style="{padding: '15px'}">
       <a-descriptions :column="1">
@@ -357,26 +413,47 @@ onMounted(async ()=>{
         </template>
         <a-descriptions-item style="padding-bottom: 4px" :labelStyle="{'color':'#999'}"  label="重置密码">
           <a-flex  align="start">
-            <a-button @click="handleShowSettingPwd" type="link" style="padding-left: 0">重置密码</a-button>
+            <a-button @click="handleShowSettingPwd" type="link" style="padding-left: 0">修改密码</a-button>
           </a-flex>
         </a-descriptions-item>
         <a-descriptions-item style="padding-bottom: 4px" :labelStyle="{'color':'#999'}"  label="Google安全验证器">
           <a-flex  align="start">
-            <a-button @click="handleShowGoogleVerify" type="link" style="padding-left: 0">
-              {{ userInfo.isBindGoogleSecretKey? '更改Google安全验证': '绑定Google安全验证' }} 
+            <a-button v-if="!userInfo.isBindGoogleSecretKey" @click="handleShowGoogleVerify" type="link" style="padding-left: 0">
+              绑定Google安全验证
             </a-button>
+            <a-flex v-else>
+              <a-tooltip>
+                <template #title>如果忘记Google安全验证，请联系管理员重置绑定</template>
+                已绑定<QuestionCircleFilled />
+              </a-tooltip>
+            </a-flex>
+           
           </a-flex>
         </a-descriptions-item>
-        <a-descriptions-item v-if="userInfo.isBindGoogleSecretKey" style="padding-bottom: 4px" :labelStyle="{'color':'#999'}"  label="登录时是否开启Google安全验证器">
+        <a-descriptions-item v-if="userInfo.isBindGoogleSecretKey" style="padding-bottom: 4px" :labelStyle="{'color':'#999'}"  label="【登录 | 提现 | 重置密码】开启Google安全验证器">
           <a-flex align="center" justify="center">
-              <a-tooltip>
-                <template #title>请确认绑定google验证码后再开启，否则登录受限</template>
-                <a-switch v-model:checked="isEnableGoogleVerify"  @change="changeGoogleVerify" :loading="state.btnStatusLoading" checked-children="已开启" un-checked-children="已关闭" /><QuestionCircleFilled style="margin-left: 2px;" />
+              <!-- <a-tooltip>
+                <template #title>如果忘记Google安全验证，请联系管理员重置绑定</template>
+                <QuestionCircleFilled style="margin-left: 2px;" />
                 
-              </a-tooltip>
-              <!-- <a-button @click="handleShowGoogleVerify" type="link" style="padding-left: 20px">
-                 测试Google验证器绑定情况
-                </a-button> -->
+              </a-tooltip> -->
+              <a-flex v-if="userInfo.isEnableGoogleVerify" align="center"  justify="center">
+                <a-tag :bordered="false" color="success">已开启</a-tag>
+                <a-tooltip>
+                  <template #title>关闭Google安全验证器</template>
+                  <FormOutlined @click="handleShowChangeGoogleVerifyDialog" style="color: #1677ff;" />
+                </a-tooltip>
+                
+              </a-flex>
+
+              <a-flex v-else align="center"  justify="center">
+                <a-tag :bordered="false" color="error">已关闭</a-tag>
+                <a-tooltip>
+                  <template #title>开启Google安全验证器</template>
+                  <FormOutlined @click="handleShowChangeGoogleVerifyDialog" style="color: #1677ff;" />
+                </a-tooltip>
+                
+              </a-flex>
           </a-flex>
         </a-descriptions-item>
       </a-descriptions>

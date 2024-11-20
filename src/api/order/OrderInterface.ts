@@ -151,7 +151,7 @@ export interface OrderSearch extends BaseOrderReportSearch{
     orderStatus?:OrderStatus[]
     orderNo?:string
     //支付方式
-    payModes?:PayModeType[]
+    payModes?:string[]
     channelTypes?:PayChannelType[]
 }
 

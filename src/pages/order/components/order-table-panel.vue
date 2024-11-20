@@ -87,6 +87,7 @@ const columns =shallowRef<any[]>(
         dataIndex: 'amount',
         tableTypes:[OrderTableType.ALL]
       },
+    
       {
         title: '商户手续费',
         width: '120px',
@@ -108,12 +109,12 @@ const columns =shallowRef<any[]>(
         dataIndex: 'orderStatus',
         tableTypes:[OrderTableType.ALL]
       },
-      {
-        title: '支付方式',
-        width: '120px',
-        dataIndex: 'payMode',
-        tableTypes:[OrderTableType.ALL,OrderTableType.PAY_ING,OrderTableType.SUCCESS,OrderTableType.FAIL],
-      },
+      // {
+      //   title: '支付方式',
+      //   width: '120px',
+      //   dataIndex: 'payMode',
+      //   tableTypes:[OrderTableType.ALL,OrderTableType.PAY_ING,OrderTableType.SUCCESS,OrderTableType.FAIL],
+      // },
       {
         title: '回调状态',
         width: '130px',
@@ -121,7 +122,16 @@ const columns =shallowRef<any[]>(
         dataIndex: 'notifyStatus',
         tableTypes:[OrderTableType.ALL]
       },
-     
+      {
+        title: '客户端',
+        dataIndex: 'clientPlatform',
+        tableTypes:[OrderTableType.ALL]
+      },
+      {
+        title: 'IP属地',
+        dataIndex: 'ip',
+        tableTypes:[OrderTableType.ALL]
+      },
       {
         title: '创建时间',
         dataIndex: 'createdTime',
@@ -349,6 +359,18 @@ onMounted(()=>{
           <a-typography-text v-if="record['payMode']">{{getPayModeTypeText(record['payMode'])}}</a-typography-text>
           <a-typography-text v-else>/</a-typography-text>
         </template>
+        <template v-if="column.dataIndex==='clientPlatform'">
+        
+          <a-typography-text>{{ record["clientPlatform"]?? '/' }}</a-typography-text>
+        </template>
+        <template v-if="column.dataIndex==='ip'">
+          <a-flex v-if="record['clientIp']" vertical :gap="5" align="start">
+            <a-typography-text>{{record["clientIp"]}}</a-typography-text>
+            <a-typography-text type="secondary">属地:{{ record["clientCountry"]??'-'}}/{{ record["clientProvince"]??'-'}}/{{ record["clientCity"]??'-'}}</a-typography-text>
+          </a-flex>
+          <a-typography-text v-else>/</a-typography-text>
+        </template>
+
         <template v-if="column.dataIndex==='successTime'">
           {{record['successTime']?? '/' }}
         </template>

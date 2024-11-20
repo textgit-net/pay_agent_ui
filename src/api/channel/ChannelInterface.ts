@@ -48,7 +48,7 @@ export interface ChannelListResponse extends ChannelSimpleResponse{
      * 订单支付累计金额
      */
     // 渠道支付方式
-    payModes?: PayModeType[]
+    payModes?: string[]
 
     successCount?: number
     totalCount?: number
@@ -63,6 +63,8 @@ export interface ChannelListResponse extends ChannelSimpleResponse{
     isItemLoadSpinning?: boolean
     //提现金额
     totalWithdrawAmount?: number
+    isErrorAutoClose?: boolean
+    closeReason?: string
 }
 
 
@@ -203,7 +205,7 @@ export interface ChannelTestRequest{
     body?:string
     subject?:string
     isWebCashier?:boolean
-    payMode?:PayModeType
+    payMode?:string
 }
 export enum PayDataType{
     app="app",

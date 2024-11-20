@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { h, createVNode  } from 'vue';
 import {ColumnsType} from "ant-design-vue/es/table";
-import {AlipaySquareFilled, ExclamationCircleOutlined, FormOutlined, FundViewOutlined } from "@ant-design/icons-vue"
+import {AlipaySquareFilled, ExclamationCircleOutlined, FormOutlined, FundViewOutlined, QuestionCircleOutlined } from "@ant-design/icons-vue"
 import {PaginationProps,Modal,message} from "ant-design-vue";
 import { ChannelGroupSimpleResponse, getChannelGroups} from '@/api/channel/group'
 
@@ -94,17 +94,18 @@ const pagination = reactive<PaginationProps>({
 const dataSource=shallowRef<ChannelListResponse[]>([])
 const channelGroups = ref<ChannelGroupSimpleResponse[]>([])
 
-const changeEnable=async (id:number)=>{
+const changeEnable=async (record:ChannelListResponse)=>{
+  let tip = record.isEnable ? `确认关闭当前渠道【${record.name}】吗？` : `确认开启当前渠道【${record.name}】吗? ${record.isErrorAutoClose? '上次是因为【'+ record.closeReason +'】关闭。':''}`
   Modal.confirm({
     title: '温馨提示',
     icon: createVNode(ExclamationCircleOutlined),
-    content: `确认关闭当前渠道吗？关闭后需联系管理员开启。`,
+    content: tip,
     okText: '确认',
     cancelText: '取消',
     async onOk() {
       try {
         state.isPageLoading=true
-        let res = await usePut(`/channel/change/${id}`)
+        let res = await usePut(`/channel/change/${record.id}`)
         message.success('操作成功')
         await loadData()
         state.isPageLoading=false
@@ -136,7 +137,7 @@ const showPayModelDialog = (record: ChannelListResponse) => {
   let domArr = []
   if (record.payModes.length) {
     record.payModes.map((item: PayModeType, index: number) => {
-      domArr.push(h('p', `${index + 1}、${getPayModeTypeText(item)}`))
+      domArr.push(h('p', `${index + 1}、${ useOptsStore().getPayModesText(item)}`))
     })
   
   }
@@ -325,22 +326,30 @@ onMounted(()=>{
                   <a-tag :bordered="false" color="success">已开启</a-tag>
                   <a-tooltip>
                     <template #title>关闭渠道</template>
-                    <FormOutlined @click="changeEnable(record.id as number)" style="color: #1677ff;" />
+                    <FormOutlined @click="changeEnable(record)" style="color: #1677ff;" />
                   </a-tooltip>
                   
                 </a-flex>
                 
+                <a-flex v-else align="center"  justify="center">
+                  <a-tooltip >
+                    <template #title>{{(record as ChannelListResponse).closeReason?? '渠道已关闭' }}</template>
+                    <a-tag :bordered="false" color="error">
+                      <span>已关闭<QuestionCircleOutlined /></span>
+                      
+                      <!-- <template #icon>
+                        <QuestionCircleOutlined />
+                      </template> -->
+                    </a-tag>
+                  </a-tooltip>
+                  <a-tooltip >
+                    <template #title>开启渠道</template>
+                    <FormOutlined @click="changeEnable(record)" style="color: #1677ff;" />
+                   
+                  </a-tooltip>
+                </a-flex>
                 
-                <a-tooltip v-else>
-                  <template #title>请联系管理员进行开启</template>
-                  <a-tag :bordered="false" color="error">
-                    已关闭
-                  </a-tag>
-                </a-tooltip>
               </a-flex>
-              
-             
-             
             </template>
             <template v-if="column.dataIndex==='groupInfo'">
               <a-flex :gap="10"  justify="space-between" align="center" >

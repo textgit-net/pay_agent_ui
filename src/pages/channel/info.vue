@@ -3,9 +3,12 @@ import BasicInfo from "~/pages/channel/basicInfo.vue";
 import DebtAccountInfo from "~/pages/channel/debtAccountInfo.vue";
 import orderInfo from "~/pages/channel/orderInfo.vue";
 import withdrawInfo from "~/pages/channel/withdrawInfo.vue";
+import areaBlackList from "~/pages/channel/areaBlackList.vue";
 
 const router=useRouter()
 const route= useRoute()
+
+
 const state=reactive({
   isLoading:false,
   activeTabKey:'basicInfo'
@@ -17,8 +20,21 @@ if (tabKey) {
 }
 
 
+const initSearchParams = () => {
+  delete route.query.page
+  delete route.query.limit
+  delete route.query.dateType
+  delete route.query.startDate
+  delete route.query.endDate
+}
+
 const onTabClick=(key: string)=>{
+  console.log('key', key, state.activeTabKey)
+  if (key != state.activeTabKey) {
+    initSearchParams()
+  }
   route.query['tabKey']=key
+
   router.replace({ query: {...route.query, timestamp: new Date().getTime()},replace:true})
 }
 
@@ -45,6 +61,7 @@ const onTabClick=(key: string)=>{
             <a-tab-pane key="channelAccountInfo" tab="渠道分账信息"/>
             <a-tab-pane key="orderInfo" tab="渠道订单信息"/>
             <a-tab-pane key="withdrawInfo" tab="渠道提现信息"/>
+            <a-tab-pane key="areaBlackList" tab="渠道地区权限"/>
           </a-tabs>
         </a-flex>
       </a-page-header>
@@ -57,6 +74,7 @@ const onTabClick=(key: string)=>{
 
     <order-info v-if="state.activeTabKey=='orderInfo'"></order-info>
     <withdraw-info v-if="state.activeTabKey=='withdrawInfo'"></withdraw-info>
+    <areaBlackList v-if="state.activeTabKey=='areaBlackList'"></areaBlackList>
   </a-flex>
 
 </template>

@@ -31,8 +31,8 @@ export function bigdGoogleSecretCode(data?: GoogleSecretCodeRequest): Promise<Re
 /**
  * 启用-禁用google安全验证
  */
-export function changeGoogleVerifyStatus(): Promise<ResponseBody<any>>{
-    return useGet<any>("/security/change/googleVerify")
+export function changeGoogleVerifyStatus(securityCode: string): Promise<ResponseBody<any>>{
+    return useGet<any>("/security/change/googleVerify", {'securityCode': securityCode})
 }
 
 /**
@@ -49,4 +49,15 @@ export function verifyGoogleCode(securityCode: string): Promise<ResponseBody<any
  */
 export function resetPassword(password: string): Promise<ResponseBody<any>>{
     return usePost<any>("/auth/resetPassword", {'password': password})
+}
+
+/**
+ * 修改密码
+ */
+export function changePassword(password: string, securityCode?: string): Promise<ResponseBody<any>>{
+    let data = { 'password': password }
+    if (securityCode) {
+        data['securityCode'] = securityCode
+    }
+    return usePut<any>("/security/account/password", data)
 }

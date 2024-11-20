@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ArrowLeftOutlined, CheckCircleOutlined, CloseCircleOutlined, UploadOutlined } from "@ant-design/icons-vue";
+import type { PayModesItem } from '~@/api/common/opts'
 import { Empty } from 'ant-design-vue';
 import {
   ChannelFormData,
@@ -16,6 +17,7 @@ import {
   ResponseBody
 } from "~/utils/constant.ts";
 import type { Rule } from 'ant-design-vue/es/form';
+const optsStore = useOptsStore()
 
 import { getChannelGroups,ChannelGroupSimpleResponse } from '@/api/channel/group'
 
@@ -209,8 +211,10 @@ const loadGroups = async () => {
 }
 
 const getPayModesWithChannelType = async (type: PayChannelType) => {
-  const { data } = await useGet<PayModeType[]>(`/channel/payMods?channelType=${type}`)
-  payModes.value = data ?? []
+  // const { data } = await useGet<PayModeType[]>(`/channel/payMods?channelType=${type}`)
+    
+  // payModes.value = data ?? []
+  payModes.value = optsStore.payModesOpts
 }
 const onChannelTypeChange = async (value: PayChannelType) => {
   console.log(value)
@@ -280,7 +284,7 @@ const filterOption = (input: string, option: any) => {
                   <a-flex style="flex: 1">
                     <a-checkbox-group v-model:value="formData.payModes">
                       <template v-for="(item) in payModes">
-                        <a-checkbox :value="item">{{ getPayModeTypeText(item) }}</a-checkbox>
+                        <a-checkbox :value="(item as PayModesItem).payMode">{{(item as PayModesItem).payModeName }}</a-checkbox>
                       </template>
                     </a-checkbox-group>
                   </a-flex>
@@ -318,7 +322,7 @@ const filterOption = (input: string, option: any) => {
                   <a-typography-text type="secondary">支付宝平台申请的应用ID.</a-typography-text>
                 </a-flex>
               </a-form-item>
-              <a-form-item label="PID" name="pid" class="mt-5" required>
+              <a-form-item label="PID" name="pid" class="mt-5">
                 <a-flex style="flex: 1" vertical>
                   <a-input v-model:value="formData.channelConfig['pid']" placeholder="请输入支付宝合作伙伴Id"
                     style="width: 320px;" allow-clear></a-input>

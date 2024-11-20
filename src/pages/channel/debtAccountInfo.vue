@@ -23,7 +23,9 @@ import {
   delChannelDebtAccount,
   getChannelDebtAccountConfig,
   updateChannelDebtAccountConfig,
-  AccountInfoItem
+  AccountInfoItem,
+  DebtAccountTypeEnum,
+  getDebtAccountTypeEnumText
 } from '~/api/channel/debt'
 
 import { calcFloat } from '~/utils/calcFloat'
@@ -36,13 +38,16 @@ const router = useRouter()
 const state = reactive<{
   showBaseInfoDialog: boolean;
   showAccountRateDialog: boolean;
+  showSettleAccountDialog: boolean;
   dialogBtnLoading: boolean;
   ShowSettingPwdDialog: boolean;
   isLoading:boolean;
   isOnEditPay:boolean;
   isOnEditChildAgent: boolean;
+  
 }>({
   showBaseInfoDialog: false,
+  showSettleAccountDialog: false,
   showAccountRateDialog: false,
   dialogBtnLoading: false,
   ShowSettingPwdDialog: false,
@@ -65,8 +70,8 @@ const ininRateForm = ():ChannelDebtAccountRequest => {
       
     }
 }
-const formData=ref<ChannelDebtAccountConfig>(ininRateForm())
-const AccountRateForm = ref<ChannelDebtAccountRequest>(ininForm())
+const formData=ref<ChannelDebtAccountConfig>(ininForm())
+const AccountRateForm = ref<ChannelDebtAccountRequest>(ininRateForm())
 const info = ref<ChannelDebtConfigInfo>({})
 
 const handleBaseInfoOk = async () => {
@@ -79,6 +84,7 @@ const submit = async () => {
       let data:ChannelDebtAccountConfig = JSON.parse(JSON.stringify(formData.value));
       data.channelId = `${id}`;
       let res = await updateChannelDebtAccountConfig(data)
+      state.showBaseInfoDialog = false
       message.success('操作成功')
       await getInfo(id as string)
       // initPayChannelConfig()
@@ -88,7 +94,7 @@ const submit = async () => {
         // message.error(`${error}`)
     } finally {
       state.dialogBtnLoading = false
-      state.showBaseInfoDialog = false
+  
       state.showAccountRateDialog = false
     }
 }
@@ -204,6 +210,12 @@ const handleShowConfig = async () => {
 
 }
 
+const handleShowSettleAccountDialog = async () => {
+ state.showSettleAccountDialog = true
+ formData.value = JSON.parse(JSON.stringify(info.value))
+
+}
+
 const changeStatus = () => {
   submit()
 }
@@ -227,6 +239,11 @@ const fetchAccountList = async () => {
 
 const columns = [
   {
+    title: '渠道类型',
+    dataIndex: 'channelType',
+    width: '18%',
+  },
+  {
     title: '分账账号',
     dataIndex: 'accountId',
     width: '35%',
@@ -234,12 +251,12 @@ const columns = [
   {
     title: '分账比率(%)',
     dataIndex: 'rate',
-    width: '20%',
+    width: '18%',
   },
   {
     title: '排序序号(降序)',
     dataIndex: 'orderNo',
-    width: '20%',
+    width: '18%',
   },
   {
     title: '操作',
@@ -255,6 +272,14 @@ const setTableRateText = (text: string) => {
 const filterOption = (input: string, option: any) => {
   return option.accountNo.toLowerCase().indexOf(input.toLowerCase()) >= 0;
 };
+
+const disabledBtn = computed(() => {
+  if (formData.value.royaltyStrategy == DebtStrategyEnum.API || formData.value.royaltyStrategy == DebtStrategyEnum.API_OR_TRANSFER) {
+    return !formData.value.settleAccountType || !formData.value.settleAccountNo || (formData.value.isRoyaltyErrorAutoClose && !formData.value.maxAllowRoyaltyFailCount)
+  } else {
+    return (formData.value.isRoyaltyErrorAutoClose && !formData.value.maxAllowRoyaltyFailCount)
+  }
+})
 </script>
 
 <template>
@@ -263,7 +288,7 @@ const filterOption = (input: string, option: any) => {
     <a-modal v-model:open="state.showBaseInfoDialog" title="设置分账配置">
       <template #footer>
         <a-button key="back" @click="state.showBaseInfoDialog = false">取 消</a-button>
-        <a-button key="submit" type="primary" :loading="state.dialogBtnLoading" @click="handleBaseInfoOk">保 存</a-button>
+        <a-button key="submit" type="primary" :disabled="disabledBtn" :loading="state.dialogBtnLoading" @click="handleBaseInfoOk">保 存</a-button>
       </template>
       <a-form
         ref="formRef"
@@ -316,6 +341,60 @@ const filterOption = (input: string, option: any) => {
             <a-radio :value="DebtStrategyEnum.API_OR_TRANSFER">{{ getDebtStrategyEnumText(DebtStrategyEnum.API_OR_TRANSFER) }}</a-radio>
           </a-radio-group>
         </a-form-item>
+        <a-form-item
+          label="分账失败自动关闭渠道"
+          name="isRoyaltyErrorAutoClose"
+          :rules="[{ required: false}]"
+        >
+          <a-checkbox v-model:checked="formData.isRoyaltyErrorAutoClose">自动关闭渠道</a-checkbox>
+        </a-form-item>
+
+        <a-form-item
+          v-if="formData.isRoyaltyErrorAutoClose"
+          label="允许分账失败最大次数"
+          name="maxAllowRoyaltyFailCount"
+          :rules="[{ required: true}]"
+        >
+          <a-input-number
+            v-model:value="formData.maxAllowRoyaltyFailCount"
+            :min="1"
+            :step="1"
+            style="width: 120px;"
+          />
+        </a-form-item>
+
+        <a-form-item
+          v-if="formData.royaltyStrategy == DebtStrategyEnum.API || formData.royaltyStrategy == DebtStrategyEnum.API_OR_TRANSFER"
+          label="分账结算账户类型"
+          name="settleAccountType"
+          :rules="[
+            { required: true, message: '请选择分账结算账户类型!' }, 
+          ]"
+        >
+          <a-radio-group v-model:value="formData.settleAccountType">
+            <a-radio :value="DebtAccountTypeEnum.UID">
+              {{ getDebtAccountTypeEnumText(DebtAccountTypeEnum.UID) }}
+            </a-radio>
+            <a-radio :value="DebtAccountTypeEnum.LOGIN_NAME">
+              {{ getDebtAccountTypeEnumText(DebtAccountTypeEnum.LOGIN_NAME) }}
+            </a-radio>
+          </a-radio-group>
+        </a-form-item>
+       
+        <a-form-item
+          v-if="formData.royaltyStrategy == DebtStrategyEnum.API || formData.royaltyStrategy == DebtStrategyEnum.API_OR_TRANSFER"
+          label="结算账户"
+          name="settleAccountNo"
+          :rules="[{ required: true, message: '请输入结算账户!' }]"
+        >
+          <a-flex vertical>
+            <a-input v-model:value="formData.settleAccountNo" style="width:  80%;"  />
+            <a-typography-text type="secondary" v-if="formData.settleAccountType">请输入{{ getDebtAccountTypeEnumText(formData.settleAccountType) }}</a-typography-text>
+          </a-flex>
+         
+        </a-form-item>
+
+       
       </a-form>
     </a-modal>
 
@@ -404,7 +483,7 @@ const filterOption = (input: string, option: any) => {
     <a-card v-show="info.isEnableRoyalty" :body-style="{padding: '15px'}" :loading="state.isLoading">
 
 
-      <a-descriptions :column="4" layout="vertical">
+      <a-descriptions :column="3" layout="vertical">
         <template #title>
           <a-flex  align="center">
             <a-typography-text>分账配置</a-typography-text>
@@ -425,12 +504,36 @@ const filterOption = (input: string, option: any) => {
           </a-tooltip>
           <a-typography-text v-else>{{ getDebtModeEnumText(info.royaltyMode) }}</a-typography-text>
         </a-descriptions-item>
+       
         <a-descriptions-item style="padding-bottom: 4px" :labelStyle="{'color':'#999'}" label="分账策略">
           {{ getDebtStrategyEnumText(info.royaltyStrategy) }}
         </a-descriptions-item>
+        <a-descriptions-item style="padding-bottom: 4px" :labelStyle="{'color':'#999'}" label="分账失败自动关闭渠道">
+          {{  info.isRoyaltyErrorAutoClose ? '是': '否'}}
+        </a-descriptions-item>
+        <a-descriptions-item style="padding-bottom: 4px" :labelStyle="{'color':'#999'}" label="允许分账失败最大次数">
+          {{  info.maxAllowRoyaltyFailCount ? `${ info.maxAllowRoyaltyFailCount}次` : '/'}}
+        </a-descriptions-item>
+      </a-descriptions>
 
+      
+
+      <a-descriptions :column="4" style="margin-top: 10px;"layout="vertical" v-if="info.royaltyStrategy == DebtStrategyEnum.API || info.royaltyStrategy == DebtStrategyEnum.API_OR_TRANSFER">
+        <template #title>
+          <a-flex  align="center">
+            <a-typography-text>分账结算账户配置</a-typography-text>
+          </a-flex>
+
+        </template>
+        <a-descriptions-item style="padding-bottom: 4px;" :labelStyle="{'color':'#999'}" label="结算账户类型">
+          {{ getDebtAccountTypeEnumText(info.settleAccountType) }}
+        </a-descriptions-item>
+        <a-descriptions-item style="padding-bottom: 4px" :labelStyle="{'color':'#999'}" label="分账结算账户">
+          <a-typography-text>{{ info.settleAccountNo?? '/' }}</a-typography-text>
+        </a-descriptions-item>
       </a-descriptions>
     </a-card>
+
     <a-card v-show="info.isEnableRoyalty" :body-style="{padding: '15px'}" :loading="state.isLoading">
 
 
@@ -459,21 +562,29 @@ const filterOption = (input: string, option: any) => {
             </div>
             
           </template>
-
-      
-          <template v-if="column.dataIndex == 'accountId'">
+          <template v-if="column.dataIndex == 'channelType'">
             <a-flex vertical :gap="5" align="start">
-              <a-typography-text >渠道类型: {{ getPayChannelTypeText((record.accountInfo as DebtAccountInfo).channelType) }}</a-typography-text>
+              <a-typography-text >{{ getPayChannelTypeText((record.accountInfo as DebtAccountInfo).channelType) }}</a-typography-text>
+              
+            </a-flex>
+          </template>
+          <template v-if="column.dataIndex == 'accountId'">
+
+
+            <a-flex vertical :gap="5" align="start">
+              <a-typography-text >分账类型: {{ getDebtAccountTypeEnumText((record.accountInfo as DebtAccountInfo).accountType) }}</a-typography-text>
               <a-flex>
-                <a-tooltip>
-                  <template #title>账户名称</template>
-                  <a-typography-text > {{ (record.accountInfo as DebtAccountInfo).realName   }}</a-typography-text>
-                </a-tooltip>
-                /
                 <a-tooltip>
                   <template #title>分账账户</template>
                   <a-typography-text >{{ (record.accountInfo as DebtAccountInfo).accountNo   }}</a-typography-text>
                 </a-tooltip>
+                /
+                <a-tooltip>
+                  <template #title>账户名称</template>
+                  <a-typography-text > {{ (record.accountInfo as DebtAccountInfo).realName ? (record.accountInfo as DebtAccountInfo).realName: '-'   }}</a-typography-text>
+                </a-tooltip>
+                
+              
               </a-flex>
               
             </a-flex>

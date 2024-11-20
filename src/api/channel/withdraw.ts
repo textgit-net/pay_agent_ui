@@ -2,6 +2,27 @@ import {PageWarp, ResponseBody, BasePageRequest} from "~/utils/constant.ts";
 import { DateSearchTypeEnum } from '@/components/date-search-wrap/type'
 import { DebtModeEnum, DebtStrategyEnum } from '@/api/channel/debt'
 
+//提现账户类型
+export enum AccountTypeEnum {
+    UID = 'UID',
+    LOGIN_NAME = 'LOGIN_NAME',
+    // OPEN_ID = 'OPEN_ID',
+    // BANK_CARD = 'BANK_CARD'
+}
+
+export function getAccountTypeEnumText(status:AccountTypeEnum): string {
+    switch (status){
+        case AccountTypeEnum.UID:
+            return "UID"
+        case AccountTypeEnum.LOGIN_NAME:
+            return "支付宝账户"
+        // case AccountTypeEnum.OPEN_ID:
+        //     return "OPEN_ID"
+        // case AccountTypeEnum.BANK_CARD:
+        //     return "银行卡账户"
+    }
+}
+
 export enum ChannelWithdrawTableTypeEnum{
     //全部
     ALL=0,
@@ -98,6 +119,7 @@ export interface ChannelWithdrawRequest {
     securityCode?: string
     remark?: string
     channelId: number
+    accountType: AccountTypeEnum
 }
 
 

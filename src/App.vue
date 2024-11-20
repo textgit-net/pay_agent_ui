@@ -3,9 +3,14 @@
 import SettingPassword from '@/components/set-password/set-password-dialog.vue'
 
 const appStore = useAppStore()
+const optsStore = useOptsStore()
 const { theme } = storeToRefs(appStore)
 const { antd } = useI18nLocale()
 
+
+onMounted(() => {
+  optsStore.initOpts()
+})
 </script>
 
 <template>

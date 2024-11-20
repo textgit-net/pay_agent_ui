@@ -40,6 +40,7 @@ export interface AgentInfoReq extends AgentInfo  {
 export interface AgentResetPwdRequset  {
     targetId?: string
     password?:string
+    securityCode?: string
     confirmPassword?: string
     isDefaultPwd?:boolean
 }

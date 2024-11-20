@@ -2,6 +2,13 @@ import { ResponseBody, BasePageRequest} from "~/utils/constant.ts";
 import { PayChannelType} from "~/utils/constant.ts";
 import { DebtAccountInfo } from "~/api/debt/account"
 
+export enum DebtAccountTypeEnum {
+    UID = 'UID',
+    LOGIN_NAME = 'LOGIN_NAME',
+    // OPEN_ID = 'OPEN_ID',
+    // BANK_CARD = 'BANK_CARD'
+}
+
 export enum DebtModeEnum {
     POLLING = 'POLLING',
     FIXED_RATIO = 'FIXED_RATIO'
@@ -11,6 +18,22 @@ export enum DebtStrategyEnum {
     API = 'API',
     TRANSFER = 'TRANSFER',
     API_OR_TRANSFER = 'API_OR_TRANSFER'
+}
+
+
+export const getDebtAccountTypeEnumText = (state: DebtAccountTypeEnum) => {
+    switch (state) {
+        case DebtAccountTypeEnum.UID:
+            return '支付宝UID';
+        case DebtAccountTypeEnum.LOGIN_NAME:
+            return '支付宝账户';
+        // case DebtAccountTypeEnum.OPEN_ID:
+        //     return 'OPEN_ID';
+        // case DebtAccountTypeEnum.BANK_CARD:
+        //     return '银行卡账户';
+        default:
+            return '未设置'
+    }
 }
 
 export const getDebtModeEnumText = (state: DebtModeEnum) => {
@@ -24,6 +47,7 @@ export const getDebtModeEnumText = (state: DebtModeEnum) => {
             return '未设置'
     }
 }
+
 
 export const getDebtStrategyEnumText = (state: DebtStrategyEnum) => {
     switch (state) {
@@ -57,6 +81,15 @@ export interface ChannelDebtAccountConfig {
     royaltyMode?: DebtModeEnum
     // 	分账策略,可用值:API,TRANSFER,API_OR_TRANSFER
     royaltyStrategy?: DebtStrategyEnum
+    //分账结算账户类型 API 或 API_OR_TRANSFER 需要
+    settleAccountType?: DebtAccountTypeEnum
+    // 渠道分账结算账户
+    settleAccountNo?: string
+    //分账失败是否自动关闭渠道
+    isRoyaltyErrorAutoClose?: boolean
+    //最大允许分账失败次数
+    maxAllowRoyaltyFailCount?: number
+
 }
 
 export interface AccountInfoItem {

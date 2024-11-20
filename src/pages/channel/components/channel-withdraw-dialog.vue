@@ -4,7 +4,7 @@ import type { Rule } from 'ant-design-vue/es/form';
 import { useDraggable } from '@vueuse/core';
 import { message } from 'ant-design-vue';
 import {ChannelListResponse} from "~/api/channel/ChannelInterface.ts";
-import {ChannelWithdrawRequest,postChannelWithdraw} from '@/api/channel/withdraw'
+import {ChannelWithdrawRequest,postChannelWithdraw, AccountTypeEnum, getAccountTypeEnumText } from '@/api/channel/withdraw'
 const userStore = useUserStore()
 
 const initFormData = ():ChannelWithdrawRequest => {
@@ -13,6 +13,7 @@ const initFormData = ():ChannelWithdrawRequest => {
     accountNo: '',
     channelId: 0,
     securityCode: '',
+    accountType: AccountTypeEnum.LOGIN_NAME
   }
 }
 
@@ -64,7 +65,11 @@ const submit = async () => {
 }
 
 const disabled = computed(() => {
-  return !(!!formData.realName && formData.accountNo) || (formData.securityCode.trim().length < 6 && userInfo.value.isEnableGoogleVerify) || chnelInfo.value.channelAmount == 0;
+  if (formData.accountType == AccountTypeEnum.LOGIN_NAME) {
+    return !(!!formData.realName && !!formData.accountNo) || (formData.securityCode.trim().length < 6 && userInfo.value.isEnableGoogleVerify) || chnelInfo.value.channelAmount == 0;
+  } else if (formData.accountType == AccountTypeEnum.UID) {
+    return !(!!formData.accountNo) || (formData.securityCode.trim().length < 6 && userInfo.value.isEnableGoogleVerify) || chnelInfo.value.channelAmount == 0;
+  }
 });
 
 const modalTitleRef = ref<HTMLElement>(null);
@@ -192,6 +197,36 @@ onMounted(() => {
             <a-button key="submit" style="width: 100%;" :disabled="disabled" type="primary" :loading="state.dialogBtnLoading" @click="handleOk">发起提现</a-button>
           </a-flex>
         </template>
+        <a-card :body-style="{padding: '15px'}">
+          <a-descriptions :column="3" layout="vertical">
+            <!-- <template #title>
+              <a-flex  align="center">
+                <a-typography-text>渠道账户信息</a-typography-text>
+                
+              </a-flex>
+
+            </template> -->
+          
+            <a-descriptions-item style="padding-bottom: 4px" :labelStyle="{'color':'#999'}" label="可用金额">
+              <a-space>
+                <a-typography-text>￥{{ chnelInfo.channelAmount }}</a-typography-text>
+              </a-space>
+            </a-descriptions-item>
+            <a-descriptions-item style="padding-bottom: 4px" :labelStyle="{'color':'#999'}" label="冻结金额">
+              <a-space>
+                <a-typography-text>￥{{ chnelInfo.channelFreezeAmount }}</a-typography-text>
+              </a-space>
+            </a-descriptions-item>
+            <a-descriptions-item style="padding-bottom: 4px" :labelStyle="{'color':'#999'}" label="已提现金额">
+              <a-space>
+                <a-typography-text>￥{{ chnelInfo.totalWithdrawAmount }}</a-typography-text>
+              </a-space>
+            </a-descriptions-item>
+            
+
+          </a-descriptions>
+        </a-card>
+
         <a-form
             ref="FormRef"
             :model="formData"
@@ -200,6 +235,19 @@ onMounted(() => {
             autocomplete="off"
             style="padding-top:10px;"
         >
+            <a-form-item
+                label="提现账户类型"
+                name="accountType"
+                :rules="[
+                    { required: true, message: '提现账户类型!' },
+                ]"
+            >
+                <a-radio-group v-model:value="formData.accountType">
+                  <a-radio :value="AccountTypeEnum.LOGIN_NAME">{{getAccountTypeEnumText(AccountTypeEnum.LOGIN_NAME)}}</a-radio>
+                  <a-radio :value="AccountTypeEnum.UID">{{getAccountTypeEnumText(AccountTypeEnum.UID)}}</a-radio>
+                </a-radio-group>
+                
+            </a-form-item>
             <a-form-item
                 label="提现金额"
                 name="amount"
@@ -214,7 +262,9 @@ onMounted(() => {
                 <a-typography-link @click="handleWithdrawAll" v-if="chnelInfo.channelAmount>0" style="margin-left: 10px">全部提现</a-typography-link>
               </a-flex>
             </a-form-item>
+
             <a-form-item
+                v-if="AccountTypeEnum.LOGIN_NAME == formData.accountType"
                 label="收款账号的真实姓名"
                 name="realName"
                 :rules="[
@@ -225,6 +275,7 @@ onMounted(() => {
                 <a-typography-text type="secondary">收款账号绑定填写的真实姓名</a-typography-text>
             </a-form-item>
             <a-form-item
+                v-if="AccountTypeEnum.LOGIN_NAME == formData.accountType"
                 label="收款账号"
                 name="accountNo"
                 :rules="[
@@ -233,6 +284,17 @@ onMounted(() => {
             >
                 <a-input v-model:value="formData.accountNo"  placeholder="请输入"></a-input>
                 <a-typography-text type="secondary">支付宝收款账号</a-typography-text>
+            </a-form-item>
+            <a-form-item
+                v-if="AccountTypeEnum.UID == formData.accountType"
+                label="UID"
+                name="accountNo"
+                :rules="[
+                    { required: true, message: '请输入支付宝UID!' },
+                ]"
+            >
+                <a-input v-model:value="formData.accountNo"  placeholder="请输入"></a-input>
+                <a-typography-text type="secondary">支付宝UID</a-typography-text>
             </a-form-item>
 
             <a-form-item
