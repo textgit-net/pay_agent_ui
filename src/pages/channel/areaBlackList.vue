@@ -4,16 +4,18 @@ import {ColumnsType} from "ant-design-vue/es/table";
 import { PayChannelType, getPayChannelTypeText} from "~/utils/constant.ts";
 import {QuestionCircleOutlined,ExclamationCircleOutlined } from "@ant-design/icons-vue"
 import { Modal, message, PaginationProps } from 'ant-design-vue';
+import { getChannelInfo, ChannelInfo } from '~/api/channel/ChannelInterface'
 
 import { delChannelAddressBlackList, getChannelAddressBlackList, ChannelAddressBlackListSearch, ChannelAddressBlackListResponse } from '@/api/channel/blacklist'
 import { updateParamsToUrl, getParamsFromUrl} from '@/utils/tools'
+import ChannelAreaBlackDialog from '@/pages/channel/components/channel-area-black-dialog.vue';
 
 const router=useRouter()
 const route = useRoute()
 const {id}= route.query
 
 const columns:ColumnsType =[
-
+  
   // {
   //   title: '#ID',
   //   dataIndex: 'id',
@@ -50,7 +52,8 @@ const columns:ColumnsType =[
 const state=reactive({
   dataSourceLoading:false,
   isSaveLoading:false,
-  isShowEditModal: false
+  isShowEditModal: false,
+  showAreaBlackDialog: false
 })
 
 const initSearchParams = ():ChannelAddressBlackListSearch => {
@@ -127,6 +130,20 @@ const handleDel = async (item?: ChannelAddressBlackListResponse) => {
  
 }
 
+const handleAddAreaBlackList = () => {
+  state.showAreaBlackDialog = true
+}
+
+const info = ref<ChannelInfo>({})
+
+const getInfo=async (id:string)=>{
+  const {data} =await getChannelInfo(id)
+  info.value = data
+}
+const addSuccess = () => {
+  filterSearch()
+}
+
 onMounted(()=>{
   if (getParamsFromUrl()) {
     searchParams.value = Object.assign(searchParams.value, getParamsFromUrl())
@@ -135,12 +152,13 @@ onMounted(()=>{
     pagination.current = searchParams.value.page
     pagination.pageSize = searchParams.value.limit
   }
-  loadData()
+  Promise.all([getInfo(id as string), loadData()])
 })
 </script>
 
 <template>
   <a-flex vertical :gap="10" style="width: 100%;height: 100%">
+    <ChannelAreaBlackDialog v-model:visible="state.showAreaBlackDialog" :chnnel-info="info" @on-success="addSuccess" />
     <!-- <a-card style="border: none" :body-style="{padding:'15px'}">
       <a-flex vertical :gap="15">
         <a-row :gutter="16">
@@ -163,6 +181,15 @@ onMounted(()=>{
       </a-flex>
     </a-card> -->
     <a-card :body-style="{'padding':'0px'}">
+      <template #title>
+        <!-- <a-radio-group v-model:value="searchParams.channelType" @change="changeChannelType">
+          <a-radio :value="null">全部</a-radio>
+          <a-radio :value="PayChannelType.ALI">{{ getPayChannelTypeText(PayChannelType.ALI) }}</a-radio>
+          <a-radio :value="PayChannelType.ALI_USER">{{ getPayChannelTypeText(PayChannelType.ALI_USER) }}</a-radio>
+        </a-radio-group> -->
+        <a-button @click="handleAddAreaBlackList" type="primary">添加渠道地区权限</a-button>
+      </template>
+
       <a-table ref="tableRef" :scroll="{x: 'max-content'}" :data-source="dataSource" :pagination="pagination" :loading="state.dataSourceLoading"  :columns="columns" size="middle" :bordered="false">
         <template #headerCell="{ column }">
           <template v-if="column.key === 'enable'">

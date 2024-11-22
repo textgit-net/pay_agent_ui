@@ -270,7 +270,7 @@ onMounted(() => {
                 ]"
             >
               <a-flex vertical>
-                <a-switch v-model:checked="formData.isEnable" checked-children="开" un-checked-children="关" style="width: 60px;" />
+                <a-switch v-model:checked="formData.isEnable" checked-children="白名单地区" un-checked-children="黑名单地区" style="width: 100px;" />
                 <a-typography-text type="secondary">若开启限制区域，将视为开启白名单，只限制在开启区域；<br />若只添加不开启，则视为添加地区黑名单。</a-typography-text>
               </a-flex>
             </a-form-item>

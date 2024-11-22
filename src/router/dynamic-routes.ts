@@ -367,6 +367,15 @@ export default [
     },
     children: [
       {
+        path: '/system/bot',
+        name: 'SystemBot',
+        component: () => import('~/pages/system/bot/index.vue'),
+        meta: {
+          title: '机器人',
+          hideChildrenInMenu: true
+        }
+      },
+      {
         path: '/system/log',
         name: 'SystemLog',
         component: () => import('~/pages/system/log/index.vue'),

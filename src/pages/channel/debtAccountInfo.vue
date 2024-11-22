@@ -154,6 +154,9 @@ const validateRate =  async (_rule: Rule, value: string) => {
 const canAddRate = ref(0)
 const calcCanAddRate = (item?: AccountInfoItem) => {
   let rate = 100;
+  if (info.value.royaltyStrategy == DebtStrategyEnum.API) {
+    rate = info.value.maxApiRoyaltyAmountRate
+  }
   if (info.value.royaltyMode == DebtModeEnum.FIXED_RATIO) {
     if (info.value.accounts.length > 0) {
       info.value.accounts.map(i=> {

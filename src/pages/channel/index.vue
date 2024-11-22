@@ -586,10 +586,11 @@ onMounted(()=>{
                         <a-button type="link" @click="router.push({path:'/channel/edit',query:{id:record['id']}})" style="padding-left: 0">编辑渠道</a-button>
                       </a-menu-item>
                       <a-menu-divider v-if="!record.isEnable" />
-                      <a-menu-item key="2" v-if="record.isEnable">
+                      <a-menu-item key="2">
                         <a-button @click="handleWithdraw(record)" type="link" style="padding-left: 0">渠道提现</a-button>
                       </a-menu-item>
-                      <a-menu-item key="0">
+                      <a-menu-divider />
+                      <a-menu-item key="areaBlackList">
                         <a-button style="padding-left: 0" type="link" @click="handleAddAreaBlackList(record)">渠道地区权限</a-button>
                       </a-menu-item>
                       <a-menu-divider />

@@ -1,10 +1,5 @@
 <script setup lang="ts">
-import BasicInfo from "~/pages/channel/basicInfo.vue";
-import DebtAccountInfo from "~/pages/channel/debtAccountInfo.vue";
-import orderInfo from "~/pages/channel/orderInfo.vue";
-import withdrawInfo from "~/pages/channel/withdrawInfo.vue";
-import areaBlackList from "~/pages/channel/areaBlackList.vue";
-import eventsSub from "~/pages/channel/eventsSub.vue";
+import eventsSub from "~/pages/system/bot/eventsSub.vue";
 
 const router=useRouter()
 const route= useRoute()
@@ -12,7 +7,7 @@ const route= useRoute()
 
 const state=reactive({
   isLoading:false,
-  activeTabKey:'basicInfo'
+  activeTabKey:'eventsSub'
 })
 
 let  { tabKey } = route.query
@@ -58,26 +53,13 @@ const onTabClick=(key: string)=>{
         </template>
         <a-flex justify="space-between" class="not_page_tabs">
           <a-tabs  v-model:activeKey="state.activeTabKey" @tabClick="onTabClick">
-            <a-tab-pane key="basicInfo" tab="渠道信息"/>
-            <a-tab-pane key="channelAccountInfo" tab="渠道分账信息"/>
-            <a-tab-pane key="orderInfo" tab="渠道订单信息"/>
-            <a-tab-pane key="withdrawInfo" tab="渠道提现信息"/>
-            <a-tab-pane key="areaBlackList" tab="渠道地区权限"/>
-            <!-- <a-tab-pane key="eventsSub" tab="渠道事件订阅"/> -->
+            <a-tab-pane key="eventsSub" tab="机器人群组&渠道消息订阅"/>
           </a-tabs>
         </a-flex>
       </a-page-header>
 
     </a-card>
-    <basic-info v-if="state.activeTabKey=='basicInfo'"/>
-  
-    <debt-account-info v-if="state.activeTabKey=='channelAccountInfo'">
-    </debt-account-info>
-
-    <order-info v-if="state.activeTabKey=='orderInfo'"></order-info>
-    <withdraw-info v-if="state.activeTabKey=='withdrawInfo'"></withdraw-info>
-    <areaBlackList v-if="state.activeTabKey=='areaBlackList'"></areaBlackList>
-    <!-- <eventsSub v-if="state.activeTabKey=='eventsSub'"></eventsSub> -->
+    <eventsSub v-if="state.activeTabKey=='eventsSub'"></eventsSub>
   </a-flex>
 
 </template>

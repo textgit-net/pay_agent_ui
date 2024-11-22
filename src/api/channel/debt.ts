@@ -89,6 +89,8 @@ export interface ChannelDebtAccountConfig {
     isRoyaltyErrorAutoClose?: boolean
     //最大允许分账失败次数
     maxAllowRoyaltyFailCount?: number
+    //APi最大分账比例
+    maxApiRoyaltyAmountRate?: number
 
 }
 
