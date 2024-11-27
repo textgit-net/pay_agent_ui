@@ -42,10 +42,9 @@ const onTabClick=(key: string)=>{
     <a-card :body-style="{padding:'10px 10px 0px 10px'}">
 
       <a-page-header
-        title="渠道详情"
+        title="机器人"
         class="site-page-header"
         sub-title="  "
-        @back="() => router.go(-1)"
         style="padding: 0;"
       >
         <template #tags>
@@ -53,7 +52,7 @@ const onTabClick=(key: string)=>{
         </template>
         <a-flex justify="space-between" class="not_page_tabs">
           <a-tabs  v-model:activeKey="state.activeTabKey" @tabClick="onTabClick">
-            <a-tab-pane key="eventsSub" tab="机器人群组&渠道消息订阅"/>
+            <a-tab-pane key="eventsSub" tab="Telegram群组&渠道消息订阅"/>
           </a-tabs>
         </a-flex>
       </a-page-header>

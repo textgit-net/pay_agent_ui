@@ -217,8 +217,8 @@ const onCheckEventsChange = (i:SubscribeEventItem, index: number) => {
                 <a-flex vertical>
                     <a-typography-text>将机器人添加到群聊</a-typography-text>
                     <a-space>
-                        <a-typography-text  type="secondary">{{info.telegramBootName}}</a-typography-text>
-                        <copy-text-btn :copytext="info.telegramBootName" tipText="复制机器人账号"></copy-text-btn>
+                        <a-typography-text  type="secondary">@{{info.telegramBootName}}</a-typography-text>
+                        <copy-text-btn :copytext="`@${info.telegramBootName}`" tipText="复制机器人账号"></copy-text-btn>
                     </a-space>
                 </a-flex>
             </a-timeline-item>
@@ -278,8 +278,8 @@ const onCheckEventsChange = (i:SubscribeEventItem, index: number) => {
 
             </template>
             <a-descriptions-item style="padding-bottom: 4px;" :labelStyle="{'color':'#999'}" label="机器人">
-                <a-typography-text>{{ info.telegramBootName }}</a-typography-text>
-                <copy-text-btn v-if="info.telegramBootName" :copytext="info.telegramBootName" tipText="复制机器人账号"></copy-text-btn>
+                <a-typography-text>@{{ info.telegramBootName }}</a-typography-text>
+                <copy-text-btn v-if="info.telegramBootName" :copytext="`@${info.telegramBootName}`" tipText="复制机器人账号"></copy-text-btn>
             </a-descriptions-item>
             <a-descriptions-item style="padding-bottom: 4px" :labelStyle="{'color':'#999'}"label="群组ID">
             
