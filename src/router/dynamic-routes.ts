@@ -115,15 +115,15 @@ export default [
     },
     children: [
 
-      {
-        path: '/channel/group',
-        name: 'ChannelGroup',
-        component: () => import('~/pages/channel/group/index.vue'),
-        meta: {
-          title: '渠道分组',
-          hideChildrenInMenu: true
-        }
-      },
+      // {
+      //   path: '/channel/group',
+      //   name: 'ChannelGroup',
+      //   component: () => import('~/pages/channel/group/index.vue'),
+      //   meta: {
+      //     title: '渠道分组',
+      //     hideChildrenInMenu: true
+      //   }
+      // },
       {
         path: '/channel/group-info',
         name: 'ChannelGroupInfo',

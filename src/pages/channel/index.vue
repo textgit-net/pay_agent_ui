@@ -438,11 +438,11 @@ onMounted(()=>{
               <a-typography-text v-if="!record.group" type="secondary">/</a-typography-text>
               <a-flex v-else vertical :gap="5" align="start">
                 
-                <a-tooltip>
+                <!-- <a-tooltip>
                   <template #title>查看渠道组【{{(record.group as ChannelGroupSimpleResponse).name}}】详情</template>
                   <a-button style="padding-left: 0" type="link" @click="router.push({path:'/channel/group-info',query:{groupCode:record.group.groupCode}})">{{(record.group as ChannelGroupSimpleResponse).name}}</a-button>
-                </a-tooltip>
-                
+                </a-tooltip> -->
+                <a-typography-text type="secondary">{{(record.group as ChannelGroupSimpleResponse).name}}</a-typography-text>
                 <a-typography-text type="secondary">编号:{{(record.group as ChannelGroupSimpleResponse).groupCode}}</a-typography-text>
               </a-flex>
             </template>
