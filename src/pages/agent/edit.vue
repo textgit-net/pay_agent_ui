@@ -3,13 +3,16 @@ import { message } from 'ant-design-vue';
 import type { Rule } from 'ant-design-vue/es/form';
 import {ContactWay, ContactWaySelectOption} from "~/utils/constant.ts";
 import {PayChannelInfo, AgentInfo, modifyAgent, getAgentInfo, AllowInviteUserEnum } from '~/api/agent/index'
+import addProductRateDialog from '@/pages/channel/components/add-product-rate-dialog.vue';
+import type { ProductItem }from '@/api/channel/group'
 const router=useRouter()
 const route=useRoute()
 const formRef=ref(null)
 
-const state = reactive<{isLoading: boolean; saveLoading: boolean}>({
+const state = reactive({
     isLoading: false,
-    saveLoading: false
+    saveLoading: false,
+    isShowRate: false
 })
 
 const ininForm = ():AgentInfo => {
@@ -17,11 +20,12 @@ const ininForm = ():AgentInfo => {
         contactWay:ContactWay.Phone,
         isAllowInviteUser: AllowInviteUserEnum.notAllow,
         isEnable: false,
-        payChannelConfig: []
+        payChannelConfig: [],
+        products: []
     }
 }
 
-const formData=reactive<AgentInfo>(ininForm())
+const formData=ref<AgentInfo>(ininForm())
 const payChannelConfigList = ref<PayChannelInfo[]>([])
 const {id}= route.query
 
@@ -37,7 +41,7 @@ const onSubmit = async ()=>{
 const submit = async () => {
     try {
         state.saveLoading=true
-        let copyFormData:AgentInfo= JSON.parse(JSON.stringify(formData));
+        let copyFormData:AgentInfo= JSON.parse(JSON.stringify(formData.value));
         copyFormData.payChannelConfig = payChannelConfigList.value;
         let res = await modifyAgent(copyFormData)
         message.success('操作成功')
@@ -56,7 +60,7 @@ const submit = async () => {
 const getInfo=async (id:string)=>{
   state.isLoading=true
   const {data} =await getAgentInfo(id)
-  Object.assign(formData, data)
+  Object.assign(formData.value, data)
   state.isLoading=false
 }
 
@@ -80,6 +84,18 @@ const validatePwd =  async (_rule: Rule, value: string) => {
   }
 };
 
+const handleAddProduct = () => {
+  state.isShowRate=true
+  formData.value = JSON.parse(JSON.stringify(formData.value))
+  console.log('formData.value', formData.value)
+}
+
+const onSuccess = (products: ProductItem[]) => {
+   
+  formData.value.products = products
+}
+
+
 onMounted(async ()=>{
   if(id){
     
@@ -90,6 +106,7 @@ onMounted(async ()=>{
 
 <template>
   <a-spin :spinning="state.isLoading">
+    <addProductRateDialog v-model:visible="state.isShowRate" :products="formData.products" @on-success="onSuccess"></addProductRateDialog>
     <a-flex justify="center">
       <a-form ref="formRef" style="width: 800px" :model="formData"  :labelCol="{style: 'width: 140px; display: inline-block;'}">
         <a-flex vertical :gap="10">
@@ -174,6 +191,16 @@ onMounted(async ()=>{
             </a-form-item>
 
           </a-card>
+          <a-card >
+            <a-typography-text strong>4.产品信息</a-typography-text>
+            
+            <a-form-item label="配置支付产品：" name="isAllowInviteUser"  class="mt-5" :rules="[{required:false,message:''}]">
+              <a-typography-text>已添加{{formData.products.length}}个支付产品</a-typography-text>
+              <a-button @click="handleAddProduct" type="link">编辑</a-button>
+            </a-form-item>
+
+          </a-card>
+
           <a-card >
             <a-flex justify="flex-end">
               <a-space>

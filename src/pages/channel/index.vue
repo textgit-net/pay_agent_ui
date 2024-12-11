@@ -11,25 +11,26 @@ import { calcFloat } from '~/utils/calcFloat'
 import { updateParamsToUrl, getParamsFromUrl} from '@/utils/tools'
 import ChannelWithdrawDialog from '@/pages/channel/components/channel-withdraw-dialog.vue';
 import ChannelAreaBlackDialog from '@/pages/channel/components/channel-area-black-dialog.vue';
+const userStore = useUserStore()
 const optsStore = useOptsStore()
 const router=useRouter()
 const columns:ColumnsType =[
   {
-    title: '所属渠道组',
-    dataIndex: 'group',
+    title: '产品编码',
+    dataIndex: 'productCode',
   },
   {
     title: '渠道名称',
     dataIndex: 'name',
   },
-  {
-    title: '渠道类型',
-    dataIndex: 'channelType',
-  },
-  {
-    title: '支付方式',
-    dataIndex: 'payModes',
-  },
+  // {
+  //   title: '渠道类型',
+  //   dataIndex: 'channelType',
+  // },
+  // {
+  //   title: '支付方式',
+  //   dataIndex: 'payModes',
+  // },
   {
     title: '启用分账',
     dataIndex: 'isEnableRoyalty',
@@ -300,16 +301,16 @@ onMounted(()=>{
         <a-form-item name="name" :rules="{required:true,message:'请输入渠道名称'}"  label="渠道名称" >
           <a-input placeholder="请输入渠道名称" v-model:value="cloneFormData.name" allow-clear></a-input>
         </a-form-item>
-        <a-form-item name="groupCode" :rules="{required:false,message:'请选择渠道组'}" label="所属渠道组">
+        <!-- <a-form-item name="groupCode" :rules="{required:false,message:'请选择支付产品'}" label="所属支付产品">
           <a-select
             v-model:value="cloneFormData.groupCode"
             style="width: 100%"
-            placeholder="请选择渠道组"
+            placeholder="请选择"
             allow-clea
           >
-            <a-select-option v-for="item in channelGroups" :value="item.groupCode">{{ item.name }}</a-select-option>
+            <a-select-option v-for="item in userStore.userInfo.products" :value="item.productCode">{{ item.productName }}</a-select-option>
           </a-select>
-        </a-form-item>
+        </a-form-item> -->
       </a-form>
     </a-modal>
 
@@ -332,15 +333,15 @@ onMounted(()=>{
                 v-model:value="searchParams.groupCodes"
                 mode="multiple"
                 style="width: 100%"
-                placeholder="按渠道组查询"
+                placeholder="按支付产品查询"
                 allow-clear
                 :max-tag-count="2"
               >
-                <a-select-option v-for="item in channelGroups" :value="item.groupCode">{{ item.name }}</a-select-option>
+                <a-select-option v-for="item in userStore.userInfo.products" :value="item.productCode">{{ item.productName }}</a-select-option>
               </a-select>
             </a-col>
 
-            <a-col class="gutter-row" :span="4">
+            <!-- <a-col class="gutter-row" :span="4">
               <a-select
                 v-model:value="searchParams.channelTypes"
                 mode="multiple"
@@ -351,7 +352,7 @@ onMounted(()=>{
               >
                 <a-select-option v-for="item in PayChannelTypeSelectOption" :value="item.value">{{ item.title }}</a-select-option>
               </a-select>
-            </a-col>
+            </a-col> -->
             <a-col class="gutter-row" :span="4">
               <a-input v-model:value="searchParams.keyword" allow-clear  placeholder="按ID/名称查询" ></a-input>
             </a-col>
@@ -460,7 +461,7 @@ onMounted(()=>{
               </a-flex>
             </template>
 
-            <template v-if="column.dataIndex==='payModes'">
+            <!-- <template v-if="column.dataIndex==='payModes'">
               <a-flex vertical :gap="5" align="start">
                 <a-tooltip>
                     <template #title>查看支付方式</template>
@@ -468,7 +469,7 @@ onMounted(()=>{
                 </a-tooltip>
                 
               </a-flex>
-            </template>
+            </template> -->
 
             <template v-if="column.dataIndex==='isEnableRoyalty'">
               <a-flex align="center" justify="start">

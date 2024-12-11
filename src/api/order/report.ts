@@ -34,6 +34,10 @@ export interface AgentOrderReportSearch extends BaseOrderReportSearch{
 
 }
 
+export interface ProductOrderReportSearch extends BaseOrderReportSearch{
+    products?: string[]
+}
+
 /**
  * 获取所有订单报表数据
  * @param search 查询参数
@@ -64,4 +68,12 @@ export function getMerchantOrderReportData(search:MerchantOrderReportSearch):Pro
  */
 export function getAgentOrderReportData(search:AgentOrderReportSearch):Promise<ResponseBody<PageWarp<any>>>{
     return useGet<PageWarp<any>>("/order/agent/report",search)
+}
+
+/**
+ * 支付产品订单数据报表
+ * @param search
+ */
+export function getProductOrderReportData(search:ProductOrderReportSearch):Promise<ResponseBody<PageWarp<any>>>{
+    return useGet<PageWarp<any>>("/order/product/report",search)
 }

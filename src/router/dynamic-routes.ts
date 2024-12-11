@@ -261,16 +261,25 @@ export default [
           hideChildrenInMenu: true
         }
       },
-
       {
-        path: '/report/channel',
-        name: 'ChannelReport',
-        component: () => import('~/pages/report/channel/index.vue'),
+        path: '/report/product',
+        name: 'reportProduct',
+        component: () => import('~/pages/report/product/index.vue'),
         meta: {
-          title: '渠道报表',
+          title: '产品报表',
           hideChildrenInMenu: true
         }
       },
+
+      // {
+      //   path: '/report/channel',
+      //   name: 'ChannelReport',
+      //   component: () => import('~/pages/report/channel/index.vue'),
+      //   meta: {
+      //     title: '渠道报表',
+      //     hideChildrenInMenu: true
+      //   }
+      // },
 
       {
         path: '/report/agent',

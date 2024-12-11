@@ -1,8 +1,10 @@
 <script setup lang="ts">
 import { ArrowLeftOutlined, CheckCircleOutlined, CloseCircleOutlined, UploadOutlined } from "@ant-design/icons-vue";
+import type { ProductItem }from '@/api/channel/group' 
 import type { PayModesItem } from '~@/api/common/opts'
 import { Empty } from 'ant-design-vue';
 import {
+  changeChannel,
   ChannelFormData,
   ChannelSimpleResponse,
   getChannelEditInfo,
@@ -10,7 +12,8 @@ import {
   saveChannel
 } from "~/api/channel/ChannelInterface.ts";
 import {
-  getPayChannelTypeText, getPayModeTypeText,
+  getPayChannelTypeText,
+  getPayModeTypeText,
   PayChannelType,
   PayChannelTypeSelectOption,
   PayModeType,
@@ -18,6 +21,7 @@ import {
 } from "~/utils/constant.ts";
 import type { Rule } from 'ant-design-vue/es/form';
 const optsStore = useOptsStore()
+const userStore = useUserStore()
 
 import { getChannelGroups,ChannelGroupSimpleResponse } from '@/api/channel/group'
 
@@ -226,6 +230,18 @@ const onChannelTypeChange = async (value: PayChannelType) => {
   }
 }
 
+const changeProduct = (item?: ProductItem) => {
+  
+  formData.channelType = item.channelType
+}
+
+const findChannelType = (productCode: string) => {
+  userStore.userInfo.products.map(i=>{
+    if (i.productCode == productCode) {
+      formData.channelType = i.channelType
+    }
+  })
+}
 
 const id = route.query['id']
 onMounted(() => {
@@ -235,10 +251,13 @@ onMounted(() => {
       Object.assign(formData, res.data ?? {})
       onChannelTypeChange(res.data.channelType)
       isLoading.value = false
+      findChannelType(formData.productCode)
     })
+   
   } else {
     getPayModesWithChannelType(formData.channelType)
   }
+ 
   loadGroups()
 })
 const filterOption = (input: string, option: any) => {
@@ -265,21 +284,14 @@ const filterOption = (input: string, option: any) => {
               :items="commonChannelStepsItems" />
             <a-card v-if="current == 0" :bordered="false">
               <!--<a-typography-text strong>1.基础信息</a-typography-text>-->
-              <a-form-item label="渠道类型" name="channelType" class="mt-5">
+              <!-- <a-form-item label="渠道类型" name="channelType" class="mt-5">
                 <a-flex style="flex: 1" vertical>
                   <a-radio-group @change="() => onChannelTypeChange(formData.channelType)" :disabled="formData.id != null" v-model:value="formData.channelType" default-value="false">
                     <a-radio v-for="(item) in PayChannelTypeSelectOption" :value="item.value">{{ item.title }}</a-radio>
                   </a-radio-group>
-
-                  <!-- <a-select :disabled="formData.id != null" v-model:value="formData.channelType"
-                    @change="onChannelTypeChange" style="width: 320px;">
-                    <a-select-option v-for="(item) in PayChannelTypeSelectOption"
-                      :value="item.value">{{ item.title }}</a-select-option>
-                  </a-select> -->
-                  <!-- <a-typography-text type="secondary">目前系统支持平台:支付宝,微信.</a-typography-text> -->
                 </a-flex>
-              </a-form-item>
-              <a-form-item label="支付方式" name="payModes" class="mt-5" :rules="{ required: true, message: '请选择支付方式' }">
+              </a-form-item> -->
+              <!-- <a-form-item label="支付方式" name="payModes" class="mt-5" :rules="{ required: true, message: '请选择支付方式' }">
                 <a-flex style="flex: 1" align="start" justify="start" vertical>
                   <a-flex style="flex: 1">
                     <a-checkbox-group v-model:value="formData.payModes">
@@ -290,6 +302,12 @@ const filterOption = (input: string, option: any) => {
                   </a-flex>
                   <a-typography-text type="secondary">请选择渠道分组,用于派单</a-typography-text>
                 </a-flex>
+              </a-form-item> -->
+              <a-form-item label="产品代码" name="productCode" class="mt-5">
+                <a-select v-model:value="formData.productCode" placeholder="请选择支付产品"
+                  style="width: 320px;">
+                  <a-select-option v-for="(item) in userStore.userInfo.products" @change="changeProduct" :value="item.productCode">{{ item.productName }}</a-select-option>
+                </a-select>
               </a-form-item>
               <a-form-item label="渠道名称" name="name" class="mt-5">
                 <a-flex style="flex: 1" vertical>
@@ -297,7 +315,9 @@ const filterOption = (input: string, option: any) => {
                   <a-typography-text type="secondary">为了方便管理渠道</a-typography-text>
                 </a-flex>
               </a-form-item>
-              <a-form-item label="渠道组" name="groupCode" class="mt-5">
+             
+             
+              <!-- <a-form-item label="渠道组" name="groupCode" class="mt-5">
                 <a-flex style="flex: 1" vertical>
                   <a-select v-model:value="formData.groupCode" show-search :filter-option="filterOption" style="width: 320px;" allowClear>
                     <a-select-option v-for="(item) in groups" :value="item.groupCode">{{ item.name }}</a-select-option>
@@ -311,7 +331,7 @@ const filterOption = (input: string, option: any) => {
                   </a-select>
                   <a-typography-text type="secondary">请选择渠道分组,用于派单</a-typography-text>
                 </a-flex>
-              </a-form-item>
+              </a-form-item> -->
             </a-card>
             <a-card v-if="current == 1 && PayChannelType.ALI === formData.channelType" :bordered="false">
               <!--<a-typography-text strong>2.渠道配制</a-typography-text>-->

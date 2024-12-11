@@ -12,6 +12,7 @@ import { updateParamsToUrl, getParamsFromUrl, flatten, unflatten} from '@/utils/
 import { calcFloat } from '@/utils/calcFloat'
 import {OrderStatisticsEnum,OrderStatisticsRequest, OrderStatisticsResponse,getOrderStatistics } from '@/api/dashboard'
 const PayModeOptions = useOptsStore().payModesOpts
+const userStore = useUserStore()
 
 const DateSearchWrapRef = ref()
 const router=useRouter()
@@ -27,7 +28,8 @@ const inntSearchParams = ():OrderSearch => {
     return {
         page:1,
         limit:10,
-        dateType:null
+        dateType:null,
+        products: []
     } as OrderSearch
 }
 const searchParams = ref<OrderSearch>(inntSearchParams())
@@ -170,10 +172,22 @@ onBeforeMount(()=>{
             </a-select>
           </a-col>
           <a-col class="gutter-row" :span="4">
+              <a-select
+                v-model:value="searchParams.products"
+                mode="multiple"
+                style="width: 100%"
+                placeholder="按支付产品查询"
+                allow-clear
+                :max-tag-count="2"
+              >
+                <a-select-option v-for="item in userStore.userInfo.products" :value="item.productCode">{{ item.productName }}</a-select-option>
+              </a-select>
+            </a-col>
+          <!-- <a-col class="gutter-row" :span="4">
             <a-select style="width: 100%" mode="multiple" allow-clear :max-tag-count="1" v-model:value="searchParams.payModes" placeholder="按支付方式查询">
               <a-select-option v-for="(item) in PayModeOptions" :value="item.payMode">{{item.payModeName}}</a-select-option>
             </a-select>
-          </a-col>
+          </a-col> -->
 
           <a-col class="gutter-row" :span="24">
             <date-search-wrap :default-date-type="searchParams.dateType" :default-range-date="defaultDateRange"  @date-change="dateChange" ref="DateSearchWrapRef" />

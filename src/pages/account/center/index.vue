@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import BasicInfo from "~/pages/account/center/basicInfo.vue";
-import MerchantInfo from "~/pages/agent/merchantInfo.vue";
+import RatesConfig from "@/pages/account/center/ratesConfig.vue";
 const router=useRouter()
 const route= useRoute()
 const state=reactive({
@@ -33,7 +33,7 @@ const onTabClick=(key: string)=>{
         <a-flex justify="space-between" class="not_page_tabs">
           <a-tabs v-model:activeKey="state.activeTabKey" @tabClick="onTabClick">
             <a-tab-pane key="basicInfo"  tab="账号信息"/>
-            <!-- <a-tab-pane key="merchantInfo" tab="登录记录"/> -->
+            <a-tab-pane key="ratesConfig" tab="支付产品"/>
           </a-tabs>
         </a-flex>
       </a-page-header>
@@ -41,8 +41,8 @@ const onTabClick=(key: string)=>{
     </a-card>
     <basic-info v-show="state.activeTabKey=='basicInfo'"/>
   
-    <!-- <merchant-info v-show="state.activeTabKey=='merchantInfo'">
-    </merchant-info> -->
+    <rates-config v-show="state.activeTabKey=='ratesConfig'">
+    </rates-config>
   </a-flex>
 
 </template>

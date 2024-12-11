@@ -111,11 +111,11 @@ getInfo()
 
 
 const columns:ColumnsType =[
-  {
-    title: '产品名称',
-    dataIndex: 'productName',
-    width: '25%'
-  },
+  // {
+  //   title: '产品名称',
+  //   dataIndex: 'productName',
+  //   width: '25%'
+  // },
   {
     title: '产品代码',
     dataIndex: 'productCode',
@@ -150,9 +150,9 @@ const columns:ColumnsType =[
         autocomplete="off"
       >
         <a-form-item
-          label="当前支付产品"
+          label="当前产品代码"
         >
-          {{ selectPayModeRateItem.productName }} | {{ selectPayModeRateItem.productCode }}
+          {{ selectPayModeRateItem.productCode }}
         </a-form-item>
         <a-form-item
           label="产品费率"

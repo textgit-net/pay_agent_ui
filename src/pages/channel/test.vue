@@ -43,7 +43,8 @@ const state=reactive({
 const fromData=reactive<ChannelTestRequest>({
    isWebCashier:true,
    amount:0.1,
-   payMode: null
+   channelId: null,
+  //  payMode: null
 })
 const orderInfo=reactive<any>({})
 
@@ -175,16 +176,12 @@ onMounted(()=>{
             </a-select>
           </a-form-item>
         
-          <a-form-item label="支付方式" name="payMode" :rules="{required:true,message:'请选择支付方式',trigger: 'change'}">
+          <!-- <a-form-item label="支付方式" name="payMode" :rules="{required:true,message:'请选择支付方式',trigger: 'change'}">
             <a-radio-group :disabled="fromData.channelId==null" v-model:value="fromData.payMode">
               <a-radio v-for="(item) in payModes" :value="item.payMode">{{item.payModeName}}</a-radio>
             </a-radio-group>
             <a-typography-text v-if="payModes.length == 0 && fromData.channelId==null" type="secondary">待选择支付渠道后显示</a-typography-text>
-
-            <!-- <a-select :disabled="fromData.channelId==null"  placeholder="请选择支付方式" v-model:value="fromData.payMode">
-              <a-select-option v-for="(item) in payModes"  :value="item.value">{{item.title}}</a-select-option>
-            </a-select> -->
-          </a-form-item>
+          </a-form-item> -->
           <a-form-item label="跳转方式" name="isWebCashier">
             <a-radio-group :disabled="fromData.channelId==null" v-model:value="fromData.isWebCashier">
               <a-radio :value="false" disabled>直连</a-radio>

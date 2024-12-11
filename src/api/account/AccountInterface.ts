@@ -1,4 +1,5 @@
 import {PageWarp, PayChannelType, ResponseBody} from "~/utils/constant.ts";
+import type { ProductItem }from '@/api/channel/group' 
 
 export interface AuthToken {
     accessToken:string;
@@ -27,6 +28,7 @@ export interface AccountInfoResponse {
     isBindGoogleSecretKey?: boolean
     // 是否开启google验证器
     isEnableGoogleVerify?: boolean
+    products?: ProductItem[]
 }
 
 export interface RoleInfoResponse{

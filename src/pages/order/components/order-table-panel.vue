@@ -32,6 +32,13 @@ const props=defineProps<{
 const columns =shallowRef<any[]>(
     [
       {
+        title: '产品编码',
+        dataIndex: 'productCode',
+        align:'left',
+        fixed: 'left',
+        tableTypes:[OrderTableType.ALL]
+      },
+      {
         title: '订单编号',
         dataIndex: 'id',
         align:'left',

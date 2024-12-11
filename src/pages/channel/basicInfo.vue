@@ -94,18 +94,18 @@ const getInfo=async (id:string)=>{
   state.isLoading=true
   const {data} =await getChannelInfo(id)
   info.value = data
-  getPayModelName(data.payModes)
+  // getPayModelName(data.payModes)
   state.isLoading=false
 }
 
 const payModelNames = ref<string[]>([])
-const getPayModelName = (payModes: string[]) => {
-  if (payModes.length) {
-    payModes.map((item: PayModeType, index: number) => {
-      payModelNames.value.push(`${index + 1}、${ useOptsStore().getPayModesText(item)}`)
-    })
-  }
-}
+// const getPayModelName = (payModes: string[]) => {
+//   if (payModes.length) {
+//     payModes.map((item: PayModeType, index: number) => {
+//       payModelNames.value.push(`${index + 1}、${ useOptsStore().getPayModesText(item)}`)
+//     })
+//   }
+// }
 
 const {id}= route.query
 onMounted(async ()=>{
@@ -173,29 +173,29 @@ onMounted(async ()=>{
       <a-descriptions :column="4" layout="vertical">
         <template #title>
           <a-flex  align="center">
-            <a-typography-text>所属渠道组</a-typography-text>
+            <a-typography-text>所属支付产品</a-typography-text>
             <!-- <a-button @click="handleShowBaseInfo" type="link">编辑</a-button> -->
           </a-flex>
 
         </template>
        
-        <a-descriptions-item style="padding-bottom: 4px" :labelStyle="{'color':'#999'}" label="渠道组名称">
-          <a-typography-text>{{info.group?.name ?? '/'}}</a-typography-text>
+        <a-descriptions-item style="padding-bottom: 4px" :labelStyle="{'color':'#999'}" label="产品编码">
+          <a-typography-text>{{info.productCode?? '/'}}</a-typography-text>
           <!-- <a-typography-link v-if="info.group" @click="router.push({path:'/channel/group-info',query:{groupCode:info.group.groupCode}})">{{info.group.name}}</a-typography-link>
           <a-typography-text v-else type="secondary">/</a-typography-text> -->
         </a-descriptions-item>
-        <a-descriptions-item style="padding-bottom: 4px" :labelStyle="{'color':'#999'}" label="渠道组编码">{{  info.group ? info.group.groupCode : '/'  }}</a-descriptions-item>
+        <!-- <a-descriptions-item style="padding-bottom: 4px" :labelStyle="{'color':'#999'}" label="渠道组编码">{{  info.group ? info.group.groupCode : '/'  }}</a-descriptions-item> -->
         
 
       </a-descriptions>
     </a-card>
 
-    <a-card :body-style="{padding: '15px'}" :loading="state.isLoading">
+    <!-- <a-card :body-style="{padding: '15px'}" :loading="state.isLoading">
       <a-descriptions :column="1" layout="vertical">
         <template #title>
           <a-flex  align="center">
             <a-typography-text>支付方式</a-typography-text>
-            <!-- <a-button @click="handleShowBaseInfo" type="link">编辑</a-button> -->
+  
           </a-flex>
 
         </template>
@@ -208,7 +208,7 @@ onMounted(async ()=>{
         
 
       </a-descriptions>
-    </a-card>
+    </a-card> -->
 
     <a-card :body-style="{padding: '15px'}" :loading="state.isLoading">
 

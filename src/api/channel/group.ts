@@ -1,5 +1,15 @@
-import {BasePageRequest, PageWarp,ResponseBody } from "~/utils/constant.ts";
+import {BasePageRequest, PageWarp,ResponseBody,PayChannelType } from "~/utils/constant.ts";
 
+
+export interface ProductItem {
+    productCode?: string
+    productName?: string
+    channelType?: PayChannelType
+    freeRate?: number
+    agentId?: number
+    channelCount?: number
+    isEnable?: boolean
+}
 
 /**
  * 渠道分组查询
@@ -14,6 +24,9 @@ export  interface ChannelGroupSimpleResponse {
     groupCode?:string
     name?:string
     isEnable?:boolean
+    channelType?: PayChannelType,
+    // 用作逻辑处理
+    rate?: number
 }
 
 export interface ChannelGroupListResponse extends ChannelGroupSimpleResponse{

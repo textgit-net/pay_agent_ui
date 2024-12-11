@@ -104,11 +104,11 @@ onBeforeMount(()=>{
               <a-select-option v-for="(item) in channelOpts" :value="item.id" :label="item.name" >{{item.name}}</a-select-option>
             </a-select>
           </a-col>
-          <a-col class="gutter-row" :span="5">
+          <!-- <a-col class="gutter-row" :span="5">
             <a-select style="width: 100%" mode="multiple" allow-clear :max-tag-count="2" v-model:value="searchParams.channelTypes" placeholder="按渠道类型查询">
               <a-select-option v-for="(item) in PayChannelTypeSelectOption" :value="item.value">{{item.title}}</a-select-option>
             </a-select>
-          </a-col>
+          </a-col> -->
 
           <a-col class="gutter-row" :span="24">
             <date-search-wrap :default-date-type="searchParams.dateType" :default-range-date="defaultDateRange"  @date-change="dateChange" ref="DateSearchWrapRef" />

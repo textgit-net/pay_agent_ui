@@ -1,4 +1,5 @@
 import {PageWarp, ResponseBody, BasePageRequest, ContactWay} from "~/utils/constant.ts";
+import type { ProductItem }from '@/api/channel/group' 
 
 export enum AllowInviteUserEnum {
     notAllow = 0,
@@ -31,6 +32,7 @@ export interface AgentInfo {
     payChannelConfig?: PayChannelInfo[]
     totalOrderAmount?: number
     totalOrderCount?: number
+    products?: ProductItem[]
 }
 
 export interface AgentInfoReq extends AgentInfo  {
@@ -121,4 +123,14 @@ export function resetAgentPwd(data: AgentResetPwdRequset):Promise<ResponseBody<a
  */
 export function changeAgentEnable(id: string):Promise<ResponseBody<any>>{
     return useGet<any>(`/agent/changeEnable/${id}`)
+}
+
+
+/**
+ * 修改支付产品
+ * @param { string } id 
+ * @returns {Promise<ResponseBody<any>>}
+ */
+export function changeAgentProducts(id: string, products: ProductItem[]):Promise<ResponseBody<any>>{
+    return usePost<any>(`agent/product?agentId=${id}`, products)
 }

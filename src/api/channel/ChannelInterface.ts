@@ -65,6 +65,8 @@ export interface ChannelListResponse extends ChannelSimpleResponse{
     totalWithdrawAmount?: number
     isErrorAutoClose?: boolean
     closeReason?: string
+    productCode?: string
+    productName?: string
 }
 
 
@@ -138,9 +140,10 @@ export interface ChannelFormData{
      * 是否启用分账
      */
     isEnableRoyalty?:boolean
-    payModes?: any,
+    payModes?: any
     //商户id
-    mchId?: number;
+    mchId?: number
+    productCode?: string
 }
 
 export interface CloneChannelFormData {
