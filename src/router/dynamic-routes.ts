@@ -25,6 +25,39 @@ export default [
     component: () => import('~/pages/dashboard/analysis/index.vue')
   },
   {
+    name: 'info',
+    path: '/info',
+    meta: {
+      title: '个人信息',
+      icon: 'TeamOutlined'
+    },
+    redirect: '/info/base',
+    component: basicRouteMap.RouteView,
+    children: [
+      {
+        path: '/info/base',
+        name: 'InfoBase',
+
+        component: () => import('~/pages/account/center/basicInfo.vue'),
+        meta: {
+          title: '基础信息',
+          hideChildrenInMenu: true
+        }
+      },
+      {
+        path: '/info/product',
+        name: 'InfoProduct',
+
+        component: () => import('~/pages/account/center/ratesConfig.vue'),
+        meta: {
+          title: '支付产品',
+          hideChildrenInMenu: true
+        }
+      },
+    ]
+  },
+
+  {
     name: 'AgentManage',
     path: '/agent',
     meta: {

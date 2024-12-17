@@ -113,26 +113,34 @@ const dataSource=shallowRef<ChannelListResponse[]>([])
 const channelGroups = ref<ChannelGroupSimpleResponse[]>([])
 
 const changeEnable=async (record:ChannelListResponse)=>{
-  let tip = record.isEnable ? `确认关闭当前渠道【${record.name}】吗？` : `确认开启当前渠道【${record.name}】吗? ${record.isErrorAutoClose? '上次是因为【'+ record.closeReason +'】关闭。':''}`
-  Modal.confirm({
-    title: '温馨提示',
-    icon: createVNode(ExclamationCircleOutlined),
-    content: tip,
-    okText: '确认',
-    cancelText: '取消',
-    async onOk() {
-      try {
-        state.isPageLoading=true
-        let res = await usePut(`/channel/change/${record.id}`)
-        message.success('操作成功')
-        await loadData()
-        state.isPageLoading=false
-      } catch {
+  // let tip = record.isEnable ? `确认关闭当前渠道【${record.name}】吗？` : `确认开启当前渠道【${record.name}】吗? ${record.isErrorAutoClose? '上次是因为【'+ record.closeReason +'】关闭。':''}`
+  // Modal.confirm({
+  //   title: '温馨提示',
+  //   icon: createVNode(ExclamationCircleOutlined),
+  //   content: tip,
+  //   okText: '确认',
+  //   cancelText: '取消',
+  //   async onOk() {
+  //     try {
+  //       state.isPageLoading=true
+  //       let res = await usePut(`/channel/change/${record.id}`)
+  //       message.success('操作成功')
+  //       await loadData()
+  //       state.isPageLoading=false
+  //     } catch {
         
-      }
-    },
-    onCancel() {},
-  });
+  //     }
+  //   },
+  //   onCancel() {},
+  // });
+  try {
+    let res = await usePut(`/channel/change/${record.id}`)
+    message.success('操作成功')
+    await loadData()
+  } catch {
+
+  }
+  
 }
 const loadData=async ()=>{
   if (state.dataSourceLoading) return
@@ -241,10 +249,9 @@ const cloneFormData = ref<CloneChannelFormData>({
 
 const handleShowClone = (record: ChannelListResponse) => {
   const uniqueId = Math.random().toString(36).substr(2, 6);
- 
-  console.log('cloneFormData', cloneFormData.value)
   state.isShowCloneModal = true
   nextTick().then(_=> {
+    optsStore.initOpts()
     cloneFormRef.value.resetFields()
     cloneFormData.value.id = record.id
     cloneFormData.value.groupCode = record.group?.groupCode
@@ -519,8 +526,14 @@ onMounted(()=>{
               {{record['totalAmount']||'/'}}
             </template>
             <template v-if="column.dataIndex==='isEnable'">
-              <a-flex :gap="5"  justify="space-between" align="center" >
-                <!-- <a-switch v-if="record['isEnable']"  @click="changeEnable(record['id'] as number)" :checked="record['isEnable']" :disabled="!record['isEnable']" :checked-value="true" :un-checked-value="false"></a-switch> -->
+              <a-flex align="center">
+                <a-switch @change="changeEnable(record)" checked-children="是" un-checked-children="否" :checked="record.isEnable" :checked-value="true" :un-checked-value="false"></a-switch>
+                <a-tooltip v-if="!record.isEnable">
+                  <template #title>{{record.isErrorAutoClose ? (record as ChannelListResponse).closeReason?? '渠道已关闭' : '渠道已关闭' }}</template>
+                  <QuestionCircleOutlined style="color: red; margin-left: 3px;" />
+                </a-tooltip>
+              </a-flex>
+              <!-- <a-flex :gap="5"  justify="space-between" align="center" >
                 <a-flex v-if="record['isEnable']" align="center"  justify="center">
                   <a-tag :bordered="false" color="success">已开启</a-tag>
                   <a-tooltip>
@@ -535,10 +548,6 @@ onMounted(()=>{
                     <template #title>{{(record as ChannelListResponse).closeReason?? '渠道已关闭' }}</template>
                     <a-tag :bordered="false" color="error">
                       <span>已关闭<QuestionCircleOutlined /></span>
-                      
-                      <!-- <template #icon>
-                        <QuestionCircleOutlined />
-                      </template> -->
                     </a-tag>
                   </a-tooltip>
                   <a-tooltip >
@@ -548,7 +557,7 @@ onMounted(()=>{
                   </a-tooltip>
                 </a-flex>
                 
-              </a-flex>
+              </a-flex> -->
             </template>
             <template v-if="column.dataIndex==='groupInfo'">
               <a-flex :gap="10"  justify="space-between" align="center" >

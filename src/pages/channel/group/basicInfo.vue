@@ -87,7 +87,7 @@ onMounted(async ()=>{
   
 
     <a-card :body-style="{padding: '15px'}" :loading="state.isLoading">
-      <a-descriptions :column="3" layout="vertical">
+      <a-descriptions :column="4" layout="vertical">
         <template #title>
           <a-flex  align="center">
             <a-typography-text>基础信息</a-typography-text>

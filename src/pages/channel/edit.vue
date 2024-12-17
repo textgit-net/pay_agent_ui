@@ -94,6 +94,7 @@ const validateAlipayAppId = async (_rule: Rule, value: string) => {
   }
 };
 const validatePid = async (_rule: Rule, value: string) => {
+  return Promise.resolve();
   if (current.value == 1 && !formData.channelConfig['pid']) {
     return Promise.reject("请输入支付宝合作伙伴Id");
   } else {
@@ -146,7 +147,7 @@ const rules: Record<string, Rule[]> = {
   channelType: [{ required: true, validator: validateChannelType, trigger: 'change' }],
   name: [{ required: true, validator: validateName, trigger: 'change' }],
   alipayAppId: [{ required: true, validator: validateAlipayAppId, trigger: 'change' }],
-  pid: [{ required: true, validator: validatePid, trigger: 'change' }],
+  pid: [{ required: false, validator: validatePid, trigger: 'change' }],
   alipayPrivateKey: [{ required: true, validator: validateAlipayPrivateKey, trigger: 'change' }],
   IsCert: [{ required: true, validator: validateIsCert, trigger: 'change' }],
   alipayPublicKey: [{ required: true, validator: validateAlipayPublicKey, trigger: 'change' }],
@@ -188,6 +189,7 @@ const onSubmit = async () => {
         saveLoading.value = false
         isSaveSuccess.value = true
         current.value = PayChannelType.ALI_USER == formData.channelType ? 3 : 2
+        optsStore.initOpts()
       }).catch(err => {
         saveLoading.value = false
         isSaveSuccess.value = false

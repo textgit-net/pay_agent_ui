@@ -275,7 +275,7 @@ onMounted(async ()=>{
           </a-flex>
 
         </template>
-
+        <a-descriptions-item style="padding-bottom: 4px" :labelStyle="{'color':'#999'}" label="商户ID">{{ formData.id }}</a-descriptions-item>
        
         <a-descriptions-item style="padding-bottom: 4px" :labelStyle="{'color':'#999'}" label="商户名称">{{ formData.name }}</a-descriptions-item>
 

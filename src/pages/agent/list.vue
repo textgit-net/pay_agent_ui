@@ -6,6 +6,7 @@ import {ContactWay, getContactWayText} from "@/utils/constant.ts";
 import {getAgentList, AgentPageReq, AgentInfo, changeAgentEnable } from '~/api/agent/index'
 import { FundViewOutlined,FileSearchOutlined } from '@ant-design/icons-vue';
 import { updateParamsToUrl, getParamsFromUrl} from '@/utils/tools'
+import { message } from 'ant-design-vue';
 
 const isHasPermission = computed(()=> {
   return userStore.userInfo.isAllowInviteUser
@@ -132,6 +133,7 @@ const loadData = async  ()=> {
 
 const changeAgentEnableStatus = async (id:string) => {
   let res = await changeAgentEnable(id)
+  message.success('操作成功')
   loadData()
 }
 

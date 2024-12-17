@@ -41,7 +41,7 @@ const state=reactive({
   current:0,
 })
 const fromData=reactive<ChannelTestRequest>({
-   isWebCashier:true,
+  //  isWebCashier:true,
    amount:0.1,
    channelId: null,
   //  payMode: null
@@ -55,18 +55,18 @@ const allChannelListRequest = ref<ALLChannelListRequest>({
 
 const onChannelChange=()=>{
   payModes.value = []
-  if(fromData.channelId){
-    let payModesArr = channelOpts.value.find(v=>v.id==fromData.channelId).payModes
-    originPayModes.map((item:PayModesItem) => {
-      if (payModesArr.includes(item.payMode)) {
-        payModes.value.push(item)
-      }
-    })
+  // if(fromData.channelId){
+  //   let payModesArr = channelOpts.value.find(v=>v.id==fromData.channelId).payModes
+  //   originPayModes.map((item:PayModesItem) => {
+  //     if (payModesArr.includes(item.payMode)) {
+  //       payModes.value.push(item)
+  //     }
+  //   })
    
-    fromData.payMode = payModes.value[0].payMode
-  }else {
-    payModes.value=[]
-  }
+  //   fromData.payMode = payModes.value[0].payMode
+  // }else {
+  //   payModes.value=[]
+  // }
 }
 
 const createOrder=()=>{
@@ -182,12 +182,12 @@ onMounted(()=>{
             </a-radio-group>
             <a-typography-text v-if="payModes.length == 0 && fromData.channelId==null" type="secondary">待选择支付渠道后显示</a-typography-text>
           </a-form-item> -->
-          <a-form-item label="跳转方式" name="isWebCashier">
+          <!-- <a-form-item label="跳转方式" name="isWebCashier">
             <a-radio-group :disabled="fromData.channelId==null" v-model:value="fromData.isWebCashier">
-              <a-radio :value="false" disabled>直连</a-radio>
+              <a-radio :value="false">原生</a-radio>
               <a-radio :value="true">Web收银台</a-radio>
             </a-radio-group>
-          </a-form-item>
+          </a-form-item> -->
           <a-form-item label="支付金额" name="amount" :rules="{required:true,message:'请输入订单金额'}">
             <a-input-number :disabled="fromData.channelId==null" v-model:value="fromData.amount" :step="1" placeholder="请输入订单金额" style="width: 100%;"></a-input-number>
           </a-form-item>

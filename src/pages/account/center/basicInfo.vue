@@ -395,7 +395,7 @@ onMounted(async ()=>{
           </a-flex>
 
         </template>
-        <a-descriptions-item style="padding-bottom: 10px" :labelStyle="{'color':'#999'}"  label="账号ID:">{{ userInfo.id }}</a-descriptions-item>
+        <!-- <a-descriptions-item style="padding-bottom: 10px" :labelStyle="{'color':'#999'}"  label="账号ID:">{{ userInfo.id }}</a-descriptions-item> -->
         <a-descriptions-item style="padding-bottom: 10px" :labelStyle="{'color':'#999'}" label="用户账号:">{{ userInfo.loginName }}</a-descriptions-item>
         <a-descriptions-item style="padding-bottom: 10px" :labelStyle="{'color':'#999'}"  label="用户名称:">{{ userInfo.nickName }}</a-descriptions-item>
         <a-descriptions-item style="padding-bottom: 10px" :labelStyle="{'color':'#999'}"  label="是否允许发展代理:">{{ userInfo.isAllowInviteUser? '是': '否' }}</a-descriptions-item>

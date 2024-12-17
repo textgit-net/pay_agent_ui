@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import {ColumnsType} from "ant-design-vue/es/table";
 import {PaginationProps} from "ant-design-vue";
-import {MerchantRequest, getMerchantList, MerchantInfo,delMerchant} from "~/api/merchant/index.ts";
+import {MerchantRequest, getMerchantList, MerchantInfo,MerchantInfoRequest,delMerchant,changeMchEnable} from "~/api/merchant/index.ts";
 import {ContactWay, getContactWayText} from "@/utils/constant.ts";
 import { Modal, message } from 'ant-design-vue';
 import { ExclamationCircleOutlined,FundViewOutlined,ReloadOutlined,FileSearchOutlined } from '@ant-design/icons-vue';
@@ -183,6 +183,12 @@ const handleDel = (item: MerchantInfo) => {
   });
 }
 
+const changeAgentEnableStatus = async (id: string) => {
+  let res = await changeMchEnable(id)
+  message.success('操作成功')
+  loadData()
+}
+
 onMounted(()=>{
   if (getParamsFromUrl()) {
     searchParams.value = Object.assign(searchParams.value, getParamsFromUrl())
@@ -263,7 +269,7 @@ onMounted(()=>{
             </a-space>
           </template>
           <template v-if="column.dataIndex==='isEnable'">
-              <a-switch :checked-value="true" :un-checked-value="false" :checked="record['isEnable']"></a-switch>
+            <a-switch @change="changeAgentEnableStatus(record.id)" checked-children="是" un-checked-children="否" :checked="record.isEnable" :checked-value="true" :un-checked-value="false"></a-switch>
           </template>
           <template v-if="column.dataIndex==='totalOrderCount'">
             {{record.totalOrderCount ?? '/' }}

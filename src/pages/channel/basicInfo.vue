@@ -158,12 +158,12 @@ onMounted(async ()=>{
        
         <a-descriptions-item style="padding-bottom: 4px" :labelStyle="{'color':'#999'}" label="渠道名称">{{ info.name }}</a-descriptions-item>
 
-        <a-descriptions-item style="padding-bottom: 4px" :labelStyle="{'color':'#999'}"  label="渠道类型">
+        <!-- <a-descriptions-item style="padding-bottom: 4px" :labelStyle="{'color':'#999'}"  label="渠道类型">
           <a-flex :gap="5" >
             <AlipaySquareFilled v-if="[PayChannelType.ALI,PayChannelType.ALI_USER].includes(info.channelType)" style="color: dodgerblue;font-size: 18px"/>
             <a-typography-text strong  style="font-size: 12px">{{getPayChannelTypeText(info.channelType)}}</a-typography-text >
           </a-flex>
-        </a-descriptions-item>
+        </a-descriptions-item> -->
         <a-descriptions-item style="padding-bottom: 4px" :labelStyle="{'color':'#999'}" label="创建日期">{{ info.createTime }}</a-descriptions-item>
 
       </a-descriptions>

@@ -82,6 +82,17 @@ export function modifyMerchant(data: MerchantInfoRequest):Promise<ResponseBody<a
     return usePut<any>('/mch', data)
 }
 
+
+/**
+ * 启用-禁用商户
+ * @param { string } id 
+ * @returns {Promise<ResponseBody<any>>}
+ */
+export function changeMchEnable(id: string):Promise<ResponseBody<any>>{
+    return useGet<any>(`/mch/changeEnable/${id}`)
+}
+
+
 /**
  * 获取全部商户列表
  * @param { MerchantPageSearch } params 
