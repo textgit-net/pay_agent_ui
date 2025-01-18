@@ -112,7 +112,7 @@ export interface DebtOrderInfo {
     successAmount?: number
     totalRoyaltyAmount?: number
     items?: DebtSplitOrderInfo[]
-    productCode: string
+    productCode?: string
 }
 
 

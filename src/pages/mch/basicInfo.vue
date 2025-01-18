@@ -279,7 +279,8 @@ onMounted(async ()=>{
        
         <a-descriptions-item style="padding-bottom: 4px" :labelStyle="{'color':'#999'}" label="商户名称">{{ formData.name }}</a-descriptions-item>
 
-        <a-descriptions-item style="padding-bottom: 4px" :labelStyle="{'color':'#999'}"  label="备注">{{ formData.remark }}</a-descriptions-item>
+        <a-descriptions-item style="padding-bottom: 4px" :labelStyle="{'color':'#999', }"  label="备注">{{ formData.remark }}</a-descriptions-item>
+
       </a-descriptions>
 
       <a-descriptions :column="3" layout="vertical" class="mt-4">

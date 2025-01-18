@@ -215,7 +215,62 @@ export default [
       }
     ]
   },
-
+  {
+    name: 'ChannelOutManage',
+    path: '/channelOut',
+    meta: {
+      title: '代付管理',
+      icon: 'ThunderboltOutlined'
+    },
+    children: [
+      {
+        path: '/channelOut/list',
+        name: 'ChannelOutList',
+        component: () => import('~/pages/transdeposit/parts/index.vue'),
+        meta: {
+          title: '进件列表',
+          hideChildrenInMenu: true
+        }
+      },
+      // {
+      //   path: '/channelOut/info',
+      //   name: 'channelOutInfo',
+      //   component: () => import('~/pages/transdeposit/parts/info.vue'),
+      //   meta: {
+      //     title: '渠道信息',
+      //     hideInMenu: true,
+      //     hideChildrenInMenu: true
+      //   }
+      // },
+      {
+        path: '/channelOut/edit',
+        name: 'channelOutEdit',
+        component: () => import('~/pages/transdeposit/parts/edit.vue'),
+        meta: {
+          title: '进件编辑',
+          hideInMenu: true,
+          hideChildrenInMenu: true
+        }
+      },
+     
+      {
+        path: '/channelOut/test',
+        name: 'channelOutTest',
+        component: () => import('~/pages/transdeposit/parts/test.vue'),
+        meta: {
+          title: '进件测试',
+        }
+      },
+      {
+        path: '/channelOut/order',
+        name: 'channelOutOrder',
+        component: () => import('~/pages/transdeposit/order/index.vue'),
+        meta: {
+          title: '订单列表',
+        }
+      }
+    ]
+  },
   {
     name: 'debt',
     path: '/debt',

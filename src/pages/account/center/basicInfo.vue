@@ -7,7 +7,7 @@ import type { Rule } from 'ant-design-vue/es/form';
 import { message } from 'ant-design-vue';
 import {QuestionCircleFilled,FormOutlined } from "@ant-design/icons-vue"
 import { AgentInfo, modifyAgent,AgentResetPwdRequset } from '~/api/agent/index'
-import { getGoogleSecretKey,bigdGoogleSecretCode,changeGoogleVerifyStatus,GoogleSecretKeyRespone,GoogleSecretCodeRequest,changePassword } from '~/api/account/auth'
+import { getGoogleSecretKey,bigdGoogleSecretCode,changeGoogleVerifyStatus,GoogleSecretKeyRespone,GoogleSecretCodeRequest,changePassword,changePayPassword } from '~/api/account/auth'
 import  logoGoogleAuth from '~/assets/images/logo-google-auth.png'
 
 const userStore = useUserStore()
@@ -18,6 +18,7 @@ const state = reactive<{
   showConcatDialog: boolean;
   dialogBtnLoading: boolean;
   ShowSettingPwdDialog: boolean;
+  ShowPaySettingPwdDialog: boolean;
   showGooglVerifyDialog: boolean;
   showChangeGoogleVerifyDialog: boolean;
   isLoading:boolean;
@@ -34,13 +35,18 @@ const state = reactive<{
   isOnEditChildAgent: false,
   showGooglVerifyDialog: false,
   showChangeGoogleVerifyDialog: false,
-  btnStatusLoading: false
+  btnStatusLoading: false,
+  ShowPaySettingPwdDialog: false
 
 })
 const formRef = ref();
 const GoogleVerifyRef = ref();
 const ResetPwdFormRef = ref();
+const ResetPayPwdFormRef = ref();
 const resetPwdForm = ref<AgentResetPwdRequset>({
+  securityCode: ''
+});
+const resetPayPwdForm = ref<AgentResetPwdRequset>({
   securityCode: ''
 });
 
@@ -94,6 +100,12 @@ const handleShowSettingPwd = () => {
   state.ShowSettingPwdDialog = true;
   nextTick(() => {
     ResetPwdFormRef.value.resetFields()
+  })
+}
+const handleShowPaySettingPwdDialog = () => {
+  state.ShowPaySettingPwdDialog = true;
+  nextTick(() => {
+    ResetPayPwdFormRef.value.resetFields()
   })
 }
 const handleShowGoogleVerify = () => {
@@ -162,6 +174,9 @@ const changeGoogleVerifyOk = async () => {
 const isDisAbledPwdBtn = computed(()=> {
   return !(resetPwdForm.value.password && resetPwdForm.value.confirmPassword) || (resetPwdForm.value.password.trim().length != 6 ||  resetPwdForm.value.confirmPassword.trim().length < 6) || (resetPwdForm.value.securityCode.length < 6 && userInfo.value.isEnableGoogleVerify);
 })
+const isDisAbledPayPwdBtn = computed(()=> {
+  return !(resetPayPwdForm.value.password && resetPayPwdForm.value.confirmPassword) || (resetPayPwdForm.value.confirmPassword.trim().length < 6) || (resetPayPwdForm.value.securityCode.length < 6 && userInfo.value.isEnableGoogleVerify);
+})
 
 const validatePwd =  async (_rule: Rule, value: string) => {
   if (!value || value.trim().length < 6) {
@@ -197,6 +212,22 @@ const handleResetPwdOk = async () => {
     } finally {
       state.dialogBtnLoading = false
     }
+}
+const handleResetPayPwdOk = async () => {
+  if (resetPayPwdForm.value.password != resetPayPwdForm.value.confirmPassword) {
+    return message.warning(`俩次密码输入不一致`)
+  }
+  state.dialogBtnLoading = true
+  try {
+    let res = await changePayPassword(resetPayPwdForm.value.password, resetPayPwdForm.value.securityCode)
+    message.success('操作成功')
+    state.ShowPaySettingPwdDialog = false
+    // initPayChannelConfig()
+  } catch (error) {
+      // message.error(`${error}`)
+  } finally {
+    state.dialogBtnLoading = false
+  }
 }
 
 const submit = async () => {
@@ -301,6 +332,63 @@ onMounted(async ()=>{
           </a-form-item>
       </a-form>
     </a-modal>
+
+    <a-modal v-model:open="state.ShowPaySettingPwdDialog" :mask-closable="false" style="width: 480px;" title="修改资金密码">
+      <template #footer>
+        <a-flex align="center">
+          <a-button key="submit" style="width: 100%;" :disabled="isDisAbledPayPwdBtn" type="primary" :loading="state.dialogBtnLoading" @click="handleResetPayPwdOk">保 存</a-button>
+        </a-flex>
+       
+      </template>
+      
+      <a-form
+        style="padding: 30px 0;"
+        :model="resetPayPwdForm"
+        name="basic"
+        ref="ResetPayPwdFormRef"
+        layout="vertical"
+        autocomplete="off"
+      >
+        <a-form-item
+          label="用户账号"
+        >
+          <a-flex> <a-typography-text>{{ userInfo.loginName }}</a-typography-text></a-flex>
+        </a-form-item>
+        <a-form-item
+          label="资金密码"
+          name="password"
+          :rules="[
+            { required: true, validator: validatePwd }
+          ]"
+        >
+          <a-input-password v-model:value="resetPayPwdForm.password" placeholder="请输入资金密码" allow-clear />
+          <a-typography-text  type="secondary">密码规则：</a-typography-text>
+          <a-typography-text  type="secondary">最少6个字符</a-typography-text>
+        </a-form-item>
+        <a-form-item
+          label="确认资金密码"
+          name="confirmPassword"
+          :rules="[
+            { required: true, validator: validatePwd }
+          ]"
+        >
+          <a-input-password v-model:value="resetPayPwdForm.confirmPassword" placeholder="请输入资金密码" allow-clear />
+        </a-form-item>
+
+        <a-form-item
+            label="Google动态安全码"
+            v-if="userInfo.isEnableGoogleVerify"
+            name="securityCode"
+            :rules="[
+              { required: true, validator: validateGoogleCode }
+            ]"
+          >
+            <a-input v-model:value="resetPayPwdForm.securityCode" placeholder="请输入6位数Google安全码" :maxlength="6" allow-clear />
+           
+          </a-form-item>
+      </a-form>
+    </a-modal>
+
     <a-modal v-model:open="state.showGooglVerifyDialog" :footer="null" :mask-closable="false" style="width: 680px;" title="绑定Google安全验证器">
       <a-flex align="center" justify="center">
 
@@ -456,6 +544,13 @@ onMounted(async ()=>{
               </a-flex>
           </a-flex>
         </a-descriptions-item>
+
+        <a-descriptions-item v-if="userInfo.isAdmin" style="padding-bottom: 4px" :labelStyle="{'color':'#999'}"  label="资金密码">
+          <a-flex  align="start">
+            <a-button @click="handleShowPaySettingPwdDialog" type="link" style="padding-left: 0">修改资金密码</a-button>
+          </a-flex>
+        </a-descriptions-item>
+
       </a-descriptions>
     </a-card>
     

@@ -61,3 +61,15 @@ export function changePassword(password: string, securityCode?: string): Promise
     }
     return usePut<any>("/security/account/password", data)
 }
+
+
+/**
+ * 修改资金密码
+ */
+export function changePayPassword(password: string, securityCode?: string): Promise<ResponseBody<any>>{
+    let data = { 'password': password }
+    if (securityCode) {
+        data['googleSecretCode'] = securityCode
+    }
+    return usePost<any>("/account/setting/payPassword", data)
+}

@@ -11,6 +11,7 @@ import Channels from "~/pages/mch/channels.vue";
 import OrderData from "~/pages/mch/orderData.vue";
 import RatesConfig from "~/pages/mch/ratesConfig.vue";
 import RiskControl from "~/pages/mch/riskControl.vue";
+import assets from "~/pages/mch/assets.vue";
 const router=useRouter()
 const route = useRoute()
 const state=reactive({
@@ -24,11 +25,22 @@ if (tabKey) {
   state.activeTabKey = tabKey as string;
 }
 
+const initSearchParams = () => {
+  delete route.query.page
+  delete route.query.limit
+  delete route.query.dateType
+  delete route.query.startDate
+  delete route.query.endDate
+}
+
 
 const onTabClick=(key)=>{
- 
-  let query=router.currentRoute.value.query
-  query['tabKey']=key
+
+
+  if (key != state.activeTabKey) {
+    initSearchParams()
+  }
+  route.query['tabKey']=key
   router.replace({ query: {...route.query, timestamp: new Date().getTime()},replace:true})
 }
 
@@ -53,6 +65,7 @@ const onTabClick=(key)=>{
           <a-tabs  v-model:activeKey="state.activeTabKey" @tabClick="onTabClick">
             <a-tab-pane key="basicInfo"  tab="商户信息"/>
             <a-tab-pane key="ratesConfig" tab="费率信息"/>
+            <a-tab-pane key="assets" tab="资产信息"/>
             <!-- <a-tab-pane key="channels" tab="渠道信息"/> -->
             <a-tab-pane key="orderInfo" tab="商户订单"/>
             <a-tab-pane key="riskControl" tab="风险监控"/>
@@ -68,6 +81,7 @@ const onTabClick=(key)=>{
     </channels>
     <order-data v-if="state.activeTabKey=='orderInfo'"></order-data>
     <rates-config v-if="state.activeTabKey=='ratesConfig'"/>
+    <assets v-if="state.activeTabKey=='assets'"/>
     <risk-control v-if="state.activeTabKey=='riskControl'"/>
   </a-flex>
 

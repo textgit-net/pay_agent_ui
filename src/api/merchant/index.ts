@@ -1,5 +1,6 @@
 import {PageWarp, ResponseBody, BasePageRequest, ContactWay, PayModeType} from "~/utils/constant.ts";
 import {AgentInfo} from "~/api/agent";
+import { WallTypeEnum} from "~/api/merchant/wallet";
 
 export interface ProductRateItem {
     isEnable?: boolean
@@ -39,6 +40,8 @@ export interface MerchantInfo {
     freezeAmount?: number
     // 用于加载动画
     isItemLoadSpinning?: boolean
+    transDepositAmount?: number
+    totalTransDepositAmount?: number
 }
 
 export interface MerchantInfoRequest extends MerchantInfo  {
@@ -61,6 +64,16 @@ export interface MerchantResetPwdRequset  {
     password?:string
     confirmPassword?: string
     isDefaultPwd?:boolean
+}
+
+
+export interface RechargeRequset {
+    mchId?: string
+    wallType?: WallTypeEnum
+    amount?: number
+    remark?:string
+    googleSecretCode?: string
+    payPassword?: string
 }
 
 export interface MerchantOptItem {
@@ -138,4 +151,14 @@ export function delMerchant(id: string):Promise<ResponseBody<MerchantInfo>>{
  */
 export function resetMerchantPwd(data: MerchantResetPwdRequset):Promise<ResponseBody<any>>{
     return usePut<any>(`/mch/resetPwd`, data)
+}
+
+
+/**
+ * 商户钱包充值
+ * @param { RechargeRequset } data 
+ * @returns {Promise<ResponseBody<any>>}
+ */
+export function recharge(data: RechargeRequset):Promise<ResponseBody<any>>{
+    return usePost<any>(`/mch/recharge`, data)
 }

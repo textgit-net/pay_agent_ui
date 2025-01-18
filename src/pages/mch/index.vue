@@ -7,6 +7,7 @@ import { Modal, message } from 'ant-design-vue';
 import { ExclamationCircleOutlined,FundViewOutlined,ReloadOutlined,FileSearchOutlined } from '@ant-design/icons-vue';
 import { ref, createVNode } from 'vue';
 import { updateParamsToUrl, getParamsFromUrl} from '@/utils/tools'
+import mchRechargeDialog from "@/pages/mch/component/mch-recharge-dialog.vue";
 
 const router=useRouter()
 
@@ -48,6 +49,14 @@ const columns:ColumnsType =[
     dataIndex: 'amount',
   },
   {
+    title: '代付保证金',
+    dataIndex: 'transDepositAmount',
+  },
+  {
+    title: '累计代付保证金',
+    dataIndex: 'totalTransDepositAmount',
+  },
+  {
     title: '签名方试',
     dataIndex: 'signType',
   },
@@ -69,10 +78,15 @@ const state=reactive<{
   dataSourceLoading: boolean;
   isConfirmLoading: boolean;
   isShowDelDialog: boolean;
+  mchInfo: MerchantInfo;
+  showRechargeDialog: boolean;
 }>({
   dataSourceLoading:false,
   isConfirmLoading:false,
-  isShowDelDialog: false
+  isShowDelDialog: false,
+  mchInfo: {},
+  showRechargeDialog: false
+
 })
 const initSearchParams = ():MerchantRequest => {
   return {
@@ -189,6 +203,17 @@ const changeAgentEnableStatus = async (id: string) => {
   loadData()
 }
 
+const handleRecharge = async (record: MerchantInfo) => {
+  
+  state.mchInfo =record
+  state.showRechargeDialog = true
+}
+
+const onRechargeSuccess = async () => {
+  
+  await loadData()
+}
+
 onMounted(()=>{
   if (getParamsFromUrl()) {
     searchParams.value = Object.assign(searchParams.value, getParamsFromUrl())
@@ -203,6 +228,8 @@ onMounted(()=>{
 
 <template>
   <a-flex vertical :gap="10" style="width: 100%;height: 100%">
+    <mchRechargeDialog v-model:visible="state.showRechargeDialog" :mch-info="state.mchInfo" @on-success="onRechargeSuccess" />
+
     <!--头部-->
     <a-card :body-style="{padding:'15px'}">
       <a-flex justify="space-between">
@@ -307,6 +334,21 @@ onMounted(()=>{
               </a-spin>
             </a-flex>
           </template>
+          <template v-if="column.dataIndex==='transDepositAmount'">
+            <a-typography-text strong>￥{{ (record as MerchantInfo).transDepositAmount }}</a-typography-text>
+
+            <a-tooltip>
+              <template #title>查看当前商户资产流水记录</template>
+              <FundViewOutlined @click="router.push({path:'/mch/info',query:{id:record.id, tabKey: 'assets'}})" style="color: #1677ff;padding-left: 3px" />
+            </a-tooltip>
+          </template>
+          <template v-if="column.dataIndex==='totalTransDepositAmount'">
+            <a-typography-text strong>￥{{ (record as MerchantInfo).totalTransDepositAmount }}</a-typography-text>
+            <a-tooltip>
+              <template #title>查看当前商户资产流水记录</template>
+              <FundViewOutlined @click="router.push({path:'/mch/info',query:{id:record.id, tabKey: 'assets'}})" style="color: #1677ff;padding-left: 3px" />
+            </a-tooltip>
+          </template>
           <template v-if="column.dataIndex==='action'">
             <a-flex :gap="5">
 
@@ -320,6 +362,10 @@ onMounted(()=>{
                     <a-menu-item key="0">
                       <a-button style="padding-left: 0" type="link" @click="router.push({path:'/mch/info',query:{id:record.id}})">查看商户</a-button>
                     </a-menu-item>
+                    <a-menu-divider />
+                      <a-menu-item key="2">
+                        <a-button @click="handleRecharge(record)" type="link" style="padding-left: 0">保证金充值</a-button>
+                      </a-menu-item>
                     <a-menu-divider />
                     <a-menu-item key="3">
                       <a-button danger style="padding-left: 0" type="link" @click="handleDel(record)">删除当前商户</a-button>
