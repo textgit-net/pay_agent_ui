@@ -102,7 +102,10 @@ const maqinTabcolumns:ColumnsType =[
     title: '收款单',
     dataIndex: 'qrName',
   },
-
+  {
+    title: '金额',
+    dataIndex: 'amount',
+  },
   {
     title: '启用状态',
     dataIndex: 'isEnable',
@@ -235,16 +238,23 @@ const onSubmit = async () => {
           })
         })
       }
+      let currentValue=0;
+      if(PayChannelType.ALI==formData.channelType){
+        currentValue=2;
+      }
+      if(PayChannelType.MQ==formData.channelType){
+        currentValue=3;
+      }
       saveChannel(formData).then(res => {
         saveLoading.value = false
         isSaveSuccess.value = true
-        current.value = PayChannelType.ALI_USER == formData.channelType ? 3 : 2
+        current.value = currentValue
         optsStore.initOpts()
       }).catch(err => {
         saveLoading.value = false
         isSaveSuccess.value = false
         errorMsg.value = err
-        current.value = PayChannelType.ALI_USER == formData.channelType ? 3 : 2
+        current.value =currentValue
       })
     })
 }
@@ -264,26 +274,9 @@ const getChannelOauthCode = async () => {
 const getMQData =async ()=>{
   isLoading.value = true
   try {
-    let result=  await useGet(`/channel/getMQData`,{"loginName":formData.channelConfig['loginName'],'password':formData.channelConfig['password']})
+    let result=  await useGet(`/channel/getMQData?channelId=${formData.id}`,{"loginName":formData.channelConfig['loginName'],'password':formData.channelConfig['password']})
     formData.channelConfig=result.data
-    let qrcodeList=[]
-    formData.channelConfig.mchList.forEach(mch=>{
-        mch.stores.forEach(store=>{
-           store.codes.forEach(code=>{
-             qrcodeList.push({
-                "qrCode":code.qrCode,
-                "qrName":code.name,
-                "amount":code.amount,
-                "storeId":store.storeId,
-                "storeName":store.storeName,
-                "isEnable":code.isEnable,
-                "mchId":mch.mchId,
-                "mchName":mch.mchName
-             })
-           })
-        })
-    })
-    maqinQrCodes.value=qrcodeList
+    updateMaqinQrCodeData()
     isSaveSuccess.value = true
   }catch (e) {
     isSaveSuccess.value = false
@@ -291,6 +284,28 @@ const getMQData =async ()=>{
   }finally {
     isLoading.value=false
     current.value=2
+  }
+}
+const updateMaqinQrCodeData =()=>{
+  if(PayChannelType.MQ==formData.channelType){
+    let qrcodeList=[]
+    formData.channelConfig.mchList.forEach(mch=>{
+      mch.stores.forEach(store=>{
+        store.codes.forEach(code=>{
+          qrcodeList.push({
+            "qrCode":code.qrCode,
+            "qrName":code.name,
+            "amount":code.amount,
+            "storeId":store.storeId,
+            "storeName":store.storeName,
+            "isEnable":code.isEnable,
+            "mchId":mch.mchId,
+            "mchName":mch.mchName
+          })
+        })
+      })
+    })
+    maqinQrCodes.value=qrcodeList
   }
 }
 const loadGroups = async () => {
@@ -352,6 +367,7 @@ onMounted(() => {
       onChannelTypeChange(res.data.channelType)
       isLoading.value = false
       findChannelType(formData.productCode)
+      updateMaqinQrCodeData()
     })
 
   } else {
@@ -447,13 +463,13 @@ const filterOption = (input: string, option: any) => {
 
               <a-form-item label="账号" class="mt-5">
                 <a-flex style="flex: 1" vertical>
-                  <a-input v-model:value="formData.channelConfig['loginName']"></a-input>
+                  <a-input :disabled="formData.id!=null" v-model:value="formData.channelConfig['loginName']"></a-input>
                   <a-typography-text type="secondary">请填写您在码钱注册的登录账号名称.</a-typography-text>
                 </a-flex>
               </a-form-item>
               <a-form-item label="密码" class="mt-5">
                 <a-flex style="flex: 1" vertical>
-                  <a-input v-model:value="formData.channelConfig['password']"></a-input>
+                  <a-input :disabled="formData.id!=null" v-model:value="formData.channelConfig['password']"></a-input>
                   <a-typography-text type="secondary">请填写您在码钱注册的登录账号密码.</a-typography-text>
                 </a-flex>
               </a-form-item>
@@ -586,11 +602,6 @@ const filterOption = (input: string, option: any) => {
                           <a-switch @click="changeQrCodeEnable(record)" checked-children="是" un-checked-children="否" :checked="record.isEnable" :checked-value="true" :un-checked-value="false"></a-switch>
                         </a-flex>
                       </template>
-                      <template v-if="column.dataIndex==='qrName'">
-                        <a-flex align="center">
-                          <span>{{record.qrName}}({{record.amount}})</span>
-                        </a-flex>
-                      </template>
                     </template>
                   </a-table>
             </a-card>
@@ -615,8 +626,11 @@ const filterOption = (input: string, option: any) => {
               <a-button v-if="current == 0" @click="next(1)" style="width:100px" type="primary">下一步</a-button>
               <a-button v-if="current == 1" @click="current = 0" style="width:100px">上一步</a-button>
 
-              <a-button v-if="current == 1 && PayChannelType.MQ == formData.channelType" @click="getMQData"
+              <a-button v-if="current == 1 && PayChannelType.MQ == formData.channelType " @click="getMQData"
                         style="width:100px" :loading="saveLoading" type="primary">同步数据</a-button>
+
+              <a-button v-if="current == 1 && PayChannelType.MQ == formData.channelType && formData.id!=null" @click="next(2)"
+                        style="width:100px" :loading="saveLoading" type="primary">下一步</a-button>
 
               <a-button v-if="current == 1 && (PayChannelType.ALI_USER != formData.channelType && PayChannelType.MQ != formData.channelType)" @click="onSubmit"
                 style="width:100px" :loading="saveLoading" type="primary">保存</a-button>
